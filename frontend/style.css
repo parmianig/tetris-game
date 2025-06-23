@@ -1,0 +1,59 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: white;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  margin-top: 1rem;
+}
+
+canvas {
+  border: 2px solid white;
+  background: #000;
+  display: block;
+  margin: 1rem auto;
+}
+
+#game-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* Controls container */
+#controls {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Control buttons */
+#controls button {
+  font-size: 1.5rem;
+  padding: 0.75rem 1.25rem;
+  background-color: #1a1a1a;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+/* Button hover and pressed effect */
+#controls button:hover,
+#controls button.pressed {
+  background-color: #333;
+  border-color: #888;
+}
+
+#controls button:active {
+  background-color: #666;
+}

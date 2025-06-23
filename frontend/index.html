@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tetris Game</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <form autocomplete="off" style="display: contents;">
+
+    <div id="game-wrapper">
+      <h1>Tetris</h1>
+      <canvas id="tetris" width="240" height="400" aria-label="Tetris game area" tabindex="0"></canvas>
+
+      <!-- Controls below the canvas -->
+      <div id="controls">
+        <button id="left" type="button" aria-label="Move Left" autocomplete="off" tabindex="0">←</button>
+        <button id="rotate" type="button" aria-label="Rotate" autocomplete="off" tabindex="0">⟳</button>
+        <button id="right" type="button" aria-label="Move Right" autocomplete="off" tabindex="0">→</button>
+        <button id="down" type="button" aria-label="Drop Down" autocomplete="off" tabindex="0">↓</button>
+      </div>
+  </form>
+
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+
+</html>
