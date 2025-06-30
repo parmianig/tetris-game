@@ -1,0 +1,32 @@
+name: Dev Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:20.10.16
+        options: --privileged
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend image
+        run: docker build -t tetris-backend ./backend
+
+      - name: Build frontend image
+        run: docker build -t tetris-frontend ./frontend
+
+      - name: Run backend tests (if any)
+        run: echo "Add pytest or other test command here"
