@@ -11,6 +11,8 @@ lerna-debug.log*
 node_modules/
 dist/
 dist-ssr/
+frontend/node_modules/
+frontend/dist/
 
 # Python
 __pycache__/
@@ -19,6 +21,7 @@ __pycache__/
 *.pyd
 *.pyc
 *.egg-info/
+backend/app/__pycache__/
 
 # Virtual Environments
 .venv/
@@ -27,6 +30,8 @@ __pycache__/
 # Env files (sensitive config)
 *.env
 !.env.example
+frontend/.env
+frontend/.env.production
 
 # IDEs and system
 .vscode/
@@ -34,17 +39,17 @@ __pycache__/
 .DS_Store
 *.suo
 *.ntvs*
-*.njsproj
+*.njsproj*
 *.sln
 *.sw?
 
 # Vercel
-.vercel
+.vercel/
 
-# Render build cache (optional)
+# Render
 render.yaml
 
-# Coverage and testing (optional)
+# Coverage and testing
 coverage/
 htmlcov/
 .tox/
