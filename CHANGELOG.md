@@ -1,4 +1,5 @@
 # Changelog
 
-## v0.0.4
+## v0.1.1
 
+* chore(backend): bump version to v0.0.4 (primo)

@@ -1,6 +1,8 @@
 import './style.css';
 import { createMatrix, drawMatrix, rotate } from './engine';
 
+declare const __API_BASE__: string;
+
 function isMacOS(): boolean {
   return navigator.userAgent.toUpperCase().includes('MAC');
 }
@@ -11,14 +13,15 @@ function flashButton(button: HTMLButtonElement | null) {
   setTimeout(() => button.classList.remove('pressed'), 150);
 }
 
-// 🎮 Tetris setup
+// 🎮 Canvas setup
 const canvas = document.getElementById('tetris') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
 ctx.scale(20, 20);
 
+// 🧩 Tetris data
 const arena = createMatrix(12, 20);
 const player = {
-  pos: { x: 1, y: 1 }, // Make the piece visible vertically
+  pos: { x: 1, y: 1 },
   matrix: [
     [0, 1, 0],
     [1, 1, 1],
@@ -26,6 +29,7 @@ const player = {
   ],
 };
 
+// 🧱 Drawing logic
 function drawGrid() {
   ctx.strokeStyle = '#444';
   for (let y = 0; y < 20; y++) {
@@ -44,7 +48,7 @@ function drawGrid() {
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawGrid(); // Optional visual aid
+  drawGrid();
   drawMatrix(ctx, arena);
   drawMatrix(ctx, player.matrix, player.pos);
 }
@@ -64,6 +68,18 @@ function rotatePlayer(dir: number) {
   draw();
 }
 
+// 🛰️ Backend communication
+function fetchScores() {
+  fetch(`${__API_BASE__}/scores`)
+    .then((res) => res.json())
+    .then((data) => {
+      console.log('Scores from backend:', data);
+    })
+    .catch((err) => {
+      console.error('Failed to fetch scores:', err);
+    });
+}
+
 // 🧠 UI Wiring
 window.addEventListener('DOMContentLoaded', () => {
   const leftButton = document.getElementById('left') as HTMLButtonElement | null;
@@ -71,19 +87,17 @@ window.addEventListener('DOMContentLoaded', () => {
   const downButton = document.getElementById('down') as HTMLButtonElement | null;
   const rotateButton = document.getElementById('rotate') as HTMLButtonElement | null;
 
-  // Button clicks
   leftButton?.addEventListener('click', () => move(-1));
   rightButton?.addEventListener('click', () => move(1));
   downButton?.addEventListener('click', () => drop());
   rotateButton?.addEventListener('click', (event) => {
-  if (event.shiftKey) {
-    rotatePlayer(-1);
-  } else {
-    rotatePlayer(1);
-  }
+    if (event.shiftKey) {
+      rotatePlayer(-1);
+    } else {
+      rotatePlayer(1);
+    }
   });
 
-  // Keyboard controls
   document.addEventListener('keydown', (event: KeyboardEvent) => {
     const isCtrlCmd = isMacOS() ? event.metaKey : event.ctrlKey;
 
@@ -108,9 +122,9 @@ window.addEventListener('DOMContentLoaded', () => {
       case 'ArrowUp':
         flashButton(rotateButton);
         if (event.shiftKey) {
-          rotatePlayer(-1); // counterclockwise
+          rotatePlayer(-1);
         } else {
-          rotatePlayer(1);  // clockwise
+          rotatePlayer(1);
         }
         break;
       default:
@@ -123,5 +137,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  draw(); // Initial render
+  draw();
+  fetchScores(); // 👈 Backend call on load
 });
