@@ -20,7 +20,6 @@ define do_release
 	make version-check-precommit; \
 	make version-set; \
 	make version-readme-update; \
-	make generate-changelog-history; \
 	make changelog; \
 	VERSION=$$(cat VERSION); \
 	echo "✅ All steps completed. Committing release v$$VERSION..."; \
