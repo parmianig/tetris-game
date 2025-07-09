@@ -1,8 +1,5 @@
-include make/common.mk
+.PHONY: version-check-precommit
 
-.PHONY: version-check-precommit check-tag-exists
-
-# ✅ Ensure the version is bumped if the related folder changed
 version-check-precommit:
 	@echo "🔍 Checking version bump per area..."
 	@CHANGED=$$(git diff --cached --name-only); \
@@ -25,12 +22,3 @@ version-check-precommit:
 		echo "❌ Invalid tag format. Must be vX.Y.Z"; exit 1; \
 	fi; \
 	echo "✅ Version bump check passed."
-
-# ✅ Check that the tag does not already exist
-check-tag-exists:
-	@TAG=$(TAG_PREFIX)$$(cat VERSION); \
-	if git rev-parse "$$TAG" >/dev/null 2>&1; then \
-		echo "❌ Tag $$TAG already exists. Please bump version."; exit 1; \
-	else \
-		echo "✅ Tag $$TAG is available."; \
-	fi

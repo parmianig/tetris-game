@@ -1,6 +1,4 @@
-include make/common.mk
-
-.PHONY: bootstrap setup clean install-hook
+.PHONY: bootstrap setup install-hook clean
 
 bootstrap: install-hook
 
@@ -14,7 +12,7 @@ install-hook:
 	@mkdir -p .git/hooks
 	@ln -sf ../../.hooks/pre-commit .git/hooks/pre-commit
 	@chmod +x .git/hooks/pre-commit
-	@echo "✅ Pre-commit hook installed"
+	@echo "✅ Pre-commit hook installed from .hooks/pre-commit"
 
 clean:
 	rm -rf $(VENV)
