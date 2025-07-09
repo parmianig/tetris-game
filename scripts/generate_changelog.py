@@ -2,49 +2,45 @@
 
 import subprocess
 from pathlib import Path
-from typing import List, Tuple
 
-CHANGELOG_FILE = Path("CHANGELOG.md")
+def git_log(args):
+    return subprocess.run(
+        ["git"] + args,
+        capture_output=True,
+        text=True,
+        check=True
+    ).stdout.strip()
 
-def get_tags() -> List[str]:
-    result = subprocess.run(["git", "tag", "--sort=-creatordate"], capture_output=True, text=True, check=True)
-    return result.stdout.strip().splitlines()[::-1]  # newest first
+def get_tags() -> list:
+    return git_log(["tag", "--sort=-creatordate"]).splitlines()
 
-def get_commits_between(prev: str, curr: str) -> List[str]:
-    commit_range = f"{prev}..{curr}" if prev else curr
-    result = subprocess.run(
-        ["git", "log", commit_range, "--pretty=format:%H|%s (%an)"],
-        capture_output=True, text=True, check=True
-    )
-    lines = result.stdout.strip().splitlines()
+def get_commits_range(from_ref: str, to_ref: str) -> list:
+    range_spec = f"{from_ref}..{to_ref}" if from_ref else to_ref
+    lines = git_log(["log", range_spec, "--pretty=format:%H|%s (%an)"]).splitlines()
     return lines
 
-def generate_changelog() -> str:
+def generate_changelog():
     tags = get_tags()
+    changelog = ["# Changelog"]
     seen_hashes = set()
-    changelog_sections = []
 
-    for i, curr_tag in enumerate(tags):
+    for i, tag in enumerate(tags):
         prev_tag = tags[i + 1] if i + 1 < len(tags) else None
-        raw_commits = get_commits_between(prev_tag, curr_tag)
-        filtered_commits = []
+        raw_commits = get_commits_range(prev_tag, tag)
 
+        entries = []
         for line in raw_commits:
             commit_hash, message = line.split("|", 1)
             if commit_hash not in seen_hashes:
-                filtered_commits.append(f"* {message.strip()}")
                 seen_hashes.add(commit_hash)
+                entries.append(f"* {message.strip()}")
 
-        if filtered_commits:
-            section = f"## {curr_tag}\n" + "\n".join(filtered_commits)
-            changelog_sections.append(section)
+        if entries:
+            changelog.append(f"\n## {tag}")
+            changelog.extend(entries)
 
-    return "# Changelog\n\n" + "\n\n".join(changelog_sections)
-
-def main():
-    output = generate_changelog()
-    CHANGELOG_FILE.write_text(output + "\n")
-    print("✅ CHANGELOG.md updated (deduplicated, ordered, isolated by tag).")
+    Path("CHANGELOG.md").write_text("\n".join(changelog) + "\n")
+    print("✅ CHANGELOG.md regenerated cleanly (FILO, deduplicated)")
 
 if __name__ == "__main__":
-    main()
+    generate_changelog()
