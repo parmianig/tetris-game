@@ -5,9 +5,9 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 ---
 ## Changelog
 <!-- changelog -->
-## release/v0.1.40
+## release/v0.1.41
+* patch: added types/node to package,json (primo)
 * patch: fix vercel config (primo)
-* patch: fix generate changelog and readme, sixteenth try (primo)
 
 ---
 
