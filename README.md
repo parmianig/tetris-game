@@ -6,6 +6,17 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 ## Changelog
 <!-- changelog -->
 
+## v0.1.8
+
+* patch: modularized makefile and added targets (primo)
+* release: modularize Makefile with .mk includes and cleanup (primo)
+* release: modularize Makefile with .mk includes and cleanup (primo)
+* release: add bump_version.py sonar cleanups (primo)
+* release: add bump_version.py sonar cleanups (primo)
+* release: refactor versioning + improve changelog injection (primo)
+* chore(release): version 0.1.2 (primo)
+* chore(release): version 0.1.1 (primo)
+* chore(backend): bump version to v0.0.4 (primo)
 ## v0.1.7
 
 * release: modularize Makefile with .mk includes and cleanup (primo)
