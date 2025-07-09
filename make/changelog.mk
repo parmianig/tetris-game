@@ -18,9 +18,9 @@ changelog:
 # 🧼 Inject only the latest changelog section into README.md
 changelog-readme:
 	@echo "🧼 Injecting latest changelog section into README.md..."
-	@awk 'BEGIN{found=0} /^## Changelog/ {print; found=1; next} found && /^---/ {exit} !found || /^---/ {print}' README.md > .readme_top.tmp
-	@awk '/^## release\/v[0-9]+\.[0-9]+\.[0-9]+/ {print; p=1; next} p && /^## / {exit} p {print}' CHANGELOG.md > .changelog_latest.tmp
-	@awk 'BEGIN{copy=0} /^---/ {copy=1; print; next} copy {print}' README.md > .readme_bottom.tmp
-	@cat .readme_top.tmp .changelog_latest.tmp .readme_bottom.tmp > README.md
+	@awk '/^## Changelog/ { print; print "<!-- changelog -->"; exit } { print }' README.md > .readme_pre.tmp
+	@awk '/^## release\/v[0-9]+\.[0-9]+\.[0-9]+/ { print; p=1; next } p && /^## / { exit } p { print }' CHANGELOG.md > .changelog_latest.tmp
+	@awk 'BEGIN { skip = 1 } /^## Changelog/ { skip = 0; next } /^---/ { skip = 1 } skip' README.md > .readme_post.tmp
+	@cat .readme_pre.tmp .changelog_latest.tmp .readme_post.tmp > README.md
 	@rm -f .readme_*.tmp .changelog_latest.tmp
-	@echo "✅ README.md changelog updated."
+	@echo "✅ README.md changelog updated with latest release."
