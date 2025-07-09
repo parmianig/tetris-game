@@ -18,9 +18,21 @@ changelog:
 # 🧼 Inject only the latest changelog section into README.md
 changelog-readme:
 	@echo "🧼 Injecting latest changelog section into README.md..."
-	@awk '/^## Changelog/ { print; print "<!-- changelog -->"; exit } { print }' README.md > .readme_pre.tmp
-	@awk '/^## release\/v[0-9]+\.[0-9]+\.[0-9]+/ { print; p=1; next } p && /^## / { exit } p { print }' CHANGELOG.md > .changelog_latest.tmp
-	@awk 'BEGIN { skip = 1 } /^## Changelog/ { skip = 0; next } /^---/ { skip = 1 } skip' README.md > .readme_post.tmp
-	@cat .readme_pre.tmp .changelog_latest.tmp .readme_post.tmp > README.md
+
+	# Extract header up to and including <!-- changelog -->
+	@awk 'BEGIN{in=1} /^## Changelog/ {print; next} /<!-- changelog -->/ {print; exit} in' README.md > .readme_pre.tmp
+
+	# Extract the first changelog section only (latest)
+	@awk '/^## release\/v[0-9]+\.[0-9]+\.[0-9]+/ {print; p=1; next} p && /^## / {exit} p {print}' CHANGELOG.md > .changelog_latest.tmp
+
+	# Extract footer from first --- after <!-- changelog -->
+	@awk 'f;/<!-- changelog -->/ {f=1; next} /^---/ {f=1; print; exit}' README.md > .readme_mid.tmp
+	@awk 'f; /^---/ {f=1}' README.md > .readme_tail.tmp
+
+	# Merge into README.md
+	@cat .readme_pre.tmp .changelog_latest.tmp .readme_tail.tmp > .README.new && mv .README.new README.md
+
+	# Cleanup
 	@rm -f .readme_*.tmp .changelog_latest.tmp
-	@echo "✅ README.md changelog updated with latest release."
+
+	@echo "✅ README.md changelog updated with only the latest version."
