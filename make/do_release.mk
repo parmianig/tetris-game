@@ -3,20 +3,7 @@
 define do_release
 	@echo "🚀 Preparing $(1) release..."
 	@set -e; \
-	CHANGED=$$(git status --porcelain | awk '{print $$2}'); \
-	BUMP_FE=0; BUMP_BE=0; \
-	if echo "$$CHANGED" | grep -q '^frontend/'; then BUMP_FE=1; fi; \
-	if echo "$$CHANGED" | grep -q '^backend/'; then BUMP_BE=1; fi; \
-	if [ "$$BUMP_FE" = "1" ]; then \
-		echo "🔼 Bumping frontend version ($(1))..."; \
-		python3 scripts/bump_version.py $(1) frontend --tag --msg "$(RELEASE_MSG)"; \
-	fi; \
-	if [ "$$BUMP_BE" = "1" ]; then \
-		echo "🔼 Bumping backend version ($(1))..."; \
-		python3 scripts/bump_version.py $(1) backend --tag --msg "$(RELEASE_MSG)"; \
-	fi; \
-	echo "🔼 Bumping app version ($(1))..."; \
-	python3 scripts/bump_version.py $(1) app --tag --msg "$(RELEASE_MSG)"; \
+	python3 scripts/bump_version.py $(1) --tag --msg "$(RELEASE_MSG)"; \
 	make version-check-precommit; \
 	make version-set; \
 	make version-readme-update; \

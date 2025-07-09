@@ -3,7 +3,7 @@ export type Matrix = number[][];
 export function createMatrix(w: number, h: number): Matrix {
   const matrix: Matrix = [];
   while (h--) {
-    matrix.push(new Array(w).fill(0));
+    matrix.push(new Array(w).fill(0)); // All elements are guaranteed to be numbers (no undefined)
   }
   return matrix;
 }
@@ -16,22 +16,19 @@ export function drawMatrix(
   matrix.forEach((row, y) => {
     row.forEach((value, x) => {
       if (value !== 0) {
-        ctx.fillStyle = 'red';
+        ctx.fillStyle = "red";
         ctx.fillRect(x + offset.x, y + offset.y, 1, 1);
       }
     });
   });
 }
 
-export function rotate(matrix: number[][], direction: number): number[][] {
-  // Transpose
-  const transposed = matrix[0].map((_, i) => matrix.map(row => row[i]));
+export function rotate(matrix: Matrix, direction: number): Matrix {
+  const transposed: Matrix = (matrix[0] ?? []).map((_, i) =>
+    matrix.map((row) => row[i] ?? 0)
+  );
 
-  if (direction > 0) {
-    // Clockwise: transpose, then reverse rows
-    return transposed.map(row => [...row].reverse());
-  } else {
-    // Counterclockwise: transpose, then reverse order of rows
-    return [...transposed].reverse();
-  }
+  return direction > 0
+    ? transposed.map((row) => [...row].reverse())
+    : [...transposed].reverse();
 }

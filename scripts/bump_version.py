@@ -67,14 +67,22 @@ def create_git_tag(tag: str, dry_run: bool, msg: str) -> str:
     except subprocess.CalledProcessError as e:
         return f"error: {e}"
 
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("bump", choices=["patch", "minor", "major"])
-    parser.add_argument("component", choices=["frontend", "backend", "app"])
-    parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--msg", default="chore: version bump", help="Git commit message")
-    parser.add_argument("--tag", action="store_true")
-    return parser.parse_args()
+def detect_changed_components() -> set:
+    changed = subprocess.run(
+        ["git", "status", "--porcelain"],
+        capture_output=True, text=True
+    ).stdout.strip().splitlines()
+
+    components = set()
+    for line in changed:
+        filepath = line[3:]
+        if filepath.startswith("frontend/"):
+            components.add("frontend")
+        elif filepath.startswith("backend/"):
+            components.add("backend")
+        elif filepath.startswith("VERSION") or filepath.startswith("app/"):
+            components.add("app")
+    return components
 
 def apply_version_changes(component: str, new_version: str, dry_run: bool, result: dict):
     version_file = get_version_file(component)
@@ -92,6 +100,52 @@ def apply_version_changes(component: str, new_version: str, dry_run: bool, resul
             result["sync_package_json"] = "written" if not dry_run else "dry-run"
             result["sync"]["frontend/package.json"] = result["sync_package_json"]
 
+def bump_component_version(component: str, bump_type: str, dry_run: bool, result: dict) -> str:
+    version_file = get_version_file(component)
+    if not version_file or not version_file.exists():
+        print(json.dumps({"error": f"Missing VERSION file for {component}"}))
+        sys.exit(1)
+
+    current_version = version_file.read_text().strip()
+    if not re.match(r"^\d+\.\d+\.\d+$", current_version):
+        print(json.dumps({"error": f"Invalid version format: {current_version}"}))
+        sys.exit(1)
+
+    new_version = bump_version(current_version, bump_type)
+    tag = f"{TAG_PREFIX}{new_version}"
+    # Auto-increment until a free tag is found
+    while check_tag_exists(tag):
+        current_version = new_version
+        new_version = bump_version(current_version, bump_type)
+        tag = f"{TAG_PREFIX}{new_version}"
+
+    result["version_bump"][component] = {
+        "from": current_version,
+        "to": new_version,
+        "file": str(version_file),
+        "status": "dry-run" if dry_run else "written"
+    }
+
+    apply_version_changes(component, new_version, dry_run, result)
+    return new_version
+
+def smart_bump(bump_type: str, dry_run: bool, result: dict):
+    changed = detect_changed_components()
+    components_to_bump = set()
+
+    if "frontend" in changed:
+        components_to_bump.update(["frontend", "app"])
+    if "backend" in changed:
+        components_to_bump.update(["backend", "app"])
+    if "app" in changed and not ("frontend" in changed or "backend" in changed):
+        components_to_bump.add("app")
+
+    bumped_versions = {}
+    for component in sorted(components_to_bump):
+        bumped_versions[component] = bump_component_version(component, bump_type, dry_run, result)
+
+    return bumped_versions
+
 def finalize_and_report(result: dict):
     for comp, path in [("frontend", "frontend/VERSION"),
                        ("backend", "backend/VERSION"),
@@ -100,11 +154,19 @@ def finalize_and_report(result: dict):
             result["resolved_versions"][comp] = Path(path).read_text().strip()
     print(json.dumps(result, indent=2))
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("bump", choices=["patch", "minor", "major"])
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--msg", default="chore: version bump", help="Git commit message")
+    parser.add_argument("--tag", action="store_true")
+    return parser.parse_args()
+
 def main():
     args = parse_args()
     result = {
         "dry_run": args.dry_run,
-        "component": args.component,
+        "component": "auto",
         "version_bump": {},
         "sync": {},
         "sync_package_json": None,
@@ -114,36 +176,15 @@ def main():
         "resolved_versions": {}
     }
 
-    version_file = get_version_file(args.component)
-    if not version_file or not version_file.exists():
-        print(json.dumps({"error": f"Invalid or missing version file for {args.component}"}))
-        sys.exit(1)
+    bumped_versions = smart_bump(args.bump, args.dry_run, result)
 
-    current_version = version_file.read_text().strip()
-    if not re.match(r"^\d+\.\d+\.\d+$", current_version):
-        print(json.dumps({"error": f"Invalid version format: {current_version}"}))
-        sys.exit(1)
-
-    new_version = bump_version(current_version, args.bump)
-    tag = f"{TAG_PREFIX}{new_version}"
-
-    if check_tag_exists(tag):
-        print(json.dumps({"error": f"Tag '{tag}' already exists. Please bump again."}))
-        sys.exit(1)
-
-    result["version_bump"] = {
-        "from": current_version,
-        "to": new_version,
-        "file": str(version_file),
-        "status": "dry-run" if args.dry_run else "written"
-    }
-
-    apply_version_changes(args.component, new_version, args.dry_run, result)
-    result["changelog"]["status"] = generate_changelog(tag, args.dry_run)
-    result["readme_versions"] = update_readme_versions(args.dry_run)
-
-    if args.tag:
-        result["git_tag"] = create_git_tag(tag, args.dry_run, args.msg)
+    # Only tag the app version if it was bumped
+    if "app" in bumped_versions:
+        app_tag = f"{TAG_PREFIX}{bumped_versions['app']}"
+        result["changelog"]["status"] = generate_changelog(app_tag, args.dry_run)
+        result["readme_versions"] = update_readme_versions(args.dry_run)
+        if args.tag:
+            result["git_tag"] = create_git_tag(app_tag, args.dry_run, args.msg)
 
     finalize_and_report(result)
 
