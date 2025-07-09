@@ -1,18 +1,21 @@
-# make/changelog.mk
-
 .PHONY: changelog-readme
 
 changelog-readme:
-	@echo "📝 Updating latest changelog in README.md..."
-	@awk 'BEGIN{inblock=0} { \
-		if ($$0 ~ /^<!-- changelog -->/) { \
-			print $$0; print ""; inblock=1; next; \
-		} \
-		if (inblock && $$0 ~ /^## /) { inblock=0 } \
-		if (!inblock) print $$0 \
-	}' README.md > .README.tmp.before
-	@awk 'BEGIN{printed=0} /^## v[0-9]+\.[0-9]+\.[0-9]+/ {if (!printed++) print $$0; else exit} printed' CHANGELOG.md > .changelog.latest.tmp
-	@cat .README.tmp.before .changelog.latest.tmp > .README.updated
-	@mv .README.updated README.md
-	@rm -f .README.tmp.before .changelog.latest.tmp
-	@echo "✅ README.md updated with latest changelog section."
+	@echo "📝 Updating changelog section in README.md..."
+
+	# Extract the head: everything up to and including `<!-- changelog -->`
+	@awk '/^## Changelog/ {print; getline; print; exit} {print}' README.md > .readme.head.tmp
+
+	# Extract the tail: everything after the next `---` (the separator)
+	@awk 'f && /^---/ {print; f=0} !f {next} {print} /^---/ {f=1}' README.md > .readme.tail.tmp
+
+	# Extract the latest changelog block from CHANGELOG.md
+	@awk 'BEGIN {p=0} /^## v[0-9]+\.[0-9]+\.[0-9]+/ {if (p++) exit} {if (p) print} /^## v[0-9]+\.[0-9]+\.[0-9]+/ {p=1}' CHANGELOG.md > .changelog.latest.tmp
+
+	# Assemble new README
+	@cat .readme.head.tmp .changelog.latest.tmp .readme.tail.tmp > .README.updated && mv .README.updated README.md
+
+	# Cleanup
+	@rm -f .readme.head.tmp .readme.tail.tmp .changelog.latest.tmp
+
+	@echo "✅ Injected latest changelog entry into README.md"
