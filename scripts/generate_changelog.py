@@ -3,39 +3,55 @@
 import subprocess
 from pathlib import Path
 
-def get_tags():
-    tags = subprocess.run(["git", "tag", "--sort=creatordate"], capture_output=True, text=True)
-    return [tag.strip() for tag in tags.stdout.splitlines() if tag.strip()]
+def get_tags() -> list[str]:
+    result = subprocess.run(["git", "tag", "--sort=-creatordate"], capture_output=True, text=True, check=True)
+    return [tag.strip() for tag in result.stdout.splitlines() if tag.strip()]
 
-def get_commits_between(start, end):
-    log = subprocess.run(["git", "log", f"{start}..{end}", "--pretty=format:* %s (%an)"], capture_output=True, text=True)
-    return log.stdout.strip()
+def get_commits_between(start: str, end: str) -> list[str]:
+    result = subprocess.run(
+        ["git", "log", f"{start}..{end}", "--pretty=format:* %s (%an)"],
+        capture_output=True, text=True, check=True
+    )
+    return list(dict.fromkeys(result.stdout.strip().splitlines()))  # dedup preserve order
 
-def generate_changelog():
+def get_initial_commits(tag: str) -> list[str]:
+    result = subprocess.run(
+        ["git", "log", tag, "--pretty=format:* %s (%an)"],
+        capture_output=True, text=True, check=True
+    )
+    return list(dict.fromkeys(result.stdout.strip().splitlines()))
+
+def generate_changelog() -> str:
     tags = get_tags()
     if not tags:
-        print("No tags found.")
-        return
+        print("❌ No Git tags found.")
+        return ""
 
     changelog = ["# Changelog\n"]
+    seen_commits = set()
 
     for i in range(len(tags)):
-        current_tag = tags[i]
-        previous_tag = tags[i - 1] if i > 0 else ""
-        title = f"\n## {current_tag}\n"
-        commits = get_commits_between(previous_tag, current_tag) if previous_tag else subprocess.run(
-            ["git", "log", f"{current_tag}", "--pretty=format:* %s (%an)"],
-            capture_output=True, text=True).stdout.strip()
+        tag = tags[i]
+        prev_tag = tags[i + 1] if i + 1 < len(tags) else None
 
-        changelog.append(title)
-        changelog.append(commits if commits else "* No commits")
-        changelog.append("")
+        changelog.append(f"\n## {tag}")
+        if prev_tag:
+            commits = get_commits_between(prev_tag, tag)
+        else:
+            commits = get_initial_commits(tag)
 
-    return "\n".join(changelog)
+        new_commits = [c for c in commits if c not in seen_commits]
+        seen_commits.update(new_commits)
+
+        if new_commits:
+            changelog.extend(new_commits)
+        else:
+            changelog.append("* No unique commits")
+
+    return "\n".join(changelog).strip() + "\n"
 
 if __name__ == "__main__":
     changelog_content = generate_changelog()
-    lines = changelog_content.strip().splitlines()
-    without_title = "\n".join(line for line in lines if not line.strip().startswith("# Changelog"))
-    Path("CHANGELOG.md").write_text(without_title.strip() + "\n")
-    print("✅ CHANGELOG.md generated from Git tag history.")
+    if changelog_content:
+        Path("CHANGELOG.md").write_text(changelog_content, encoding="utf-8")
+        print("✅ CHANGELOG.md generated (FILO, deduplicated).")
