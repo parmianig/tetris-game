@@ -5,14 +5,25 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 ---
 ## Changelog
 <!-- changelog -->
+## v0.1.13
+## v0.1.13
 
-## v0.0.2
-
-* chore(frontend): bump version to v0.0.2 (primo)
-* Remove .venv from Git tracking (primo)
-* Setup env-based config, ignore dev artifacts, Vite proxy to Render (primo)
-* Cleanup: update .gitignore and remove local files from repo (primo)
-* Set up Vercel deployment (primo)
-* Initial commit (primo)
-
-
+* patch: fixed readme.md (primo)
+* patch: fixed readme.md (primo)
+* patch: fixed readme.md (primo)
+* patch: removed full changelog from the readme.md (primo)
+* patch: removed full changelog from the readme.md (primo)
+* patch: fix safe abort on release failure (primo)
+* patch: fix safe abort on release failure (primo)
+* patch: modularized makefile and added release targets (primo)
+* patch: modularized makefile and added release targets (primo)
+* patch: modularized makefile and added targets (primo)
+* patch: modularized makefile and added targets (primo)
+* release: modularize Makefile with .mk includes and cleanup (primo)
+* release: modularize Makefile with .mk includes and cleanup (primo)
+* release: add bump_version.py sonar cleanups (primo)
+* release: add bump_version.py sonar cleanups (primo)
+* release: refactor versioning + improve changelog injection (primo)
+* chore(release): version 0.1.2 (primo)
+* chore(release): version 0.1.1 (primo)
+* chore(backend): bump version to v0.0.4 (primo)
