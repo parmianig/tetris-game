@@ -25,14 +25,11 @@ changelog-readme:
 	# 3. Extract everything after the first `---` following <!-- changelog --> line
 	@awk 'f && $$0 == "---" { print; found=1; next } f && found { print } /<!-- changelog -->/ { f=1 }' README.md > .readme_post.tmp
 
-	# 4. Build new README with inserted latest changelog and one separator
-	@cat .readme_pre.tmp .changelog_latest.tmp > .README.new
-	@cat .readme_post.tmp >> .README.new
+	# 4. Build new README with inserted latest changelog
+	@cat .readme_pre.tmp .changelog_latest.tmp .readme_post.tmp > .README.new
 
 	# 5. Replace original and clean up
 	@mv .README.new README.md
 	@rm -f .readme_*.tmp .changelog_latest.tmp
 
 	@echo "✅ README.md changelog injected correctly."
-
-
