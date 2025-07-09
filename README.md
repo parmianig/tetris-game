@@ -6,164 +6,148 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 ## Changelog
 <!-- changelog -->
 
+## v0.1.14
 
----
-## Versioning
-APP_VERSION: 0.1.14
-FRONTEND_VERSION: 0.0.5
-BACKEND_VERSION: 0.0.5
+* patch: preserve README content, except those between < changelog --> and the next ## (primo)
+* patch: fixed readme.md (primo)
+* patch: fixed readme.md (primo)
+* patch: fixed readme.md (primo)
+* patch: fixed readme.md (primo)
+* patch: removed full changelog from the readme.md (primo)
+* patch: removed full changelog from the readme.md (primo)
+* patch: fix safe abort on release failure (primo)
+* patch: fix safe abort on release failure (primo)
+* patch: modularized makefile and added release targets (primo)
+* patch: modularized makefile and added release targets (primo)
+* patch: modularized makefile and added targets (primo)
+* patch: modularized makefile and added targets (primo)
+* release: modularize Makefile with .mk includes and cleanup (primo)
+* release: modularize Makefile with .mk includes and cleanup (primo)
+* release: add bump_version.py sonar cleanups (primo)
+* release: add bump_version.py sonar cleanups (primo)
+* release: refactor versioning + improve changelog injection (primo)
+* chore(release): version 0.1.2 (primo)
+* chore(release): version 0.1.1 (primo)
+* chore(backend): bump version to v0.0.4 (primo)
+## v0.0.2
 
----
-## 🚀 Features
+* chore(frontend): bump version to v0.0.2 (primo)
+* Remove .venv from Git tracking (primo)
+* Setup env-based config, ignore dev artifacts, Vite proxy to Render (primo)
+* Cleanup: update .gitignore and remove local files from repo (primo)
+* Set up Vercel deployment (primo)
+* Initial commit (primo)
 
-* 🎮 Tetris rendering with canvas
-* ⌨️ Keyboard + mobile UI controls
-* 🔁 Tetromino rotation (clockwise / counterclockwise)
-* 🐍 Python FastAPI backend (optional leaderboard integration)
-* 🐳 Dockerized frontend/backend with Compose support
-* 🛠️ Vite + TypeScript dev tooling
-* 📦 Kubernetes-ready layout (`k8s/`)
 
----
+## v0.0.3
 
-## 📁 Project Structure
+* chore(app): bump version to v0.0.3 (primo)
 
-```
-.
-├── backend/             # Python FastAPI API
-│   ├── app/main.py      # Entry point
-│   └── static/          # Assets (favicon etc.)
-├── frontend/            # Vite + TypeScript frontend
-│   ├── src/             # Main logic (main.ts, engine.ts, etc.)
-│   └── public/          # Static files for production
-├── docker-compose.yml   # Dev orchestrator
-├── k8s/                 # Kubernetes manifests (optional)
-└── Makefile             # Optional commands
-```
 
----
+## release/v0.0.3
 
-## 🧑‍💻 Getting Started
+* chore(backend): bump version to v0.0.4 (primo)
 
-### 1. Clone and Setup
 
-```bash
-git clone https://github.com/parmianig/tetris-game.git
-cd tetris-game
-```
+## release/v0.0.4
 
-### 2. Local Development (Docker)
+* No commits
 
-Run backend and frontend together:
 
-```bash
-docker compose down -v && docker compose build --no-cache && docker compose up
-```
+## release/v0.0.5
 
-> 🔁 Use this command after any change to `Dockerfile`, `requirements.txt`, or `package.json`.
+* No commits
 
-Alternatively:
 
-```bash
-docker compose up --build
-```
+## release/v0.0.6
 
-### 3. Access the Game
+* No commits
 
-* Frontend: [http://localhost:5173](http://localhost:5173)
-* Backend API: [http://localhost:8000/scores](http://localhost:8000/scores) (test endpoint)
 
----
+## v0.0.4
 
-## 📦 Scripts
+* No commits
 
-You can also define and use helper scripts in the root `package.json`:
 
-```json
-"scripts": {
-  "docker:restart": "docker compose down -v && docker compose build --no-cache && docker compose up"
-}
-```
+## release/v0.1.1
 
-Then run:
+* chore(release): version 0.1.1 (primo)
 
-```bash
-npm run docker:restart
-```
 
----
+## release/v0.1.2
 
-## ⚙️ Frontend Tech
+* chore(release): version 0.1.2 (primo)
 
-* [x] TypeScript + Vite
-* [x] Keyboard and touch control support
-* [x] Canvas-based rendering logic in `engine.ts`
-* [x] Rotations with `rotate(matrix, dir)`
 
-## 🐍 Backend Tech
+## release/v0.1.6
 
-* [x] Python 3.12
-* [x] FastAPI with `/scores` endpoint
-* [x] Static serving support
-* [x] Dockerized using `uvicorn`
+* release: add bump_version.py sonar cleanups (primo)
+* release: add bump_version.py sonar cleanups (primo)
+* release: refactor versioning + improve changelog injection (primo)
 
----
 
-## 🧪 Development Tips
+## release/v0.1.7
 
-### Change Controls
+* release: modularize Makefile with .mk includes and cleanup (primo)
 
-Controls are handled in `main.ts`:
 
-* Arrow keys or buttons move/rotate
-* `Shift + Rotate` = counterclockwise
-* `Rotate` alone = clockwise
+## release/v0.1.9
 
-### Communication with Backend
+* patch: modularized makefile and added release targets (primo)
+* patch: modularized makefile and added targets (primo)
+* patch: modularized makefile and added targets (primo)
+* release: modularize Makefile with .mk includes and cleanup (primo)
 
-Handled via `fetch(__API_BASE__ + '/scores')` in `main.ts`
 
-### Edit Canvas Logic
+## release/v0.1.10
 
-Modify drawing in:
+* patch: fix safe abort on release failure (primo)
+* patch: modularized makefile and added release targets (primo)
 
-* `engine.ts`
-* `main.ts`
 
----
+## release/v0.1.11
 
-## 🐳 Deployment (Basic)
+* patch: removed full changelog from the readme.md (primo)
+* patch: fix safe abort on release failure (primo)
 
-Production-ready build for frontend:
 
-```bash
-cd frontend
-npm run build
-```
+## release/v0.1.12
 
-Build + serve with Nginx (already handled in Dockerfile):
+* patch: fixed readme.md (primo)
+* patch: removed full changelog from the readme.md (primo)
 
-```Dockerfile
-FROM nginx:stable-alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
-```
 
----
+## release/v0.1.13
 
-## ✅ TODO
+* patch: fixed readme.md (primo)
+* patch: fixed readme.md (primo)
 
-* [ ] Implement score persistence via backend
-* [ ] Add multiplayer mode (WebSocket?)
-* [ ] Save high scores to database
 
----
+## release/v0.1.14
 
-## 📄 License
+* patch: preserve README content, except those between < changelog --> and the next ## (primo)
+* patch: fixed readme.md (primo)
+## v0.1.14
+## v0.1.14
 
-MIT License. See `LICENSE` file.
-
----
-
-## 👨‍💻 Author
-
-Made with ❤️ by \[parmianig]. Contributions welcome!
+* patch: preserve README content, except those between < changelog --> and the next ## (primo)
+* patch: fixed readme.md (primo)
+* patch: fixed readme.md (primo)
+* patch: fixed readme.md (primo)
+* patch: fixed readme.md (primo)
+* patch: removed full changelog from the readme.md (primo)
+* patch: removed full changelog from the readme.md (primo)
+* patch: fix safe abort on release failure (primo)
+* patch: fix safe abort on release failure (primo)
+* patch: modularized makefile and added release targets (primo)
+* patch: modularized makefile and added release targets (primo)
+* patch: modularized makefile and added targets (primo)
+* patch: modularized makefile and added targets (primo)
+* release: modularize Makefile with .mk includes and cleanup (primo)
+* release: modularize Makefile with .mk includes and cleanup (primo)
+* release: add bump_version.py sonar cleanups (primo)
+* release: add bump_version.py sonar cleanups (primo)
+* release: refactor versioning + improve changelog injection (primo)
+* chore(release): version 0.1.2 (primo)
+* chore(release): version 0.1.1 (primo)
+* chore(backend): bump version to v0.0.4 (primo)
