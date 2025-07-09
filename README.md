@@ -21,42 +21,10 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 * chore(release): version 0.1.2 (primo)
 * chore(release): version 0.1.1 (primo)
 * chore(backend): bump version to v0.0.4 (primo)
-## v0.1.9
 
-* patch: modularized makefile and added release targets (primo)
-* patch: modularized makefile and added targets (primo)
-* patch: modularized makefile and added targets (primo)
-* release: modularize Makefile with .mk includes and cleanup (primo)
-* release: modularize Makefile with .mk includes and cleanup (primo)
-* release: add bump_version.py sonar cleanups (primo)
-* release: add bump_version.py sonar cleanups (primo)
-* release: refactor versioning + improve changelog injection (primo)
-* chore(release): version 0.1.2 (primo)
-* chore(release): version 0.1.1 (primo)
-* chore(backend): bump version to v0.0.4 (primo)
-## v0.1.8
-
-* patch: modularized makefile and added targets (primo)
-* release: modularize Makefile with .mk includes and cleanup (primo)
-* release: modularize Makefile with .mk includes and cleanup (primo)
-* release: add bump_version.py sonar cleanups (primo)
-* release: add bump_version.py sonar cleanups (primo)
-* release: refactor versioning + improve changelog injection (primo)
-* chore(release): version 0.1.2 (primo)
-* chore(release): version 0.1.1 (primo)
-* chore(backend): bump version to v0.0.4 (primo)
-## v0.1.7
-
-* release: modularize Makefile with .mk includes and cleanup (primo)
-* release: add bump_version.py sonar cleanups (primo)
-* release: add bump_version.py sonar cleanups (primo)
-* release: refactor versioning + improve changelog injection (primo)
-* chore(release): version 0.1.2 (primo)
-* chore(release): version 0.1.1 (primo)
-* chore(backend): bump version to v0.0.4 (primo)
 ---
 ## Versioning
-APP_VERSION: 0.1.10
+APP_VERSION: 0.1.11
 FRONTEND_VERSION: 0.0.5
 BACKEND_VERSION: 0.0.5
 
