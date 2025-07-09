@@ -8,6 +8,7 @@
     "docker:restart": "docker compose down -v && docker compose build --no-cache && docker compose up"
   },
   "devDependencies": {
+    "@types/node": "^24.0.12",
     "vite": "^6.3.5"
   }
 }
