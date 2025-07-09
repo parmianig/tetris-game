@@ -4,6 +4,7 @@ PYTHON := python3.12
 VENV := .venv
 ACTIVATE := $(VENV)/bin/activate
 TAG_PREFIX := release/v
+RELEASE_MSG ?= version bump
 
 .PHONY: bootstrap install-hook setup install backend-install frontend-install install-all clean \
         version-set version-set-fe version-set-be version-set-app \
@@ -68,7 +69,7 @@ check-tag-exists:
 
 # 🔼 Version bump targets (safe, fail-fast)
 version-patch-fe:
-	@python3 scripts/bump_version.py patch frontend && \
+	@python3 scripts/bump_version.py patch frontend --tag --msg "$(RELEASE_MSG)" && \
 	make version-check-precommit && \
 	make check-tag-exists && \
 	make version-set-fe && \
@@ -76,7 +77,7 @@ version-patch-fe:
 	make changelog
 
 version-minor-fe:
-	@python3 scripts/bump_version.py minor frontend && \
+	@python3 scripts/bump_version.py minor frontend --tag --msg "$(RELEASE_MSG)" && \
 	make version-check-precommit && \
 	make check-tag-exists && \
 	make version-set-fe && \
@@ -84,7 +85,7 @@ version-minor-fe:
 	make changelog
 
 version-major-fe:
-	@python3 scripts/bump_version.py major frontend && \
+	@python3 scripts/bump_version.py major frontend --tag --msg "$(RELEASE_MSG)" && \
 	make version-check-precommit && \
 	make check-tag-exists && \
 	make version-set-fe && \
@@ -92,7 +93,7 @@ version-major-fe:
 	make changelog
 
 version-patch-be:
-	@python3 scripts/bump_version.py patch backend && \
+	@python3 scripts/bump_version.py patch backend --tag --msg "$(RELEASE_MSG)" && \
 	make version-check-precommit && \
 	make check-tag-exists && \
 	make version-set-be && \
@@ -100,7 +101,7 @@ version-patch-be:
 	make changelog
 
 version-minor-be:
-	@python3 scripts/bump_version.py minor backend && \
+	@python3 scripts/bump_version.py minor backend --tag --msg "$(RELEASE_MSG)" && \
 	make version-check-precommit && \
 	make check-tag-exists && \
 	make version-set-be && \
@@ -108,7 +109,7 @@ version-minor-be:
 	make changelog
 
 version-major-be:
-	@python3 scripts/bump_version.py major backend && \
+	@python3 scripts/bump_version.py major backend --tag --msg "$(RELEASE_MSG)" && \
 	make version-check-precommit && \
 	make check-tag-exists && \
 	make version-set-be && \
@@ -116,7 +117,7 @@ version-major-be:
 	make changelog
 
 version-patch-app:
-	@python3 scripts/bump_version.py patch app && \
+	@python3 scripts/bump_version.py patch app --tag --msg "$(RELEASE_MSG)" && \
 	make version-check-precommit && \
 	make check-tag-exists && \
 	make version-set-app && \
@@ -124,7 +125,7 @@ version-patch-app:
 	make changelog
 
 version-minor-app:
-	@python3 scripts/bump_version.py minor app && \
+	@python3 scripts/bump_version.py minor app --tag --msg "$(RELEASE_MSG)" && \
 	make version-check-precommit && \
 	make check-tag-exists && \
 	make version-set-app && \
@@ -132,7 +133,7 @@ version-minor-app:
 	make changelog
 
 version-major-app:
-	@python3 scripts/bump_version.py major app && \
+	@python3 scripts/bump_version.py major app --tag --msg "$(RELEASE_MSG)" && \
 	make version-check-precommit && \
 	make check-tag-exists && \
 	make version-set-app && \
@@ -180,8 +181,11 @@ version-show:
 	@echo "📦 Frontend Version: $$(cat frontend/VERSION)"
 
 generate-changelog-history:
-	@python3 scripts/generate_changelog.py && echo "✅ CHANGELOG.md from full history injected." && \
-	sed -i '' "/<!-- changelog -->/r CHANGELOG.md" README.md
+	@python3 scripts/generate_changelog.py && \
+	sed -i '' '/<!-- changelog -->/q' README.md && \
+	echo "" >> README.md && \
+	cat CHANGELOG.md >> README.md && \
+	echo "✅ Full changelog injected into README.md"
 
 # 📝 Changelog generation
 changelog:
@@ -189,8 +193,9 @@ changelog:
 	echo "# Changelog\n\n## v$$VERSION\n" > CHANGELOG.md; \
 	git tag --sort=-creatordate | tail -n 2 | head -n 1 | xargs -I {} \
 	git log {}..HEAD --pretty=format:"* %s (%an)" >> CHANGELOG.md; \
-	echo "✅ CHANGELOG.md updated."; \
-	sed -i '' "/<!-- changelog -->/r CHANGELOG.md" README.md
+	tail -n +2 CHANGELOG.md > .changelog.tmp && \
+	sed -i '' "/<!-- changelog -->/r .changelog.tmp" README.md && rm .changelog.tmp; \
+	echo "✅ CHANGELOG.md updated and injected into README.md"
 
 # 🪪 README version injection
 version-readme-update:

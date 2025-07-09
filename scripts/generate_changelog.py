@@ -36,5 +36,7 @@ def generate_changelog():
 
 if __name__ == "__main__":
     changelog_content = generate_changelog()
-    Path("CHANGELOG.md").write_text(changelog_content.strip() + "\n")
+    lines = changelog_content.strip().splitlines()
+    without_title = "\n".join(line for line in lines if not line.strip().startswith("# Changelog"))
+    Path("CHANGELOG.md").write_text(without_title.strip() + "\n")
     print("✅ CHANGELOG.md generated from Git tag history.")
