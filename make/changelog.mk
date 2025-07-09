@@ -6,7 +6,7 @@ generate-changelog-history:
 	@python3 scripts/generate_changelog.py
 	@echo "✅ CHANGELOG.md regenerated from tag history."
 
-# 📦 Generate changelog for latest version only and inject it
+# 📦 Generate changelog for latest version only and inject into README
 changelog:
 	@echo "📦 Generating latest CHANGELOG.md..."
 	@VERSION=$$(cat VERSION); \
@@ -15,21 +15,21 @@ changelog:
 	git log {}..HEAD --pretty=format:"* %s (%an)" >> CHANGELOG.md; \
 	make changelog-readme
 
-# 🧼 Inject only the latest changelog section into README.md
+# 🧼 Inject only the latest changelog section into README.md (preserving content)
 changelog-readme:
 	@echo "🧼 Injecting latest changelog section into README.md..."
 
 	# Extract header up to and including <!-- changelog -->
-	@awk 'BEGIN{in=1} /^## Changelog/ {print; next} /<!-- changelog -->/ {print; exit} in' README.md > .readme_pre.tmp
+	@awk '{ print; if ($$0 ~ /<!-- changelog -->/) { exit } }' README.md > .readme_pre.tmp
 
-	# Extract the first changelog section only (latest)
-	@awk '/^## release\/v[0-9]+\.[0-9]+\.[0-9]+/ {print; p=1; next} p && /^## / {exit} p {print}' CHANGELOG.md > .changelog_latest.tmp
+	# Extract latest changelog block (top section only)
+	@awk '/^## release\/v[0-9]+\.[0-9]+\.[0-9]+/ { if (found) exit; found=1 } found' CHANGELOG.md > .changelog_latest.tmp
 
-	# Extract footer from first --- after <!-- changelog -->
-	@awk 'f;/<!-- changelog -->/ {f=1; next} /^---/ {f=1; print; exit}' README.md > .readme_mid.tmp
-	@awk 'f; /^---/ {f=1}' README.md > .readme_tail.tmp
+	# Extract the README tail after first --- after <!-- changelog -->
+	@awk '/<!-- changelog -->/ {found=1; next} found && /^---/ {print; exit}' README.md > .readme_mid.tmp
+	@awk '/^---/ {seen=1} seen' README.md > .readme_tail.tmp
 
-	# Merge into README.md
+	# Combine all
 	@cat .readme_pre.tmp .changelog_latest.tmp .readme_tail.tmp > .README.new && mv .README.new README.md
 
 	# Cleanup
