@@ -5,17 +5,15 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 ---
 ## Changelog
 <!-- changelog -->
-## release/v0.1.33
-* patch: fix generate changelog and readme, tenth try (primo)
-* patch: fix generate changelog and readme, ninth try (primo)
+## release/v0.1.35
+* patch: fix generate changelog and readme, twelfth try (primo)
+* patch: fix generate changelog and readme, eleventh try (primo)
 
----
 ## Versioning
 APP_VERSION: 0.1.35
 FRONTEND_VERSION: 0.0.5
 BACKEND_VERSION: 0.0.5
 
----
 ## 🚀 Features
 
 * 🎮 Tetris rendering with canvas
@@ -26,7 +24,6 @@ BACKEND_VERSION: 0.0.5
 * 🛠️ Vite + TypeScript dev tooling
 * 📦 Kubernetes-ready layout (`k8s/`)
 
----
 
 ## 📁 Project Structure
 
@@ -43,7 +40,6 @@ BACKEND_VERSION: 0.0.5
 └── Makefile             # Optional commands
 ```
 
----
 
 ## 🧑‍💻 Getting Started
 
@@ -75,7 +71,6 @@ docker compose up --build
 * Frontend: [http://localhost:5173](http://localhost:5173)
 * Backend API: [http://localhost:8000/scores](http://localhost:8000/scores) (test endpoint)
 
----
 
 ## 📦 Scripts
 
@@ -93,7 +88,6 @@ Then run:
 npm run docker:restart
 ```
 
----
 
 ## ⚙️ Frontend Tech
 
@@ -109,7 +103,6 @@ npm run docker:restart
 * [x] Static serving support
 * [x] Dockerized using `uvicorn`
 
----
 
 ## 🧪 Development Tips
 
@@ -132,7 +125,6 @@ Modify drawing in:
 * `engine.ts`
 * `main.ts`
 
----
 
 ## 🐳 Deployment (Basic)
 
@@ -150,7 +142,6 @@ FROM nginx:stable-alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 ```
 
----
 
 ## ✅ TODO
 
@@ -158,13 +149,11 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 * [ ] Add multiplayer mode (WebSocket?)
 * [ ] Save high scores to database
 
----
 
 ## 📄 License
 
 MIT License. See `LICENSE` file.
 
----
 
 ## 👨‍💻 Author
 
@@ -269,17 +258,11 @@ Made with ❤️ by \[parmianig]. Contributions welcome!
 * Cleanup: update .gitignore and remove local files from repo (primo)
 * Set up Vercel deployment (primo)
 * Initial commit (primo)
----
-## Changelog
-<!-- changelog -->
-
----
 ## Versioning
 APP_VERSION: 0.1.35
 FRONTEND_VERSION: 0.0.5
 BACKEND_VERSION: 0.0.5
 
----
 ## 🚀 Features
 
 * 🎮 Tetris rendering with canvas
@@ -290,7 +273,6 @@ BACKEND_VERSION: 0.0.5
 * 🛠️ Vite + TypeScript dev tooling
 * 📦 Kubernetes-ready layout (`k8s/`)
 
----
 
 ## 📁 Project Structure
 
@@ -307,7 +289,6 @@ BACKEND_VERSION: 0.0.5
 └── Makefile             # Optional commands
 ```
 
----
 
 ## 🧑‍💻 Getting Started
 
@@ -339,7 +320,6 @@ docker compose up --build
 * Frontend: [http://localhost:5173](http://localhost:5173)
 * Backend API: [http://localhost:8000/scores](http://localhost:8000/scores) (test endpoint)
 
----
 
 ## 📦 Scripts
 
@@ -357,7 +337,6 @@ Then run:
 npm run docker:restart
 ```
 
----
 
 ## ⚙️ Frontend Tech
 
@@ -373,7 +352,6 @@ npm run docker:restart
 * [x] Static serving support
 * [x] Dockerized using `uvicorn`
 
----
 
 ## 🧪 Development Tips
 
@@ -396,7 +374,6 @@ Modify drawing in:
 * `engine.ts`
 * `main.ts`
 
----
 
 ## 🐳 Deployment (Basic)
 
@@ -414,7 +391,6 @@ FROM nginx:stable-alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 ```
 
----
 
 ## ✅ TODO
 
@@ -422,13 +398,11 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 * [ ] Add multiplayer mode (WebSocket?)
 * [ ] Save high scores to database
 
----
 
 ## 📄 License
 
 MIT License. See `LICENSE` file.
 
----
 
 ## 👨‍💻 Author
 
