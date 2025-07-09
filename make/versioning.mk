@@ -68,17 +68,25 @@ version-readme-update:
 	@echo "✅ README.md updated with versions."
 
 changelog:
+	@echo "📦 Building latest CHANGELOG.md and injecting into README.md..."
 	@VERSION=$$(cat VERSION); \
 	echo "# Changelog\n\n## v$$VERSION\n" > CHANGELOG.md; \
 	git tag --sort=-creatordate | tail -n 2 | head -n 1 | xargs -I {} \
 	git log {}..HEAD --pretty=format:"* %s (%an)" >> CHANGELOG.md; \
-	tail -n +2 CHANGELOG.md > .changelog.tmp && \
-	sed -i '' "/<!-- changelog -->/r .changelog.tmp" README.md && rm .changelog.tmp; \
-	echo "✅ CHANGELOG.md updated and injected into README.md"
+	awk 'BEGIN{skip=0} {if ($$0 ~ /^## Changelog/) {print; print "<!-- changelog -->"; skip=1; next} if ($$0 ~ /^---/) {skip=0} if (!skip) print}' README.md > .README_HEAD.tmp; \
+	awk '/^## v[0-9]+\.[0-9]+\.[0-9]+/ {print; p=1; next} p && /^## / {exit} p {print}' CHANGELOG.md > .CHANGELOG_LATEST.tmp; \
+	awk '/^---/ {f=1} f' README.md > .README_TAIL.tmp; \
+	cat .README_HEAD.tmp .CHANGELOG_LATEST.tmp .README_TAIL.tmp > README.md && \
+	rm -f .README_*.tmp .CHANGELOG_LATEST.tmp; \
+	echo "✅ Injected latest v$$VERSION changelog into README.md."
+
 
 generate-changelog-history:
+	@echo "📜 Generating full CHANGELOG.md from git tags..."
 	@python3 scripts/generate_changelog.py && \
-	sed -i '' '/<!-- changelog -->/q' README.md && \
-	echo "" >> README.md && \
-	cat CHANGELOG.md >> README.md && \
+	awk 'BEGIN{skip=0} {if ($$0 ~ /^## Changelog/) {print; print "<!-- changelog -->"; skip=1; next} if ($$0 ~ /^---/) {skip=0} if (!skip) print}' README.md > .README_HEAD.tmp; \
+	awk '/^---/ {f=1} f' README.md > .README_TAIL.tmp; \
+	cat .README_HEAD.tmp CHANGELOG.md .README_TAIL.tmp > README.md && \
+	rm -f .README_HEAD.tmp .README_TAIL.tmp; \
 	echo "✅ Full changelog injected into README.md"
+
