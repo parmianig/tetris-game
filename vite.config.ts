@@ -1,17 +1,17 @@
 // frontend/vite.config.ts
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig, loadEnv } from "vite";
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '');
+  const env = loadEnv(mode, process.cwd(), "");
   return {
     server: {
-      host: '0.0.0.0',
+      host: "0.0.0.0",
       port: 5173,
       proxy: {
-        '/api': {
+        "/api": {
           target: env.VITE_BACKEND_URL,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, ''),
+          rewrite: (path) => path.replace(/^\/api/, ""),
         },
       },
     },
