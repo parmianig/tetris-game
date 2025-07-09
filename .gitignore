@@ -53,3 +53,7 @@ render.yaml
 coverage/
 htmlcov/
 .tox/
+
+# Ignore environment & tooling
+.envrc
+.direnv/

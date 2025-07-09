@@ -7,6 +7,11 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 <!-- changelog -->
 # Changelog
 
+## v0.1.2
+
+* chore(release): version 0.1.1 (primo)
+* chore(backend): bump version to v0.0.4 (primo)# Changelog
+
 ## v0.1.1
 
 * chore(backend): bump version to v0.0.4 (primo)# Changelog
@@ -20,7 +25,7 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 * chore(backend): bump version to v0.0.4 (primo)
 ---
 ## Versioning
-APP_VERSION: 0.1.1
+APP_VERSION: 0.1.2
 FRONTEND_VERSION: 0.0.5
 BACKEND_VERSION: 0.0.5
 
