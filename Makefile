@@ -71,7 +71,6 @@ check-tag-exists:
 version-patch-fe:
 	@python3 scripts/bump_version.py patch frontend --tag --msg "$(RELEASE_MSG)" && \
 	make version-check-precommit && \
-	make check-tag-exists && \
 	make version-set-fe && \
 	make version-readme-update && \
 	make changelog
@@ -79,7 +78,6 @@ version-patch-fe:
 version-minor-fe:
 	@python3 scripts/bump_version.py minor frontend --tag --msg "$(RELEASE_MSG)" && \
 	make version-check-precommit && \
-	make check-tag-exists && \
 	make version-set-fe && \
 	make version-readme-update && \
 	make changelog
@@ -87,7 +85,6 @@ version-minor-fe:
 version-major-fe:
 	@python3 scripts/bump_version.py major frontend --tag --msg "$(RELEASE_MSG)" && \
 	make version-check-precommit && \
-	make check-tag-exists && \
 	make version-set-fe && \
 	make version-readme-update && \
 	make changelog
@@ -95,7 +92,6 @@ version-major-fe:
 version-patch-be:
 	@python3 scripts/bump_version.py patch backend --tag --msg "$(RELEASE_MSG)" && \
 	make version-check-precommit && \
-	make check-tag-exists && \
 	make version-set-be && \
 	make version-readme-update && \
 	make changelog
@@ -103,7 +99,6 @@ version-patch-be:
 version-minor-be:
 	@python3 scripts/bump_version.py minor backend --tag --msg "$(RELEASE_MSG)" && \
 	make version-check-precommit && \
-	make check-tag-exists && \
 	make version-set-be && \
 	make version-readme-update && \
 	make changelog
@@ -111,7 +106,6 @@ version-minor-be:
 version-major-be:
 	@python3 scripts/bump_version.py major backend --tag --msg "$(RELEASE_MSG)" && \
 	make version-check-precommit && \
-	make check-tag-exists && \
 	make version-set-be && \
 	make version-readme-update && \
 	make changelog
@@ -119,7 +113,6 @@ version-major-be:
 version-patch-app:
 	@python3 scripts/bump_version.py patch app --tag --msg "$(RELEASE_MSG)" && \
 	make version-check-precommit && \
-	make check-tag-exists && \
 	make version-set-app && \
 	make version-readme-update && \
 	make changelog
@@ -127,7 +120,6 @@ version-patch-app:
 version-minor-app:
 	@python3 scripts/bump_version.py minor app --tag --msg "$(RELEASE_MSG)" && \
 	make version-check-precommit && \
-	make check-tag-exists && \
 	make version-set-app && \
 	make version-readme-update && \
 	make changelog
@@ -135,7 +127,6 @@ version-minor-app:
 version-major-app:
 	@python3 scripts/bump_version.py major app --tag --msg "$(RELEASE_MSG)" && \
 	make version-check-precommit && \
-	make check-tag-exists && \
 	make version-set-app && \
 	make version-readme-update && \
 	make changelog
