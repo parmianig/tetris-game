@@ -16,20 +16,23 @@ changelog:
 changelog-readme:
 	@echo "🧼 Injecting latest changelog section into README.md..."
 
-	# Extract everything before the changelog block
-	@awk 'BEGIN{p=1} /^## Changelog/ {print; getline; print; exit} p' README.md > .readme_pre.tmp
+	# 1. Extract the latest release changelog block from CHANGELOG.md
+	@awk '/^## release\/v[0-9]+\.[0-9]+\.[0-9]+/ {if (++f == 2) exit} f' CHANGELOG.md > .changelog_latest.tmp
 
-	# Extract latest version section only
-	@awk '/^## release\/v[0-9]+\.[0-9]+\.[0-9]+/ {if (++found > 1) exit} found' CHANGELOG.md > .changelog_latest.tmp
+	# 2. Extract everything from README.md up to and including the changelog placeholder
+	@awk '{ print } /<!-- changelog -->/ { exit }' README.md > .readme_pre.tmp
 
-	# Extract everything after the first '---' *following* the changelog section
-	@awk 'BEGIN{skip=1} /^## Changelog/ {getline; skip=1} /^---/ {skip=0; next} skip==0' README.md > .readme_post.tmp
+	# 3. Extract everything after the first `---` following <!-- changelog --> line
+	@awk 'f && $$0 == "---" { print; found=1; next } f && found { print } /<!-- changelog -->/ { f=1 }' README.md > .readme_post.tmp
 
-	# Combine parts together
-	@cat .readme_pre.tmp .changelog_latest.tmp .readme_post.tmp > .README.new && mv .README.new README.md
+	# 4. Build new README with inserted latest changelog and one separator
+	@cat .readme_pre.tmp .changelog_latest.tmp > .README.new
+	@cat .readme_post.tmp >> .README.new
 
-	# Cleanup
+	# 5. Replace original and clean up
+	@mv .README.new README.md
 	@rm -f .readme_*.tmp .changelog_latest.tmp
 
-	@echo "✅ README.md changelog section updated."
+	@echo "✅ README.md changelog injected correctly."
+
 
