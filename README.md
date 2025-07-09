@@ -5,6 +5,13 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 ---
 ## Changelog
 <!-- changelog -->
+## release/v0.1.33
+* patch: fix generate changelog and readme, tenth try (primo)
+* patch: fix generate changelog and readme, ninth try (primo)
+
+---
+## Changelog
+<!-- changelog -->
 
 ---
 ## Versioning
