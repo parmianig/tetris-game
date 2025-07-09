@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import subprocess
-import re
 from pathlib import Path
 
 def get_tags():
