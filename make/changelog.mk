@@ -6,21 +6,12 @@ generate-changelog-history:
 	@python3 scripts/generate_changelog.py
 	@echo "✅ CHANGELOG.md regenerated from tag history."
 
-# 📦 Generate changelog for latest version only and inject it
+# 📦 Inject latest tag entry into README.md
 changelog:
-	@echo "📦 Generating latest CHANGELOG.md..."
-	@VERSION=$$(cat VERSION); \
-	echo "# Changelog\n\n## v$$VERSION" > CHANGELOG.md; \
-	git tag --sort=-creatordate | tail -n 2 | head -n 1 | xargs -I {} \
-	git log {}..HEAD --pretty=format:"* %s (%an)" >> CHANGELOG.md; \
-	make changelog-readme
-
-# 🧼 Inject only the latest changelog section into README.md
-changelog-readme:
-	@echo "🧼 Injecting latest changelog section into README.md..."
-	@awk 'BEGIN{in_block=1} /^## Changelog/ {print; print "<!-- changelog -->"; next} /^---/ {in_block=0} in_block' README.md > .readme_pre.tmp
-	@awk '/^## v[0-9]+\.[0-9]+\.[0-9]+/ {print; p=1; next} p && /^## / {exit} p {print}' CHANGELOG.md > .changelog_latest.tmp
-	@awk '/^---/ {found=1} found' README.md > .readme_post.tmp
-	@cat .readme_pre.tmp .changelog_latest.tmp .readme_post.tmp > .README.new && mv .README.new README.md
+	@echo "📦 Extracting latest changelog section for README.md..."
+	@awk 'BEGIN{p=1} /^## Changelog/ {print; print "<!-- changelog -->"; p=0; next} /^---/ {p=1} p' README.md > .readme_head.tmp
+	@awk '/^## / {print; p=1; next} p && /^## / {exit} p {print}' CHANGELOG.md > .changelog_latest.tmp
+	@awk 'BEGIN{f=0} /^---/ {f=1} f' README.md > .readme_tail.tmp
+	@cat .readme_head.tmp .changelog_latest.tmp .readme_tail.tmp > .README.new && mv .README.new README.md
 	@rm -f .readme_*.tmp .changelog_latest.tmp
-	@echo "✅ README.md changelog updated."
+	@echo "✅ README.md changelog section updated with latest entry."
