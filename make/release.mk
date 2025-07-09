@@ -1,6 +1,7 @@
 # make/release.mk
 
 include make/do_release.mk
+include make/changelog.mk
 
 .PHONY: release release-patch release-minor release-major do-release
 
