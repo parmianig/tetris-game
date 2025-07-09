@@ -5,9 +5,10 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 ---
 ## Changelog
 <!-- changelog -->
+
 ---
 ## Versioning
-APP_VERSION: 0.1.16
+APP_VERSION: 0.1.17
 FRONTEND_VERSION: 0.0.5
 BACKEND_VERSION: 0.0.5
 
@@ -280,7 +281,7 @@ Made with ❤️ by \[parmianig]. Contributions welcome!
 <!-- changelog -->
 ---
 ## Versioning
-APP_VERSION: 0.1.16
+APP_VERSION: 0.1.17
 FRONTEND_VERSION: 0.0.5
 BACKEND_VERSION: 0.0.5
 
@@ -470,7 +471,7 @@ Made with ❤️ by \[parmianig]. Contributions welcome!
 <!-- changelog -->
 ---
 ## Versioning
-APP_VERSION: 0.1.16
+APP_VERSION: 0.1.17
 FRONTEND_VERSION: 0.0.5
 BACKEND_VERSION: 0.0.5
 
@@ -743,7 +744,7 @@ Made with ❤️ by \[parmianig]. Contributions welcome!
 <!-- changelog -->
 ---
 ## Versioning
-APP_VERSION: 0.1.16
+APP_VERSION: 0.1.17
 FRONTEND_VERSION: 0.0.5
 BACKEND_VERSION: 0.0.5
 
@@ -933,7 +934,7 @@ Made with ❤️ by \[parmianig]. Contributions welcome!
 <!-- changelog -->
 ---
 ## Versioning
-APP_VERSION: 0.1.16
+APP_VERSION: 0.1.17
 FRONTEND_VERSION: 0.0.5
 BACKEND_VERSION: 0.0.5
 
@@ -1206,7 +1207,7 @@ Made with ❤️ by \[parmianig]. Contributions welcome!
 <!-- changelog -->
 ---
 ## Versioning
-APP_VERSION: 0.1.16
+APP_VERSION: 0.1.17
 FRONTEND_VERSION: 0.0.5
 BACKEND_VERSION: 0.0.5
 
@@ -1396,7 +1397,7 @@ Made with ❤️ by \[parmianig]. Contributions welcome!
 <!-- changelog -->
 ---
 ## Versioning
-APP_VERSION: 0.1.16
+APP_VERSION: 0.1.17
 FRONTEND_VERSION: 0.0.5
 BACKEND_VERSION: 0.0.5
 
@@ -1671,7 +1672,7 @@ Made with ❤️ by \[parmianig]. Contributions welcome!
 
 ---
 ## Versioning
-APP_VERSION: 0.1.16
+APP_VERSION: 0.1.17
 FRONTEND_VERSION: 0.0.5
 BACKEND_VERSION: 0.0.5
 
