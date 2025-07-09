@@ -148,3 +148,8 @@ button.pressed {
   outline: 6px solid #888;
   background-color: #333;
 }
+
+#controls {
+  margin: 1rem 0;
+  font-family: monospace;
+}
