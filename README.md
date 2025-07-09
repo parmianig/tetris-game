@@ -4,7 +4,10 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 
 ---
 ## Changelog
-## release/v0.1.29
+<!-- changelog -->
+## release/v0.1.30
+* patch: fix generate changelog and readme, seventh try (primo)
+* patch: fix generate changelog and readme, sixth try (primo)
 * patch: fix generate changelog and readme, sixth try (primo)
 * patch: fix generate changelog and readme, fifth try (primo)
 * patch: fix generate changelog and readme, fifth try (primo)
@@ -56,10 +59,12 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 * chore(release): version 0.1.2 (primo)
 * chore(release): version 0.1.1 (primo)
 * chore(backend): bump version to v0.0.4 (primo)
----
-## Changelog
-<!-- changelog -->
+# Tetris Game (Frontend + Backend)
 
+This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, **FastAPI**, and **Docker**. It includes a responsive UI for desktop and mobile, and a containerized environment for both development and production.
+
+---
+---
 ---
 ## Versioning
 APP_VERSION: 0.1.30
@@ -321,9 +326,6 @@ Made with ❤️ by \[parmianig]. Contributions welcome!
 * Set up Vercel deployment (primo)
 * Initial commit (primo)
 ---
-## Changelog
-<!-- changelog -->
-
 ---
 ## Versioning
 APP_VERSION: 0.1.30
