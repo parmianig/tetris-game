@@ -21,7 +21,6 @@ define do_release
 	make version-set; \
 	make version-readme-update; \
 	make changelog; \
-	make changelog-readme; \
 	VERSION=$$(cat VERSION); \
 	echo "✅ All steps completed. Committing release v$$VERSION..."; \
 	git add VERSION backend/VERSION frontend/VERSION frontend/package.json CHANGELOG.md README.md Makefile scripts/*.py; \
