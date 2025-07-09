@@ -12,12 +12,14 @@ changelog:
 # 🧼 Inject latest changelog section into README.md between placeholders
 changelog-readme:
 	@echo "🧼 Injecting latest changelog section into README.md..."
-	@awk 'BEGIN{p=1} /^## Changelog/ {print; getline; print; p=0; next} /^---/ {p=1} p' README.md > .readme_head.tmp; \
-	awk '/^## v[0-9]+\.[0-9]+\.[0-9]+/ {print; p=1; next} p && /^## / {exit} p {print}' CHANGELOG.md > .changelog_latest.tmp; \
-	awk 'BEGIN{f=0} /^---/ {f=1} f' README.md > .readme_tail.tmp; \
-	cat .readme_head.tmp .changelog_latest.tmp .readme_tail.tmp > .README.new && mv .README.new README.md; \
-	rm -f .readme_*.tmp .changelog_latest.tmp; \
-	echo "✅ README.md changelog updated."
+	@VERSION=$$(cat VERSION); \
+	awk 'BEGIN{block=1} /^## Changelog/ {print; print "<!-- changelog -->"; block=0; next} /^---/ {block=1} block {print}' README.md > .README_HEAD.tmp; \
+	echo "" > .README_CHANGELOG.tmp; \
+	awk -v v="v$$VERSION" '/^## v[0-9]+\.[0-9]+\.[0-9]+/ { if ($$2 == v) {print; inblock=1; next} } /^## v[0-9]+\.[0-9]+\.[0-9]+/ { inblock=0 } inblock && NF > 0 {print}' CHANGELOG.md >> .README_CHANGELOG.tmp; \
+	awk 'BEGIN{print_marker=0} /^---/ {print_marker=1} print_marker' README.md > .README_TAIL.tmp; \
+	cat .README_HEAD.tmp .README_CHANGELOG.tmp .README_TAIL.tmp > .README.new && mv .README.new README.md; \
+	rm -f .README_*.tmp; \
+	echo "✅ README.md changelog updated with v$$VERSION."
 
 # 📜 Generate full changelog from tag history and inject into README.md
 generate-changelog-history:
