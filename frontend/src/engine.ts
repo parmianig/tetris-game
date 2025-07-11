@@ -51,7 +51,7 @@ export function merge(
   });
 }
 
-export function applyGravity(arena: Matrix, level: number): void {
+export function applyGravity(arena: Matrix, _level: number): void {
   for (let y = arena.length - 2; y >= 0; y--) {
     const row = arena[y];
     const nextRow = arena[y + 1];
