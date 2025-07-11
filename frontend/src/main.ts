@@ -1,14 +1,27 @@
 import { createMatrix, drawMatrix, rotate, applyGravity } from "./engine";
 
+const TILE_SIZE = 20;
+const ARENA_WIDTH = 10;
+const ARENA_HEIGHT = 20;
+
 const canvas = document.getElementById("tetris") as HTMLCanvasElement;
 const context = canvas.getContext("2d")!;
-context.scale(20, 20);
+context.scale(TILE_SIZE, TILE_SIZE);
 
-// Arena setup
-const arena = createMatrix(10, 20);
+interface Position {
+  x: number;
+  y: number;
+}
 
-// Active piece
-const player = {
+interface Player {
+  pos: Position;
+  matrix: number[][];
+  level: number;
+}
+
+const arena: number[][] = createMatrix(ARENA_WIDTH, ARENA_HEIGHT);
+
+const player: Player = {
   pos: { x: 3, y: 0 },
   matrix: [
     [0, 1, 0],
@@ -18,7 +31,6 @@ const player = {
   level: 1,
 };
 
-// Gravity curve
 const gravityLevels: number[] = [
   0, // unused
   0.01667,
@@ -39,24 +51,22 @@ const gravityLevels: number[] = [
 ];
 
 let gravityMode = false;
+let dropAccumulator = 0;
+let lastTime = 0;
 
+// Toggle gravity mode
 const gravityToggle = document.getElementById(
   "gravity-toggle"
 ) as HTMLInputElement;
-if (gravityToggle) {
-  gravityToggle.addEventListener("change", () => {
-    gravityMode = gravityToggle.checked;
-    console.log(`Gravity Mode: ${gravityMode ? "ON" : "OFF"}`);
-  });
-}
+gravityToggle?.addEventListener("change", () => {
+  gravityMode = gravityToggle.checked;
+});
 
-let dropCounter = 0;
-let lastTime = 0;
+// Merge tetromino into arena
+function merge(arena: number[][], player: Player): void {
+  const arenaWidth = arena[0]?.length;
+  if (arenaWidth === undefined) return; // Avoid operating on undefined
 
-function merge(
-  arena: number[][],
-  player: { pos: { x: number; y: number }; matrix: number[][] }
-) {
   player.matrix.forEach((row, y) => {
     row.forEach((value, x) => {
       if (value !== 0) {
@@ -66,31 +76,29 @@ function merge(
           ay >= 0 &&
           ay < arena.length &&
           ax >= 0 &&
-          ax < (arena[0]?.length ?? 0)
+          ax < arenaWidth &&
+          arena[ay] !== undefined
         ) {
-          if (arena[ay]?.[ax] !== undefined) {
-            arena[ay][ax] = value;
-          }
+          arena[ay][ax] = value;
         }
       }
     });
   });
 }
 
-function collide(
-  arena: number[][],
-  player: { pos: { x: number; y: number }; matrix: number[][] }
-): boolean {
-  const m = player.matrix;
-  const o = player.pos;
+// Check collision
+function collide(arena: number[][], player: Player): boolean {
+  const { matrix, pos } = player;
 
-  for (let y = 0; y < m.length; y++) {
-    for (let x = 0; x < (m[y]?.length ?? 0); x++) {
-      if (
-        m[y]?.[x] !== 0 &&
-        (!arena[y + o.y] || // off the bottom
-          (arena[y + o.y]?.[x + o.x] ?? 0) !== 0)
-      ) {
+  for (let y = 0; y < matrix.length; y++) {
+    const row = matrix[y];
+    if (!row) continue;
+
+    for (let x = 0; x < row.length; x++) {
+      const ay = y + pos.y;
+      const ax = x + pos.x;
+
+      if (row[x] !== 0 && (arena[ay]?.[ax] ?? 1) !== 0) {
         return true;
       }
     }
@@ -99,73 +107,72 @@ function collide(
   return false;
 }
 
-function draw() {
+// Draw canvas
+function draw(): void {
   context.fillStyle = "#222";
   context.fillRect(0, 0, canvas.width, canvas.height);
   drawMatrix(context, arena);
   drawMatrix(context, player.matrix, player.pos);
 }
 
-function playerDrop() {
+// Drop logic
+function playerDrop(): void {
   player.pos.y++;
-
-  // Prevent moving beyond arena bottom
   if (collide(arena, player)) {
     player.pos.y--;
-
-    // If we're already at the top row and can't place the piece, game over logic could go here
     merge(arena, player);
-
     if (gravityMode) {
       applyGravity(arena, player.level);
     }
-
     arenaSweep(arena);
-    resetPlayer(); // must happen after sweep
-    updateScore();
+    resetPlayer();
+    if (collide(arena, player)) {
+      console.log("Game Over");
+    }
   }
-
-  dropCounter = 0;
 }
 
-function resetPlayer() {
+// Reset piece
+function resetPlayer(): void {
   player.matrix = [
     [0, 1, 0],
     [1, 1, 1],
     [0, 0, 0],
   ];
   player.pos.y = 0;
-  player.pos.x = (((arena[0]?.length ?? 0) / 2) | 0) - 1;
+  player.pos.x = ((ARENA_WIDTH / 2) | 0) - 1;
 }
 
-function update(time = 0) {
+// Frame-based update
+function update(time = 0): void {
   const deltaTime = (time - lastTime) / 1000;
   lastTime = time;
-  dropCounter += deltaTime;
 
-  const gravity = gravityLevels[player.level] ?? 0.01667;
-  if (dropCounter >= gravity) {
+  const gravity =
+    gravityLevels[Math.min(player.level, gravityLevels.length - 1)] ?? 0.01667;
+  dropAccumulator += deltaTime / gravity;
+
+  while (dropAccumulator >= 1) {
     playerDrop();
+    dropAccumulator--;
   }
 
   draw();
   requestAnimationFrame(update);
 }
 
-function arenaSweep(arena: number[][]) {
-  outer: for (let y = arena.length - 1; y >= 0; --y) {
+// Clear full lines
+function arenaSweep(arena: number[][]): void {
+  for (let y = arena.length - 1; y >= 0; y--) {
     if (arena[y]?.every((cell) => cell !== 0)) {
       arena.splice(y, 1);
-      arena.unshift(new Array(arena[0]?.length ?? 10).fill(0));
-      y++; // check this row again after shift
+      arena.unshift(new Array(ARENA_WIDTH).fill(0));
+      y++;
     }
   }
 }
 
-function updateScore() {
-  // placeholder
-}
-
+// Keyboard controls
 document.addEventListener("keydown", (event) => {
   switch (event.key) {
     case "ArrowLeft":
@@ -191,6 +198,7 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+// Mobile button controls
 document.getElementById("left")?.addEventListener("click", () => {
   player.pos.x--;
   if (collide(arena, player)) player.pos.x++;

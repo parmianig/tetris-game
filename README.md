@@ -5,15 +5,14 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 ---
 ## Changelog
 <!-- changelog -->
-## release/v0.2.1
-* patch: suppress the warning that level is unused in function applyGravity (primo)
-* - Added Gravity Mode toggle (classic vs cascading) - Fixed player drop overflow issue - Restored mobile/touch control buttons - Removed legacy main.js and updated TypeScript entrypoint (primo)
+## release/v0.9.0
+* No unique changes
 
 ---
 
 ## Versioning
-APP_VERSION: 0.2.1
-FRONTEND_VERSION: 0.1.3
+APP_VERSION: 0.24.0
+FRONTEND_VERSION: 0.24.0
 BACKEND_VERSION: 0.0.5
 
 ## 🚀 Features

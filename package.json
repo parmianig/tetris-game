@@ -2,7 +2,7 @@
   "name": "tetris-frontend",
   "version": "1.0.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview",
     "docker:restart": "docker compose down -v && docker compose build --no-cache && docker compose up"

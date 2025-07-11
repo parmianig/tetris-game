@@ -8,6 +8,11 @@ import argparse
 from pathlib import Path
 
 TAG_PREFIX = "release/v"
+DEBUG = False
+
+def debug(msg: str):
+    if DEBUG:
+        print(f"[DEBUG] {msg}")
 
 def bump_version(version: str, part: str) -> str:
     major, minor, patch = map(int, version.strip().split('.'))
@@ -25,11 +30,13 @@ def get_version_file(component: str) -> Path:
     }.get(component)
 
 def check_tag_exists(tag: str) -> bool:
-    return subprocess.run(
+    exists = subprocess.run(
         ["git", "rev-parse", "--quiet", "--verify", tag],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL
     ).returncode == 0
+    debug(f"Tag '{tag}' exists: {exists}")
+    return exists
 
 def generate_changelog(tag: str, dry_run: bool) -> str:
     try:
@@ -82,6 +89,7 @@ def detect_changed_components() -> set:
             components.add("backend")
         elif filepath.startswith("VERSION") or filepath.startswith("app/"):
             components.add("app")
+    debug(f"Changed components: {components}")
     return components
 
 def apply_version_changes(component: str, new_version: str, dry_run: bool, result: dict):
@@ -113,8 +121,9 @@ def bump_component_version(component: str, bump_type: str, dry_run: bool, result
 
     new_version = bump_version(current_version, bump_type)
     tag = f"{TAG_PREFIX}{new_version}"
-    # Auto-increment until a free tag is found
+
     while check_tag_exists(tag):
+        debug(f"Tag '{tag}' already exists. Incrementing...")
         current_version = new_version
         new_version = bump_version(current_version, bump_type)
         tag = f"{TAG_PREFIX}{new_version}"
@@ -140,6 +149,7 @@ def smart_bump(bump_type: str, dry_run: bool, result: dict):
     if "app" in changed and not ("frontend" in changed or "backend" in changed):
         components_to_bump.add("app")
 
+    debug(f"Bumping components: {components_to_bump}")
     bumped_versions = {}
     for component in sorted(components_to_bump):
         bumped_versions[component] = bump_component_version(component, bump_type, dry_run, result)
@@ -158,12 +168,16 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("bump", choices=["patch", "minor", "major"])
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--debug", action="store_true")
     parser.add_argument("--msg", default="chore: version bump", help="Git commit message")
     parser.add_argument("--tag", action="store_true")
     return parser.parse_args()
 
 def main():
+    global DEBUG
     args = parse_args()
+    DEBUG = args.debug
+
     result = {
         "dry_run": args.dry_run,
         "component": "auto",
@@ -178,7 +192,6 @@ def main():
 
     bumped_versions = smart_bump(args.bump, args.dry_run, result)
 
-    # Only tag the app version if it was bumped
     if "app" in bumped_versions:
         app_tag = f"{TAG_PREFIX}{bumped_versions['app']}"
         result["changelog"]["status"] = generate_changelog(app_tag, args.dry_run)

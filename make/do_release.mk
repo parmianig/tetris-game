@@ -1,10 +1,14 @@
-# make/do_release.mk
-
 define do_release
 	@echo "🚀 Preparing $(1) release..."
 	@set -e; \
-	python3 scripts/bump_version.py $(1) --tag --msg "$(RELEASE_MSG)"; \
-	make version-check-precommit; \
+	if [ "$(DEBUG)" = "1" ]; then echo "🔍 DEBUG MODE ENABLED"; fi; \
+	if [ "$(DRY_RUN)" = "1" ]; then echo "🧪 Running in DRY RUN mode"; fi; \
+	python3 scripts/bump_version.py $(1) \
+		$(if $(DEBUG),--debug) \
+		$(if $(DRY_RUN),--dry-run) \
+		--tag \
+		--msg "$(RELEASE_MSG)"; \
+  make version-check-precommit; \
 	make version-set; \
 	make version-readme-update; \
 	make changelog; \

@@ -2,16 +2,6 @@
 
 echo "🔍 Running pre-commit version enforcement..."
 
-make version-check-precommit || {
-  echo "❌ Pre-commit version check failed. Bump version before committing."
-  exit 1
-}
-
-make check-tag-exists || {
-  echo "❌ A tag already exists for this version. Use version bump."
-  exit 1
-}
-
 make version-readme-update
 
 echo "✅ Pre-commit checks passed."

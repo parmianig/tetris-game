@@ -25,7 +25,7 @@ export function drawMatrix(
 
 export function rotate(matrix: Matrix, direction: number): Matrix {
   const transposed: Matrix = (matrix[0] ?? []).map((_, i) =>
-    matrix.map((row) => (typeof row[i] === "number" ? (row[i] as number) : 0))
+    matrix.map((row) => row[i] ?? 0)
   );
 
   return direction > 0
