@@ -1,14 +1,13 @@
+# In make/do_release.mk
+
 define do_release
 	@echo "🚀 Preparing $(1) release..."
 	@set -e; \
-	if [ "$(DEBUG)" = "1" ]; then echo "🔍 DEBUG MODE ENABLED"; fi; \
-	if [ "$(DRY_RUN)" = "1" ]; then echo "🧪 Running in DRY RUN mode"; fi; \
-	python3 scripts/bump_version.py $(1) \
-		$(if $(DEBUG),--debug) \
-		$(if $(DRY_RUN),--dry-run) \
-		--tag \
-		--msg "$(RELEASE_MSG)"; \
-  make version-check-precommit; \
+	python3 scripts/bump_version.py $(1) --tag --msg "$(RELEASE_MSG)" $(if $(DEBUG),--debug,); \
+	# Add these lines:
+	git add VERSION backend/VERSION frontend/VERSION frontend/package.json; \
+	# Now do further checks:
+	make version-check-precommit; \
 	make version-set; \
 	make version-readme-update; \
 	make changelog; \
@@ -19,3 +18,4 @@ define do_release
 	git push origin main --follow-tags; \
 	echo "✅ Release v$$VERSION completed!"
 endef
+

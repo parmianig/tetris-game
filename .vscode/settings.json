@@ -7,6 +7,8 @@
     "Tetris",
     "tetromino",
     "VENV"
-  ]
+  ],
+  "autoHide.autoHideSideBar": false,
+  "workbench.secondarySideBar.defaultVisibility": "visibleInWorkspace"
 }
 
