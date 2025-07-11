@@ -4,9 +4,7 @@ define do_release
 	@echo "🚀 Preparing $(1) release..."
 	@set -e; \
 	python3 scripts/bump_version.py $(1) --tag --msg "$(RELEASE_MSG)" $(if $(DEBUG),--debug,); \
-	# Add these lines:
 	git add VERSION backend/VERSION frontend/VERSION frontend/package.json; \
-	# Now do further checks:
 	make version-check-precommit; \
 	make version-set; \
 	make version-readme-update; \

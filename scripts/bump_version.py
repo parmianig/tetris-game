@@ -12,7 +12,7 @@ DEBUG = False
 
 def debug(msg: str):
     if DEBUG:
-        print(f"[DEBUG] {msg}")
+        print(f"[DEBUG] {msg}", file=sys.stderr)
 
 def bump_version(version: str, part: str) -> str:
     major, minor, patch = map(int, version.strip().split('.'))
@@ -27,16 +27,16 @@ def get_version_file(component: str) -> Path:
         "frontend": Path("frontend/VERSION"),
         "backend": Path("backend/VERSION"),
         "app": Path("VERSION")
-    }.get(component)
+    }[component]
 
 def check_tag_exists(tag: str) -> bool:
-    exists = subprocess.run(
+    result = subprocess.run(
         ["git", "rev-parse", "--quiet", "--verify", tag],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL
-    ).returncode == 0
-    debug(f"Tag '{tag}' exists: {exists}")
-    return exists
+    )
+    debug(f"Tag '{tag}' exists: {result.returncode == 0}")
+    return result.returncode == 0
 
 def generate_changelog(tag: str, dry_run: bool) -> str:
     try:
@@ -87,7 +87,8 @@ def detect_changed_components() -> set:
             components.add("frontend")
         elif filepath.startswith("backend/"):
             components.add("backend")
-        elif filepath.startswith("VERSION") or filepath.startswith("app/"):
+        else:
+            # If not FE or BE, treat as app-level change (including VERSION)
             components.add("app")
     debug(f"Changed components: {components}")
     return components
@@ -96,15 +97,17 @@ def apply_version_changes(component: str, new_version: str, dry_run: bool, resul
     version_file = get_version_file(component)
     if not dry_run:
         version_file.write_text(new_version + "\n")
-
+        subprocess.run(["git", "add", str(version_file)])
+    debug(f"Bumped {component} version file {version_file}: now {new_version}")
     if component == "frontend":
         pkg = Path("frontend/package.json")
         if pkg.exists():
-            pkg_json = re.sub(r'"version":\s*"\d+\.\d+\.\d+"',
-                              f'"version": "{new_version}"',
+            pkg_json = re.sub(r'"version":\s*"\d+\.\d+\.\d+")',
+                              f'"version": \"{new_version}\"',
                               pkg.read_text())
             if not dry_run:
                 pkg.write_text(pkg_json)
+                subprocess.run(["git", "add", str(pkg)])
             result["sync_package_json"] = "written" if not dry_run else "dry-run"
             result["sync"]["frontend/package.json"] = result["sync_package_json"]
 
@@ -121,7 +124,6 @@ def bump_component_version(component: str, bump_type: str, dry_run: bool, result
 
     new_version = bump_version(current_version, bump_type)
     tag = f"{TAG_PREFIX}{new_version}"
-
     while check_tag_exists(tag):
         debug(f"Tag '{tag}' already exists. Incrementing...")
         current_version = new_version
@@ -136,32 +138,40 @@ def bump_component_version(component: str, bump_type: str, dry_run: bool, result
     }
 
     apply_version_changes(component, new_version, dry_run, result)
+
+    # Double-check version file contains the intended version (robustness)
+    if not dry_run:
+        file_version = version_file.read_text().strip()
+        assert file_version == new_version, f"BUG: {component} version file ({file_version}) != intended ({new_version})"
     return new_version
 
-def smart_bump(bump_type: str, dry_run: bool, result: dict):
-    changed = detect_changed_components()
-    components_to_bump = set()
-
-    if "frontend" in changed:
-        components_to_bump.update(["frontend", "app"])
-    if "backend" in changed:
-        components_to_bump.update(["backend", "app"])
-    if "app" in changed and not ("frontend" in changed or "backend" in changed):
-        components_to_bump.add("app")
-
-    debug(f"Bumping components: {components_to_bump}")
+def smart_bump(bump_type: str, dry_run: bool, result: dict, forced_components=None):
+    if forced_components:
+        components_to_bump = set(forced_components)
+        debug(f"Forcing bump for components: {components_to_bump}")
+    else:
+        changed = detect_changed_components()
+        components_to_bump = set()
+        if "frontend" in changed:
+            components_to_bump.update(["frontend", "app"])
+        if "backend" in changed:
+            components_to_bump.update(["backend", "app"])
+        if "app" in changed and not ("frontend" in changed or "backend" in changed):
+            components_to_bump.add("app")
+        debug(f"Bumping components: {components_to_bump}")
     bumped_versions = {}
     for component in sorted(components_to_bump):
         bumped_versions[component] = bump_component_version(component, bump_type, dry_run, result)
-
     return bumped_versions
 
 def finalize_and_report(result: dict):
+    print("\n===== VERSION SUMMARY =====", file=sys.stderr if DEBUG else sys.stdout)
     for comp, path in [("frontend", "frontend/VERSION"),
                        ("backend", "backend/VERSION"),
                        ("app", "VERSION")]:
         if Path(path).exists():
             result["resolved_versions"][comp] = Path(path).read_text().strip()
+            print(f"{comp:>8}: {result['resolved_versions'][comp]}", file=sys.stderr if DEBUG else sys.stdout)
     print(json.dumps(result, indent=2))
 
 def parse_args():
@@ -171,6 +181,7 @@ def parse_args():
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--msg", default="chore: version bump", help="Git commit message")
     parser.add_argument("--tag", action="store_true")
+    parser.add_argument("--components", nargs="+", help="Force bump listed components only (for debug/testing)")
     return parser.parse_args()
 
 def main():
@@ -190,7 +201,7 @@ def main():
         "resolved_versions": {}
     }
 
-    bumped_versions = smart_bump(args.bump, args.dry_run, result)
+    bumped_versions = smart_bump(args.bump, args.dry_run, result, forced_components=args.components)
 
     if "app" in bumped_versions:
         app_tag = f"{TAG_PREFIX}{bumped_versions['app']}"
