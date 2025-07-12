@@ -1,5 +1,6 @@
 # Changelog
 
+<<<<<<< HEAD
 ## release/v0.3.3
 * patch: - update main.ts with the canvas right border \and some refactor (primo)
 * patch: fix bump version (primo)
@@ -170,3 +171,8 @@
 * Cleanup: update .gitignore and remove local files from repo (primo)
 * Set up Vercel deployment (primo)
 * Initial commit (primo)
+=======
+## release/v0.3.4
+* patch: - update main.ts with the canvas right border \and some refactor (primo)
+* patch: fix bump version (primo)
+>>>>>>> 8b28639 (patch: - update main.ts with the canvas right border \and some refactor)
