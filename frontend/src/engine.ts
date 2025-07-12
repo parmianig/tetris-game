@@ -1,3 +1,5 @@
+import type { Player } from "./types";
+
 export type Matrix = number[][];
 
 export function createMatrix(w: number, h: number): Matrix {
@@ -6,6 +8,36 @@ export function createMatrix(w: number, h: number): Matrix {
     matrix.push(new Array(w).fill(0));
   }
   return matrix;
+}
+
+// Check collision
+export function collide(arena: number[][], player: Player): boolean {
+  const { matrix, pos } = player;
+  if (!matrix || !Array.isArray(matrix)) return false;
+
+  for (let y = 0; y < matrix.length; y++) {
+    const row = matrix[y];
+    if (!row) continue;
+
+    for (let x = 0; x < row.length; x++) {
+      if (row[x] !== 0 && (arena[y + pos.y]?.[x + pos.x] ?? 1) !== 0) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+export function arenaSweep(arena: number[][], width: number) {
+  for (let y = arena.length - 1; y >= 0; --y) {
+    const row = arena[y];
+    if (!row) continue;
+    if (row.every((cell) => cell !== 0)) {
+      arena.splice(y, 1);
+      arena.unshift(new Array(width).fill(0));
+      y++;
+    }
+  }
 }
 
 export function drawMatrix(
