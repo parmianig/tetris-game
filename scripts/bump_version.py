@@ -9,6 +9,8 @@ from pathlib import Path
 
 TAG_PREFIX = "release/v"
 DEBUG = False
+FRONTEND_VERSION_PATH = "frontend/VERSION"
+BACKEND_VERSION_PATH = "backend/VERSION"
 
 def debug(msg: str):
     if DEBUG:
@@ -24,8 +26,8 @@ def bump_version(version: str, part: str) -> str:
 
 def get_version_file(component: str) -> Path:
     return {
-        "frontend": Path("frontend/VERSION"),
-        "backend": Path("backend/VERSION"),
+        "frontend": Path(FRONTEND_VERSION_PATH),
+        "backend": Path(BACKEND_VERSION_PATH),
         "app": Path("VERSION")
     }.get(component)
 
@@ -57,8 +59,8 @@ def update_readme_versions(dry_run: bool) -> str:
     if dry_run:
         return "dry-run"
     for name, file in [("APP_VERSION", "VERSION"),
-                       ("FRONTEND_VERSION", "frontend/VERSION"),
-                       ("BACKEND_VERSION", "backend/VERSION")]:
+                       ("FRONTEND_VERSION", FRONTEND_VERSION_PATH),
+                       ("BACKEND_VERSION", BACKEND_VERSION_PATH)]:
         version = Path(file).read_text().strip()
         subprocess.run(["sed", "-i", "", f"s/{name}: .*/{name}: {version}/", "README.md"])
     return "updated"
@@ -163,8 +165,8 @@ def smart_bump(bump_type: str, dry_run: bool, result: dict):
 
 def finalize_and_report(result: dict):
     print("\n===== VERSION SUMMARY =====")
-    for comp, path in [("frontend", "frontend/VERSION"),
-                       ("backend", "backend/VERSION"),
+    for comp, path in [("frontend", FRONTEND_VERSION_PATH),
+                       ("backend", BACKEND_VERSION_PATH),
                        ("app", "VERSION")]:
         if Path(path).exists():
             version = Path(path).read_text().strip()

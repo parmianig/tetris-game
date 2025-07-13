@@ -64,27 +64,6 @@ gravityToggle?.addEventListener("change", () => {
   setGravityMode(gravityToggle.checked);
 });
 
-// Merge tetromino into arena
-function merge(arena: number[][], player: Player) {
-  if (!arena.length || !arena[0]) return;
-  player.matrix.forEach((row, y) => {
-    row.forEach((value, x) => {
-      if (value !== 0) {
-        const ay = y + player.pos.y;
-        const ax = x + player.pos.x;
-        if (
-          ay >= 0 &&
-          ay < arena.length &&
-          ax >= 0 &&
-          ax < (arena[0]?.length ?? 0)
-        ) {
-          arena[ay]![ax] = value;
-        }
-      }
-    });
-  });
-}
-
 // Render loop with white border after scaling
 function draw() {
   context.fillStyle = "#222";

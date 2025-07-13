@@ -1,6 +1,6 @@
 import type { Player } from "./types";
 import { rotate, collide } from "./engine";
-import { playerDrop, getGravityMode, setGravityMode } from "./game";
+import { playerDrop, getGravityMode } from "./game";
 
 // Handles keyboard controls for Tetris.
 // Rotation: Option (Alt) or Shift = counterclockwise, Space = clockwise.
