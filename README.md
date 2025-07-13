@@ -5,8 +5,9 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 ---
 ## Changelog
 <!-- changelog -->
-## release/v0.3.4
+## release/v0.3.3
 * patch: - update main.ts with the canvas right border \and some refactor (primo)
+* patch: fix bump version (primo)
 
 ---
 
