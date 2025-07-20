@@ -1,37 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tetris Game</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tetris Game</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-<body>
-  <label>
-    <input type="checkbox" id="gravity-toggle" />
-    Gravity Mode (Cascade)
-  </label>
-  <form autocomplete="off" class="game-form"></form>
+  <body>
+    <!-- Hamburger Button -->
+    <button id="settings-hamburger" class="icon-btn" aria-label="Show settings" aria-controls="settings-drawer"
+      aria-expanded="false">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
 
-    <div id="game-wrapper">
-      <h1>Tetris</h1>
-      <canvas id="tetris" width="240" height="400" aria-label="Tetris game area" tabindex="0"></canvas>
-
-      <!-- Controls below the canvas -->
-      <div id="controls">
-        <button id="left" type="button" aria-label="Move Left" autocomplete="off" tabindex="0">←</button>
-        <button id="rotate" type="button" aria-label="Rotate" autocomplete="off" tabindex="0">⟳</button>
-        <button id="right" type="button" aria-label="Move Right" autocomplete="off" tabindex="0">→</button>
-        <button id="down" type="button" aria-label="Drop Down" autocomplete="off" tabindex="0">↓</button>
+    <!-- Game Over Overlay -->
+    <div id="game-overlay" class="overlay hidden" tabindex="-1">
+      <div class="overlay-content">
+        <span id="overlay-text"></span>
+        <button id="restart" class="overlay-btn control-btn">Restart</button>
       </div>
-  </form>
+    </div>
 
-  </div>
 
-  <script type="module" src="/src/main.ts"></script>
-</body>
+    <!-- Settings Drawer -->
+    <aside id="settings-drawer" aria-label="Game Settings" tabindex="-1">
+      <button id="settings-close" aria-label="Close settings">&times;</button>
+      <section id="settings" aria-label="Game Settings">
+        <h2>Settings</h2>
+        <div class="setting-row">
+          <label for="gravity-toggle">
+            <input type="checkbox" id="gravity-toggle" />
+            Gravity Mode (Cascade)
+          </label>
+        </div>
+        <div class="setting-row">
+          <label>
+            <input type="checkbox" id="lock-cascade-toggle" checked />
+            Lock Controls During Cascade
+          </label>
+        </div>
+        <div class="setting-row">
+          <label for="cascade-speed">Cascade Speed:</label>
+          <div class="slider-row">
+            <input type="range" id="cascade-speed" min="10" max="200" step="10" value="50" />
+            <span id="cascade-speed-label">50ms</span>
+          </div>
+        </div>
+        <div class="setting-row">
+          <label for="gravity-speed">Gravity Speed:</label>
+          <div class="slider-row">
+            <input type="range" id="gravity-speed" min="0.05" max="2" step="0.01" value="1" />
+            <span id="gravity-speed-label">1.00s</span>
+          </div>
+        </div>
+      </section>
+    </aside>
 
+    <main id="main-content">
+      <!-- Game Wrapper -->
+      <section id="game-wrapper" aria-label="Game Area">
+        <h1>Tetris</h1>
+        <div id="game-area">
+          <canvas id="tetris" width="240" height="400" aria-label="Tetris game area" tabindex="0"></canvas>
+        </div>
+        <section id="ui-status">
+          <div id="status-bar" aria-live="polite"></div>
+          <div id="next-piece" aria-label="Next piece"></div>
+          <div id="game-over" aria-label="Game Over"></div>
+          <div id="pause-menu" aria-label="Pause Menu"></div>
+        </section>
+      </section>
+
+      <!-- Controls -->
+      <!-- Pause Button: ONLY ONE, styled consistently, no blur on pause -->
+      <button id="pause-btn" type="button" aria-label="Pause" tabindex="0" class="control-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="5" y="4" width="5" height="16" rx="2" />
+          <rect x="14" y="4" width="5" height="16" rx="2" />
+        </svg>
+      </button>
+      <nav id="controls" aria-label="Game Controls">
+        <button id="left" type="button" aria-label="Move Left" class="control-btn">←</button>
+        <button id="rotate" type="button" aria-label="Rotate" class="control-btn">⟳</button>
+        <button id="right" type="button" aria-label="Move Right" class="control-btn">→</button>
+        <button id="down" type="button" aria-label="Drop Down" class="control-btn">↓</button>
+      </nav>
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+    <script>
+      // Hamburger menu and drawer logic
+      const hamburger = document.getElementById("settings-hamburger");
+      const drawer = document.getElementById("settings-drawer");
+      const closeBtn = document.getElementById("settings-close");
+
+      function openDrawer() {
+        drawer.classList.add("open");
+        hamburger.setAttribute("aria-expanded", "true");
+        drawer.focus();
+      }
+      function closeDrawer() {
+        drawer.classList.remove("open");
+        hamburger.setAttribute("aria-expanded", "false");
+        hamburger.focus();
+      }
+      hamburger.addEventListener("click", openDrawer);
+      closeBtn.addEventListener("click", closeDrawer);
+      drawer.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeDrawer();
+      });
+      document.addEventListener("mousedown", (e) => {
+        if (
+          drawer.classList.contains("open") &&
+          !drawer.contains(e.target) &&
+          e.target !== hamburger
+        ) {
+          closeDrawer();
+        }
+      });
+    </script>
+  </body>
 
 </html>

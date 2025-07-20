@@ -35,8 +35,9 @@ canvas {
   margin-top: 1rem;
 }
 
-/* Control buttons */
-#controls button {
+/* Control buttons (including pause) */
+#controls button,
+#pause-btn {
   font-size: 1.5rem;
   padding: 0.75rem 1.25rem;
   background-color: #1a1a1a;
@@ -47,13 +48,370 @@ canvas {
   transition: background-color 0.3s, border-color 0.3s;
 }
 
-/* Button hover and pressed effect */
 #controls button:hover,
-#controls button.pressed {
+#controls button.pressed,
+#pause-btn:hover {
   background-color: #333;
   border-color: #888;
 }
 
-#controls button:active {
+#controls button:active,
+#pause-btn:active {
   background-color: #666;
+}
+
+/* Hamburger menu button */
+#settings-hamburger {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1002;
+  width: 48px;
+  height: 48px;
+  background: #333;
+  color: #fff;
+  border: none;
+  font-size: 2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+#settings-hamburger:focus {
+  outline: 2px solid #ff0;
+}
+
+/* Hide hamburger when drawer open */
+#settings-drawer.open~#settings-hamburger {
+  display: none;
+}
+
+/* Slide-in drawer */
+#settings-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 260px;
+  max-width: 80vw;
+  height: 100%;
+  background: #24262b;
+  color: #fff;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.4);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  z-index: 1003;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(.62, .28, .23, .99);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+#settings-drawer.open {
+  transform: translateX(0);
+}
+
+#settings-close {
+  background: none;
+  color: #fff;
+  border: none;
+  font-size: 2rem;
+  align-self: flex-end;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+}
+
+#settings-close:focus {
+  outline: 2px solid #ff0;
+}
+
+#main-content {
+  margin-left: 0;
+  transition: filter 0.2s;
+}
+
+#settings-drawer.open~#main-content {
+  filter: blur(1.5px) brightness(0.9);
+  pointer-events: none;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  #settings-drawer {
+    width: 80vw;
+    min-width: 180px;
+  }
+}
+
+#settings {
+  background: #222;
+  color: #fff;
+  padding: 2rem 1.5rem;
+  border-radius: 12px;
+  max-width: 350px;
+  margin: 2rem auto 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  box-shadow: 0 4px 32px #000a;
+}
+
+#settings h2 {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.setting-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  gap: 0.5rem;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+input[type="range"] {
+  flex: 1;
+  margin-right: 0.5em;
+}
+
+/* Game Overlay: used for Game Over and Pause */
+#game-overlay.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  /* For Safari & iOS */
+  -webkit-backdrop-filter: blur(6px) brightness(0.8);
+  backdrop-filter: blur(6px) brightness(0.8);
+  pointer-events: auto;
+}
+
+#game-overlay.show,
+#game-overlay:not(.hidden) {
+  display: flex;
+  animation: fadeIn 0.5s;
+}
+
+#restart {
+  margin-top: 2rem;
+  padding: 0.75em 2em;
+  font-size: 1.3rem;
+  background: #488cff;
+  color: #fff;
+  border: none;
+  border-radius: 0.5em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#restart:hover,
+.overlay-btn:hover,
+#restart:focus,
+.overlay-btn:focus {
+  background: #3870d0;
+  outline: 2px solid #fff;
+}
+
+#game-area {
+  position: relative;
+}
+
+/* Touch interactions and double-tap prevention */
+button,
+#controls button,
+.control-btn {
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+html,
+body {
+  touch-action: manipulation;
+  overscroll-behavior: contain;
+}
+
+/* Blurred effect when paused */
+.paused #game-wrapper,
+.paused #controls {
+  filter: blur(3px);
+  pointer-events: none;
+}
+
+.paused #pause-btn,
+.paused #settings-hamburger {
+  filter: none !important;
+  pointer-events: auto;
+  z-index: 1002;
+}
+
+/* For the pause button absolute at top right of canvas */
+#pause-btn {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  z-index: 50;
+  background: #1a1a1a;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 0.8rem;
+  font-size: 1.6rem;
+}
+
+#pause-btn:focus {
+  outline: 2px solid #6cf;
+}
+
+#pause-btn svg {
+  display: block;
+  fill: #fff;
+}
+#unpause-btn {
+  margin-top: 2rem;
+  padding: 0.75em 2em;
+  font-size: 1.3rem;
+  background: #488cff;
+  color: #fff;
+  border: none;
+  border-radius: 0.5em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#unpause-btn:hover,
+#unpause-btn:focus {
+  background: #3870d0;
+  outline: 2px solid #fff;
+}
+
+.paused #settings-hamburger {
+  filter: none !important;
+  pointer-events: auto;
+  z-index: 1002;
+}
+
+#pause-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  -webkit-backdrop-filter: blur(6px) brightness(0.8);
+  backdrop-filter: blur(6px) brightness(0.8);
+  pointer-events: auto;
+}
+
+#pause-overlay.show {
+  display: flex;
+  animation: fadeIn 0.5s;
+}
+
+#pause-message {
+  font-size: 2.5rem;
+  font-weight: bold;
+  background: rgba(20, 20, 20, 0.96);
+  color: #fff;
+  border-radius: 1em;
+  box-shadow: 0 8px 32px #000a;
+  padding: 2rem 3.5rem;
+  border: 3px solid #48f;
+  letter-spacing: 0.12em;
+  text-align: center;
+}
+
+.overlay-content {
+  background: rgba(20, 20, 20, 0.96);
+  color: #fff;
+  border-radius: 1em;
+  box-shadow: 0 8px 32px #000a;
+  padding: 2.5rem 3.5rem 2rem 3.5rem;
+  border: 3px solid #48f;
+  letter-spacing: 0.12em;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 240px;
+}
+
+#overlay-text {
+  font-size: 2.4rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  display: block;
+}
+
+.overlay-actions {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay-btn,
+#restart {
+  margin: 0 auto;
+  padding: 0.8em 2.2em;
+  font-size: 1.15rem;
+  background: #488cff;
+  color: #fff;
+  border: none;
+  border-radius: 0.6em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.overlay-btn:hover,
+.overlay-btn:focus,
+#restart:hover,
+#restart:focus {
+  background: #3870d0;
+  outline: 2px solid #fff;
+}
+
+.icon-btn {
+  background: #333;
+  border: none;
+  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1002;
+}
+
+.icon-btn:focus {
+  outline: 2px solid #ff0;
+}
+
+.icon-btn .bar {
+  display: block;
+  width: 26px;
+  height: 4px;
+  margin: 3px 0;
+  background: #fff;
+  border-radius: 2px;
+  transition: 0.3s;
 }

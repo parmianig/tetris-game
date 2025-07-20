@@ -83,21 +83,47 @@ export function merge(
   });
 }
 
-export function applyGravity(arena: Matrix, _level: number): void {
+// engine.ts
+export function applyGravityStep(arena: Matrix): boolean {
+  let changed = false;
+  // Scan from bottom-2 up to top
   for (let y = arena.length - 2; y >= 0; y--) {
     const row = arena[y];
     const nextRow = arena[y + 1];
-
     if (!row || !nextRow) continue;
 
     for (let x = 0; x < row.length; x++) {
-      const current = row[x];
-      const below = nextRow[x];
-
-      if (current !== 0 && below === 0) {
-        nextRow[x] = current as number;
+      if (row[x] !== 0 && nextRow[x] === 0) {
+        nextRow[x] = row[x]!;
         row[x] = 0;
+        changed = true;
       }
     }
   }
+  return changed;
+}
+
+export function applyGravity(arena: Matrix, _level: number): void {
+  let changed: boolean;
+  do {
+    changed = false;
+    // Start from second-to-last row upwards
+    for (let y = arena.length - 2; y >= 0; y--) {
+      const row = arena[y];
+      const nextRow = arena[y + 1];
+
+      if (!row || !nextRow) continue;
+
+      for (let x = 0; x < row.length; x++) {
+        const current = row[x];
+        const below = nextRow[x];
+
+        if (current !== 0 && below === 0) {
+          nextRow[x] = current as number;
+          row[x] = 0;
+          changed = true; // We made a drop, so repeat!
+        }
+      }
+    }
+  } while (changed); // Repeat until nothing falls further
 }
