@@ -5,10 +5,10 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 ---
 ## Changelog
 <!-- changelog -->
-## release/v0.3.5
+## release/v0.4.0
+* minor: feat: update hamburger menu, fix pause/settings UI, clean up styles - Replace hamburger icon with semantic HTML/CSS - Improve pause overlay and settings drawer - Remove src/style.css, centralize styles - Add new settings drawer script and types - Minor fixes in engine and main logic (primo)
+* Remove .DS_Store files (primo)
 * patch: fix vercel (primo)
-* patch: - update main.ts with the canvas right border \ fix bumb version  and some refactor (primo)
-* patch: - update main.ts with the canvas right border \and some refactor (primo)
 
 ---
 
