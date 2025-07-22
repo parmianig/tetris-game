@@ -1,3 +1,4 @@
+import type { Position } from "./game";
 import type { Player } from "./types";
 
 export type Matrix = number[][];
@@ -38,21 +39,6 @@ export function arenaSweep(arena: number[][], width: number) {
       y++;
     }
   }
-}
-
-export function drawMatrix(
-  ctx: CanvasRenderingContext2D,
-  matrix: Matrix,
-  offset = { x: 0, y: 0 }
-) {
-  matrix.forEach((row, y) => {
-    row.forEach((value, x) => {
-      if (value !== 0) {
-        ctx.fillStyle = "red";
-        ctx.fillRect(x + offset.x, y + offset.y, 1, 1);
-      }
-    });
-  });
 }
 
 export function rotate(matrix: Matrix, direction: number): Matrix {

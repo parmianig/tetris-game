@@ -377,7 +377,6 @@ body {
   transition: background 0.2s;
 }
 
-.overlay-btn:hover,
 .overlay-btn:focus,
 #restart:hover,
 #restart:focus {
@@ -414,4 +413,28 @@ body {
   background: #fff;
   border-radius: 2px;
   transition: 0.3s;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.overlay.hidden {
+  display: none !important;
+}
+
+.overlay-buttons {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.control-btn {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border: none;
+  background-color: #444;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
 }

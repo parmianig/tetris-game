@@ -18,13 +18,15 @@
     </button>
 
     <!-- Game Over Overlay -->
-    <div id="game-overlay" class="overlay hidden" tabindex="-1">
+    <div id="game-overlay" class="overlay hidden">
       <div class="overlay-content">
-        <span id="overlay-text"></span>
-        <button id="restart" class="overlay-btn control-btn">Restart</button>
+        <div id="overlay-text" aria-live="polite"></div>
+        <div class="overlay-buttons">
+          <button id="resume-btn" type="button" class="hidden control-btn">Resume</button>
+          <button id="restart" type="button" class="hidden control-btn">Restart</button>
+        </div>
       </div>
-    </div>
-
+      </div>
 
     <!-- Settings Drawer -->
     <aside id="settings-drawer" aria-label="Game Settings" tabindex="-1">

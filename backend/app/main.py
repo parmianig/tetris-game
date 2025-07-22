@@ -1,9 +1,13 @@
+import os
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
 from fastapi.middleware.cors import CORSMiddleware
+from .api.tetromino import router as tetromino_router
+
 
 app = FastAPI()
 
@@ -16,8 +20,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(tetromino_router, prefix="/api/tetromino")
+
 # Serve static files (e.g., favicon)
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+# Get the absolute path to static
+STATIC_PATH = os.path.join(os.path.dirname(__file__), "static")
+app.mount("/static", StaticFiles(directory=STATIC_PATH), name="static")
 
 # In-memory score list (temporary)
 scores = []

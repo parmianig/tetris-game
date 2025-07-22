@@ -1,12 +1,15 @@
+import type { Position } from "./game";
+
 export function drawMatrix(
   ctx: CanvasRenderingContext2D,
   matrix: number[][],
-  offset: { x: number; y: number } = { x: 0, y: 0 }
+  offset: { x: number; y: number } = { x: 0, y: 0 },
+  color = "#F00" // Default if none is passed
 ) {
   matrix.forEach((row, y) => {
     row.forEach((value, x) => {
       if (value !== 0) {
-        ctx.fillStyle = "red";
+        ctx.fillStyle = color;
         ctx.fillRect(x + offset.x, y + offset.y, 1, 1);
       }
     });
