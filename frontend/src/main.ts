@@ -54,7 +54,6 @@ const pauseBtn = document.getElementById(
 
 // --- Game State ---
 type PauseReason = "user" | "menu" | null;
-let pauseReason: PauseReason = null; // Only for overlay logic
 let nextTetromino: Tetromino | null = null;
 
 const arena: Matrix = createMatrix(ARENA_WIDTH, ARENA_HEIGHT);
@@ -127,7 +126,6 @@ async function restartGame() {
   gameState.gameOver = false; // <-- Use shared state!
   gameState.paused = false;
   gameState.isGravityAnimating = false;
-  pauseReason = null;
   dropAccumulator = 0;
   lastTime = 0;
   await safeResetPlayer(player);
