@@ -1,7 +1,11 @@
 import type { Player } from "./types";
 import { drawMatrix } from "./render";
+import type { Matrix } from "./engine";
 import { collide, merge, applyGravity, arenaSweep } from "./engine";
 import { ARENA_WIDTH, ARENA_HEIGHT, TILE_SIZE } from "./constants";
+import { resetPlayerFromBackend } from "./main";
+import { updateOverlay } from "./ui";
+import { gameState } from "./gameState"; // NEW: import shared state
 
 // Canvas setup
 const canvas = document.getElementById("tetris") as HTMLCanvasElement;
@@ -11,7 +15,7 @@ const context = canvas.getContext("2d")!;
 context.scale(TILE_SIZE, TILE_SIZE);
 
 // Draw current frame
-export function draw(arena: number[][], player: Player) {
+export function draw(arena: Matrix, player: Player) {
   context.fillStyle = "#122";
   context.fillRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT);
   drawMatrix(context, arena);
@@ -21,23 +25,56 @@ export function draw(arena: number[][], player: Player) {
 // Drop player by 1 step or lock+reset if collision
 export function playerDrop(
   player: Player,
-  arena: number[][],
+  arena: Matrix,
   gravityMode: boolean
 ): void {
   player.pos.y++;
   if (collide(arena, player)) {
     player.pos.y--;
-    merge(arena, player.matrix, player.pos);
-
+    merge(arena, player.matrix, player.pos, player.color);
     if (gravityMode) {
       applyGravity(arena, player.level);
     }
-
     arenaSweep(arena, ARENA_WIDTH);
     resetPlayer(player);
 
     if (collide(arena, player)) {
-      console.log("Game Over");
+      gameState.gameOver = true;
+      updateOverlay("gameover");
+    }
+  }
+}
+
+// --- Safe player reset wrapper ---
+async function safeResetPlayer(player: Player) {
+  try {
+    await resetPlayerFromBackend(player);
+  } catch (e) {
+    console.error("Failed to fetch next piece from server:", e);
+    gameState.paused = true;
+    updateOverlay("error");
+  }
+}
+
+// Drop with game over and overlay
+export async function playerDropWithGameOver(
+  player: Player,
+  arena: Matrix,
+  gravityMode: boolean
+) {
+  if (gameState.gameOver) return;
+  player.pos.y++;
+  if (collide(arena, player)) {
+    player.pos.y--;
+    merge(arena, player.matrix, player.pos, player.color);
+    arenaSweep(arena, ARENA_WIDTH);
+    if (gravityMode) {
+      // handled in gravity animation
+    }
+    await safeResetPlayer(player);
+    if (collide(arena, player)) {
+      gameState.gameOver = true;
+      updateOverlay("gameover");
     }
   }
 }
@@ -50,4 +87,5 @@ function resetPlayer(player: Player) {
     [1, 1, 1],
     [0, 0, 0],
   ];
+  // Optionally reset color/shape/level here if needed
 }

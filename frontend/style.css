@@ -96,7 +96,6 @@ canvas {
   left: 0;
   width: 260px;
   max-width: 80vw;
-  height: 100%;
   background: #24262b;
   color: #fff;
   box-shadow: 2px 0 12px rgba(0, 0, 0, 0.4);
@@ -107,6 +106,9 @@ canvas {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  height: 100dvh;
+  /* fixes iOS viewport issues */
+  will-change: transform;
 }
 
 #settings-drawer.open {
@@ -132,7 +134,7 @@ canvas {
   transition: filter 0.2s;
 }
 
-#settings-drawer.open~#main-content {
+body.drawer-open #main-content {
   filter: blur(1.5px) brightness(0.9);
   pointer-events: none;
 }
@@ -437,4 +439,46 @@ body {
   color: #fff;
   border-radius: 4px;
   cursor: pointer;
+}
+
+#drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.33);
+  z-index: 1001;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+body.drawer-open #drawer-overlay {
+  opacity: 1;
+  pointer-events: all;
+}
+
+#settings-hamburger.open .bar:nth-child(1) {
+  transform: rotate(45deg) translateY(7px);
+}
+
+#settings-hamburger.open .bar:nth-child(2) {
+  opacity: 0;
+}
+
+#settings-hamburger.open .bar:nth-child(3) {
+  transform: rotate(-45deg) translateY(-7px);
+}
+
+.version-footer {
+  margin-top: auto;
+  /* stick to bottom */
+  padding: 1rem 0 0.5rem 0;
+  color: #ff4e4e;
+  /* vivid red */
+  background: none;
+  font-family: monospace;
+  font-size: 1rem;
+  text-align: center;
+  letter-spacing: 0.04em;
+  z-index: 1004;
+  position: relative;
 }

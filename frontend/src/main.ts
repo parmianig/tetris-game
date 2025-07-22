@@ -1,23 +1,21 @@
-import { draw } from "./game";
+import { draw, playerDropWithGameOver } from "./game";
 import { bindInput } from "./input";
 import {
   createMatrix,
-  collide,
-  merge,
   applyGravityStep,
   arenaSweep,
+  type Matrix,
 } from "./engine";
 import { ARENA_WIDTH, ARENA_HEIGHT } from "./constants";
 import { GAME_SETTINGS } from "./settings";
+import "./settings-drawer";
+import { updateOverlay } from "./ui";
+import { gameState } from "./gameState";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 if (!BACKEND_URL) throw new Error("Missing VITE_BACKEND_URL env variable");
 
-// Expose for vanilla JS
 (window as any).GAME_SETTINGS = GAME_SETTINGS;
-
-// Import settings drawer
-import "./settings-drawer";
 
 // --- Types ---
 export interface Tetromino {
@@ -31,27 +29,35 @@ interface Position {
 }
 interface Player {
   pos: Position;
-  matrix: number[][];
+  matrix: Matrix;
   color: string;
   shape: string;
   level: number;
 }
 
 // --- DOM Elements ---
-const overlay = document.getElementById("game-overlay") as HTMLDivElement;
-const overlayText = document.getElementById("overlay-text") as HTMLSpanElement;
-const restartBtn = document.getElementById("restart") as HTMLButtonElement;
-const resumeBtn = document.getElementById("resume-btn") as HTMLButtonElement;
-const pauseBtn = document.getElementById("pause-btn") as HTMLButtonElement;
+const overlay = document.getElementById(
+  "game-overlay"
+) as HTMLDivElement | null;
+const overlayText = document.getElementById(
+  "overlay-text"
+) as HTMLSpanElement | null;
+const restartBtn = document.getElementById(
+  "restart"
+) as HTMLButtonElement | null;
+const resumeBtn = document.getElementById(
+  "resume-btn"
+) as HTMLButtonElement | null;
+const pauseBtn = document.getElementById(
+  "pause-btn"
+) as HTMLButtonElement | null;
 
 // --- Game State ---
 type PauseReason = "user" | "menu" | null;
-let paused: PauseReason = null;
-let gameOver = false;
-let isGravityAnimating = false;
+let pauseReason: PauseReason = null; // Only for overlay logic
 let nextTetromino: Tetromino | null = null;
 
-const arena = createMatrix(ARENA_WIDTH, ARENA_HEIGHT);
+const arena: Matrix = createMatrix(ARENA_WIDTH, ARENA_HEIGHT);
 const player: Player = {
   pos: { x: 3, y: 0 },
   matrix: [],
@@ -70,85 +76,68 @@ let lastTime = 0;
 
 // --- API ---
 async function fetchNextTetromino(): Promise<Tetromino> {
-  const res = await fetch("/api/tetromino/next", {
-    cache: "no-store",
-  });
+  const res = await fetch("/api/tetromino/next", { cache: "no-store" });
   if (!res.ok) throw new Error("Tetromino API error");
   return res.json();
 }
 
 // --- Player Reset (from backend) ---
-async function resetPlayerFromBackend(player: Player): Promise<void> {
+export async function resetPlayerFromBackend(player: Player): Promise<void> {
   const tetro = nextTetromino ?? (await fetchNextTetromino());
-  player.matrix = tetro.matrix;
+  player.matrix = tetro.matrix.map((row) => [...row]) as Matrix;
   player.color = tetro.color;
   player.shape = tetro.shape;
   player.pos.y = 0;
   player.pos.x = Math.floor(
-    (ARENA_WIDTH - (player.matrix[0]?.length || 0)) / 2
+    (ARENA_WIDTH - (player.matrix[0]?.length ?? 0)) / 2
   );
   player.level = 1;
   nextTetromino = await fetchNextTetromino();
   updateNextPiecePreview(nextTetromino);
 }
 
-// --- UI Overlay ---
-function updateOverlay() {
-  if (!overlay || !overlayText || !resumeBtn || !restartBtn) return;
-  if (gameOver) {
-    overlayText.textContent = "Game Over!";
-    overlay.classList.remove("hidden");
-    resumeBtn.classList.add("hidden");
-    restartBtn.classList.remove("hidden");
-  } else if (paused === "user") {
-    overlayText.textContent = "Paused";
-    overlay.classList.remove("hidden");
-    resumeBtn.classList.remove("hidden");
-    restartBtn.classList.add("hidden");
-  } else {
-    overlay.classList.add("hidden");
-    resumeBtn.classList.add("hidden");
-    restartBtn.classList.add("hidden");
-  }
-}
-
 // --- Pause/Resume Logic ---
 function setPaused(val: boolean, reason: PauseReason = "user") {
   if (val) {
-    paused = reason;
+    gameState.paused = true;
+    updateOverlay("paused", reason); // <-- pass the reason!
   } else {
-    paused = null;
+    gameState.paused = false;
+    updateOverlay("hidden");
   }
-  updateOverlay();
-  if (!paused && !gameOver) {
+  if (!gameState.paused && !gameState.gameOver) {
     requestAnimationFrame(update);
   }
 }
+
 (window as any).setPaused = (val: boolean, reason: PauseReason = "menu") =>
   setPaused(val, reason);
 
 // --- Pause/Resume Event Handlers ---
 pauseBtn?.addEventListener("click", () => {
-  if (gameOver) return;
-  setPaused(!paused, "user");
+  if (gameState.gameOver) return;
+  setPaused(!gameState.paused, "user");
 });
 resumeBtn?.addEventListener("click", () => setPaused(false));
 
 // --- Restart ---
-function restartGame() {
+async function restartGame() {
   for (const row of arena) row.fill(0);
   player.level = 1;
-  gameOver = false;
-  paused = null;
-  isGravityAnimating = false;
+  gameState.gameOver = false; // <-- Use shared state!
+  gameState.paused = false;
+  gameState.isGravityAnimating = false;
+  pauseReason = null;
   dropAccumulator = 0;
-  lastTime = performance.now();
-  safeResetPlayer(player);
-  updateOverlay();
+  lastTime = 0;
+  await safeResetPlayer(player);
+  updateOverlay("hidden");
   requestAnimationFrame(update);
 }
 
-restartBtn?.addEventListener("click", restartGame);
+restartBtn?.addEventListener("click", () => {
+  restartGame().catch(console.error);
+});
 
 // --- Next Piece Preview ---
 function updateNextPiecePreview(next: Tetromino | null) {
@@ -159,16 +148,15 @@ function updateNextPiecePreview(next: Tetromino | null) {
 
 // --- Gravity Animation ---
 function startGravityAnimation(callbackAfter?: () => void) {
-  isGravityAnimating = true;
+  gameState.isGravityAnimating = true;
   function animate() {
     const changed = applyGravityStep(arena);
     draw(arena, player);
     if (changed) {
       setTimeout(animate, GAME_SETTINGS.gravityCascadeDelayMs);
     } else {
-      // 🔴 After gravity animation, sweep for completed lines!
       arenaSweep(arena, ARENA_WIDTH);
-      isGravityAnimating = false;
+      gameState.isGravityAnimating = false;
       if (callbackAfter) callbackAfter();
     }
   }
@@ -177,40 +165,18 @@ function startGravityAnimation(callbackAfter?: () => void) {
 
 function dropAndMaybeAnimateGravity() {
   playerDropWithGameOver(player, arena, GAME_SETTINGS.gravityMode);
-  if (GAME_SETTINGS.gravityMode && !gameOver) {
+  if (GAME_SETTINGS.gravityMode && !gameState.gameOver) {
     startGravityAnimation();
-  }
-}
-
-async function playerDropWithGameOver(
-  player: Player,
-  arena: number[][],
-  gravityMode: boolean
-) {
-  if (gameOver) return;
-  player.pos.y++;
-  if (collide(arena, player)) {
-    player.pos.y--;
-    merge(arena, player.matrix, player.pos);
-    arenaSweep(arena, ARENA_WIDTH);
-    if (gravityMode) {
-      // handled in gravity animation
-    }
-    await safeResetPlayer(player);
-    if (collide(arena, player)) {
-      gameOver = true;
-      updateOverlay();
-    }
   }
 }
 
 // --- Game Loop ---
 function update(time = 0) {
-  if (gameOver || paused) {
+  if (gameState.gameOver || gameState.paused) {
     draw(arena, player);
     return;
   }
-
+  if (!lastTime) lastTime = time;
   const deltaTime = (time - lastTime) / 1000;
   lastTime = time;
 
@@ -219,14 +185,13 @@ function update(time = 0) {
     gravityLevels[Math.min(player.level, gravityLevels.length - 1)] ||
     1.0;
 
-  if (!isGravityAnimating) {
+  if (!gameState.isGravityAnimating) {
     dropAccumulator += deltaTime;
     if (dropAccumulator >= gravity) {
       dropAndMaybeAnimateGravity();
       dropAccumulator = 0;
     }
   }
-
   draw(arena, player);
   requestAnimationFrame(update);
 }
@@ -238,8 +203,8 @@ async function safeResetPlayer(player: Player) {
   } catch (e) {
     console.error("Failed to fetch next piece from server:", e);
     setPaused(true);
-    overlayText.textContent = "Connection Error";
-    overlay.classList.add("show");
+    if (overlayText) overlayText.textContent = "Connection Error";
+    if (overlay) overlay.classList.add("show");
   }
 }
 
@@ -248,9 +213,9 @@ bindInput(
   player,
   arena,
   () =>
-    gameOver ||
-    Boolean(paused) ||
-    (isGravityAnimating && GAME_SETTINGS.lockDuringCascade),
+    gameState.gameOver ||
+    gameState.paused ||
+    (gameState.isGravityAnimating && GAME_SETTINGS.lockDuringCascade),
   dropAndMaybeAnimateGravity
 );
 

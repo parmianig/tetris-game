@@ -1,14 +1,10 @@
-export interface Player {
-  pos: { x: number; y: number };
-  matrix: number[][];
-  level: number;
-}
+import type { Matrix } from "./engine";
 
 export interface Player {
   pos: Position;
-  matrix: number[][];
   color: string;
   shape: string;
+  matrix: Matrix;
   level: number;
 }
 

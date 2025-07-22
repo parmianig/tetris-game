@@ -1,9 +1,9 @@
-import { rotate, collide } from "./engine";
+import { rotate, collide, type Matrix } from "./engine";
 import type { Player } from "./types";
 
 export function bindInput(
   player: Player,
-  arena: number[][],
+  arena: Matrix, // <--- must be Matrix!
   isDisabled: () => boolean,
   drop: () => void
 ) {
