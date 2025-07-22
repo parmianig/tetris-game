@@ -1,5 +1,3 @@
-import type { Position } from "./game";
-
 export function drawMatrix(
   ctx: CanvasRenderingContext2D,
   matrix: number[][],

@@ -1,4 +1,3 @@
-import type { Position } from "./game";
 import type { Player } from "./types";
 
 export type Matrix = number[][];
