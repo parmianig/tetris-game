@@ -10,6 +10,9 @@ import {
 import { ARENA_WIDTH, ARENA_HEIGHT } from "./constants";
 import { GAME_SETTINGS } from "./settings";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+if (!BACKEND_URL) throw new Error("Missing VITE_BACKEND_URL env variable");
+
 // Expose for vanilla JS
 (window as any).GAME_SETTINGS = GAME_SETTINGS;
 
@@ -67,7 +70,9 @@ let lastTime = 0;
 
 // --- API ---
 async function fetchNextTetromino(): Promise<Tetromino> {
-  const res = await fetch("/api/tetromino/next", { cache: "no-store" });
+  const res = await fetch("/api/tetromino/next", {
+    cache: "no-store",
+  });
   if (!res.ok) throw new Error("Tetromino API error");
   return res.json();
 }
@@ -125,7 +130,7 @@ function setPaused(val: boolean, reason: PauseReason = "user") {
 // --- Pause/Resume Event Handlers ---
 pauseBtn?.addEventListener("click", () => {
   if (gameOver) return;
-  setPaused(paused ? false : true, "user");
+  setPaused(!paused, "user");
 });
 resumeBtn?.addEventListener("click", () => setPaused(false));
 
