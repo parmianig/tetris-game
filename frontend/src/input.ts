@@ -1,12 +1,16 @@
-import type { Player } from "./types";
 import { rotate, collide } from "./engine";
-import { playerDrop, getGravityMode } from "./game";
+import type { Player } from "./types";
 
-// Handles keyboard controls for Tetris.
-// Rotation: Option (Alt) or Shift = counterclockwise, Space = clockwise.
-
-export function bindInput(player: Player, arena: number[][]) {
+export function bindInput(
+  player: Player,
+  arena: number[][],
+  isDisabled: () => boolean,
+  drop: () => void
+) {
+  // Keyboard controls
   document.addEventListener("keydown", (event) => {
+    if (isDisabled()) return;
+
     switch (event.key) {
       case "ArrowLeft":
         player.pos.x--;
@@ -17,37 +21,47 @@ export function bindInput(player: Player, arena: number[][]) {
         if (collide(arena, player)) player.pos.x--;
         break;
       case "ArrowDown":
-        playerDrop(player, arena, getGravityMode());
+        drop();
         break;
-      case "Alt": // Option key (⌥) on macOS, Alt on Win/Linux
-      case "Shift":
-        player.matrix = rotate(player.matrix, -1);
-        if (collide(arena, player)) player.matrix = rotate(player.matrix, 1);
-        break;
-      case " ":
-        player.matrix = rotate(player.matrix, 1);
-        if (collide(arena, player)) player.matrix = rotate(player.matrix, -1);
+      case "ArrowUp":
+        if (event.shiftKey) {
+          player.matrix = rotate(player.matrix, -1); // Counterclockwise
+          if (collide(arena, player)) player.matrix = rotate(player.matrix, 1);
+        } else {
+          player.matrix = rotate(player.matrix, 1); // Clockwise
+          if (collide(arena, player)) player.matrix = rotate(player.matrix, -1);
+        }
         break;
     }
   });
 
-  // Mobile/touch UI controls (assuming button IDs exist in DOM)
-  document.getElementById("left")?.addEventListener("click", () => {
-    player.pos.x--;
-    if (collide(arena, player)) player.pos.x++;
-  });
+  // Touch/Control UI
+  const safe = (action: () => void) => {
+    if (!isDisabled()) action();
+  };
 
-  document.getElementById("right")?.addEventListener("click", () => {
-    player.pos.x++;
-    if (collide(arena, player)) player.pos.x--;
-  });
+  document.getElementById("left")?.addEventListener("click", () =>
+    safe(() => {
+      player.pos.x--;
+      if (collide(arena, player)) player.pos.x++;
+    })
+  );
 
-  document.getElementById("rotate")?.addEventListener("click", () => {
-    player.matrix = rotate(player.matrix, 1);
-    if (collide(arena, player)) player.matrix = rotate(player.matrix, -1);
-  });
+  document.getElementById("right")?.addEventListener("click", () =>
+    safe(() => {
+      player.pos.x++;
+      if (collide(arena, player)) player.pos.x--;
+    })
+  );
 
-  document.getElementById("down")?.addEventListener("click", () => {
-    playerDrop(player, arena, getGravityMode());
-  });
+  document.getElementById("rotate")?.addEventListener("click", () =>
+    safe(() => {
+      player.matrix = rotate(player.matrix, 1);
+      if (collide(arena, player)) player.matrix = rotate(player.matrix, -1);
+    })
+  );
+
+  document
+    .getElementById("down")
+    ?.addEventListener("click", () => safe(() => drop()));
 }

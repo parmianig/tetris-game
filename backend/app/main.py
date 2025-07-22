@@ -55,3 +55,8 @@ def get_scores():
 def add_score(score: Score):
     scores.append(score)
     return score
+
+# Health Check
+@app.get("/ping")
+def ping():
+    return {"status": "ok"}

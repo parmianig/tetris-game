@@ -36,7 +36,7 @@
         <div class="setting-row">
           <label for="gravity-toggle">
             <input type="checkbox" id="gravity-toggle" />
-            Gravity Mode (Cascade)
+            Enable Gravity Animation
           </label>
         </div>
         <div class="setting-row">
@@ -45,20 +45,18 @@
             Lock Controls During Cascade
           </label>
         </div>
-        <div class="setting-row">
-          <label for="cascade-speed">Cascade Speed:</label>
-          <div class="slider-row">
-            <input type="range" id="cascade-speed" min="10" max="200" step="10" value="50" />
-            <span id="cascade-speed-label">50ms</span>
-          </div>
+        <div>
+          <label for="gravity-speed">
+            Gravity Speed (sec per drop): <span id="gravity-speed-label">1.0</span>
+          </label>
+          <input type="range" id="gravity-speed" min="0.1" max="2" step="0.1" value="1.0" />
         </div>
-        <div class="setting-row">
-          <label for="gravity-speed">Gravity Speed:</label>
-          <div class="slider-row">
-            <input type="range" id="gravity-speed" min="0.05" max="2" step="0.01" value="1" />
-            <span id="gravity-speed-label">1.00s</span>
-          </div>
-        </div>
+
+        <div>
+          <label for="cascade-speed">
+            Cascade Delay (ms): <span id="cascade-speed-label">50</span>
+          </label>
+          <input type="range" id="cascade-speed" min="0" max="200" step="10" value="50" />  </div>
       </section>
     </aside>
 
@@ -94,37 +92,6 @@
     </main>
 
     <script type="module" src="/src/main.ts"></script>
-    <script>
-      // Hamburger menu and drawer logic
-      const hamburger = document.getElementById("settings-hamburger");
-      const drawer = document.getElementById("settings-drawer");
-      const closeBtn = document.getElementById("settings-close");
-
-      function openDrawer() {
-        drawer.classList.add("open");
-        hamburger.setAttribute("aria-expanded", "true");
-        drawer.focus();
-      }
-      function closeDrawer() {
-        drawer.classList.remove("open");
-        hamburger.setAttribute("aria-expanded", "false");
-        hamburger.focus();
-      }
-      hamburger.addEventListener("click", openDrawer);
-      closeBtn.addEventListener("click", closeDrawer);
-      drawer.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") closeDrawer();
-      });
-      document.addEventListener("mousedown", (e) => {
-        if (
-          drawer.classList.contains("open") &&
-          !drawer.contains(e.target) &&
-          e.target !== hamburger
-        ) {
-          closeDrawer();
-        }
-      });
-    </script>
   </body>
 
 </html>

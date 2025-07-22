@@ -1,26 +1,24 @@
 import type { Player } from "./types";
+import { drawMatrix } from "./render";
 import { collide, merge, applyGravity, arenaSweep } from "./engine";
-import { ARENA_WIDTH } from "./constants";
-let _gravityMode = false;
+import { ARENA_WIDTH, ARENA_HEIGHT, TILE_SIZE } from "./constants";
 
-export function getGravityMode(): boolean {
-  return _gravityMode;
+// Canvas setup
+const canvas = document.getElementById("tetris") as HTMLCanvasElement;
+canvas.width = ARENA_WIDTH * TILE_SIZE;
+canvas.height = ARENA_HEIGHT * TILE_SIZE;
+const context = canvas.getContext("2d")!;
+context.scale(TILE_SIZE, TILE_SIZE);
+
+// Draw current frame
+export function draw(arena: number[][], player: Player) {
+  context.fillStyle = "#122";
+  context.fillRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT);
+  drawMatrix(context, arena);
+  drawMatrix(context, player.matrix, player.pos, player.color);
 }
 
-export function setGravityMode(val: boolean): void {
-  _gravityMode = val;
-}
-
-export function resetPlayer(player: Player) {
-  player.matrix = [
-    [0, 1, 0],
-    [1, 1, 1],
-    [0, 0, 0],
-  ];
-  player.pos.y = 0;
-  player.pos.x = ((ARENA_WIDTH / 2) | 0) - 1;
-}
-
+// Drop player by 1 step or lock+reset if collision
 export function playerDrop(
   player: Player,
   arena: number[][],
@@ -30,41 +28,26 @@ export function playerDrop(
   if (collide(arena, player)) {
     player.pos.y--;
     merge(arena, player.matrix, player.pos);
+
     if (gravityMode) {
       applyGravity(arena, player.level);
     }
+
     arenaSweep(arena, ARENA_WIDTH);
     resetPlayer(player);
-    // Game over detection
+
     if (collide(arena, player)) {
       console.log("Game Over");
     }
   }
 }
-export interface Position {
-  x: number;
-  y: number;
-}
 
-export function createPlayer(): Player {
-  return {
-    pos: { x: 3, y: 0 },
-    matrix: [
-      [0, 1, 0],
-      [1, 1, 1],
-      [0, 0, 0],
-    ],
-    level: 1,
-  };
-}
-
-export function sweepArena(arena: number[][]): void {
-  const width = arena[0]?.length ?? 10; // fallback to default width if arena is empty
-  for (let y = arena.length - 1; y >= 0; y--) {
-    if (arena[y]?.every((cell) => cell !== 0)) {
-      arena.splice(y, 1);
-      arena.unshift(new Array(width).fill(0));
-      y++;
-    }
-  }
+// Dummy fallback (can be overridden during serverless mode)
+function resetPlayer(player: Player) {
+  player.pos = { x: 3, y: 0 };
+  player.matrix = [
+    [0, 1, 0],
+    [1, 1, 1],
+    [0, 0, 0],
+  ];
 }

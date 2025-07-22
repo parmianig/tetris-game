@@ -1,15 +1,20 @@
-import { drawMatrix } from "./render";
+import { draw } from "./game";
+import { bindInput } from "./input";
 import {
   createMatrix,
-  rotate,
   collide,
-  applyGravityStep,
   merge,
+  applyGravityStep,
   arenaSweep,
 } from "./engine";
-import { getGravityMode, setGravityMode } from "./game";
-import { TILE_SIZE, ARENA_WIDTH, ARENA_HEIGHT } from "./constants";
+import { ARENA_WIDTH, ARENA_HEIGHT } from "./constants";
 import { GAME_SETTINGS } from "./settings";
+
+// Expose for vanilla JS
+(window as any).GAME_SETTINGS = GAME_SETTINGS;
+
+// Import settings drawer
+import "./settings-drawer";
 
 // --- Types ---
 export interface Tetromino {
@@ -30,36 +35,19 @@ interface Player {
 }
 
 // --- DOM Elements ---
-const canvas = document.getElementById("tetris") as HTMLCanvasElement;
-canvas.width = ARENA_WIDTH * TILE_SIZE;
-canvas.height = ARENA_HEIGHT * TILE_SIZE;
-const context = canvas.getContext("2d")!;
-context.scale(TILE_SIZE, TILE_SIZE);
-
-const lockCascadeToggle = document.getElementById(
-  "lock-cascade-toggle"
-) as HTMLInputElement | null;
-const cascadeSpeedSlider = document.getElementById(
-  "cascade-speed"
-) as HTMLInputElement | null;
-const cascadeSpeedLabel = document.getElementById("cascade-speed-label");
-const gravitySpeedSlider = document.getElementById(
-  "gravity-speed"
-) as HTMLInputElement | null;
-const gravitySpeedLabel = document.getElementById("gravity-speed-label");
 const overlay = document.getElementById("game-overlay") as HTMLDivElement;
 const overlayText = document.getElementById("overlay-text") as HTMLSpanElement;
 const restartBtn = document.getElementById("restart") as HTMLButtonElement;
 const resumeBtn = document.getElementById("resume-btn") as HTMLButtonElement;
 const pauseBtn = document.getElementById("pause-btn") as HTMLButtonElement;
 
-// --- State ---
-let paused = false;
+// --- Game State ---
+type PauseReason = "user" | "menu" | null;
+let paused: PauseReason = null;
 let gameOver = false;
 let isGravityAnimating = false;
 let nextTetromino: Tetromino | null = null;
 
-// --- Game Data ---
 const arena = createMatrix(ARENA_WIDTH, ARENA_HEIGHT);
 const player: Player = {
   pos: { x: 3, y: 0 },
@@ -77,25 +65,14 @@ const gravityLevels: number[] = [
 let dropAccumulator = 0;
 let lastTime = 0;
 
-// --- Backend API: Tetromino ---
+// --- API ---
 async function fetchNextTetromino(): Promise<Tetromino> {
-  // Always use relative path, let Vite proxy handle it!
-  const res = await fetch("/api/tetromino/next", {
-    cache: "no-store",
-  });
+  const res = await fetch("/api/tetromino/next", { cache: "no-store" });
   if (!res.ok) throw new Error("Tetromino API error");
   return res.json();
 }
 
-// --- Next Piece Preview ---
-function updateNextPiecePreview(next: Tetromino | null) {
-  const preview = document.getElementById("next-piece");
-  if (!preview || !next) return;
-  preview.innerHTML = `<b>Next:</b> ${next.shape}`;
-  // For a real preview: render matrix here (canvas or emoji)
-}
-
-// --- Player (re)set using backend ---
+// --- Player Reset (from backend) ---
 async function resetPlayerFromBackend(player: Player): Promise<void> {
   const tetro = nextTetromino ?? (await fetchNextTetromino());
   player.matrix = tetro.matrix;
@@ -110,16 +87,15 @@ async function resetPlayerFromBackend(player: Player): Promise<void> {
   updateNextPiecePreview(nextTetromino);
 }
 
-// --- Overlay logic ---
+// --- UI Overlay ---
 function updateOverlay() {
   if (!overlay || !overlayText || !resumeBtn || !restartBtn) return;
-
   if (gameOver) {
     overlayText.textContent = "Game Over!";
     overlay.classList.remove("hidden");
     resumeBtn.classList.add("hidden");
     restartBtn.classList.remove("hidden");
-  } else if (paused) {
+  } else if (paused === "user") {
     overlayText.textContent = "Paused";
     overlay.classList.remove("hidden");
     resumeBtn.classList.remove("hidden");
@@ -131,21 +107,34 @@ function updateOverlay() {
   }
 }
 
-function setPaused(val: boolean) {
-  paused = val;
+// --- Pause/Resume Logic ---
+function setPaused(val: boolean, reason: PauseReason = "user") {
+  if (val) {
+    paused = reason;
+  } else {
+    paused = null;
+  }
   updateOverlay();
-
   if (!paused && !gameOver) {
-    requestAnimationFrame(update); // ✅ continue game loop, no reset
+    requestAnimationFrame(update);
   }
 }
+(window as any).setPaused = (val: boolean, reason: PauseReason = "menu") =>
+  setPaused(val, reason);
+
+// --- Pause/Resume Event Handlers ---
+pauseBtn?.addEventListener("click", () => {
+  if (gameOver) return;
+  setPaused(paused ? false : true, "user");
+});
+resumeBtn?.addEventListener("click", () => setPaused(false));
 
 // --- Restart ---
 function restartGame() {
   for (const row of arena) row.fill(0);
   player.level = 1;
   gameOver = false;
-  paused = false;
+  paused = null;
   isGravityAnimating = false;
   dropAccumulator = 0;
   lastTime = performance.now();
@@ -156,25 +145,24 @@ function restartGame() {
 
 restartBtn?.addEventListener("click", restartGame);
 
-resumeBtn?.addEventListener("click", () => {
-  setPaused(false);
-});
-
-// --- Pause Button ---
-pauseBtn?.addEventListener("click", () => {
-  if (gameOver) return;
-  setPaused(!paused);
-});
+// --- Next Piece Preview ---
+function updateNextPiecePreview(next: Tetromino | null) {
+  const preview = document.getElementById("next-piece");
+  if (!preview || !next) return;
+  preview.innerHTML = `<b>Next:</b> ${next.shape}`;
+}
 
 // --- Gravity Animation ---
 function startGravityAnimation(callbackAfter?: () => void) {
   isGravityAnimating = true;
   function animate() {
     const changed = applyGravityStep(arena);
-    draw();
+    draw(arena, player);
     if (changed) {
       setTimeout(animate, GAME_SETTINGS.gravityCascadeDelayMs);
     } else {
+      // 🔴 After gravity animation, sweep for completed lines!
+      arenaSweep(arena, ARENA_WIDTH);
       isGravityAnimating = false;
       if (callbackAfter) callbackAfter();
     }
@@ -182,15 +170,13 @@ function startGravityAnimation(callbackAfter?: () => void) {
   animate();
 }
 
-// --- Drop + Animate Gravity ---
 function dropAndMaybeAnimateGravity() {
-  playerDropWithGameOver(player, arena, getGravityMode());
-  if (getGravityMode() && !gameOver) {
+  playerDropWithGameOver(player, arena, GAME_SETTINGS.gravityMode);
+  if (GAME_SETTINGS.gravityMode && !gameOver) {
     startGravityAnimation();
   }
 }
 
-// --- Game Over Drop ---
 async function playerDropWithGameOver(
   player: Player,
   arena: number[][],
@@ -203,39 +189,23 @@ async function playerDropWithGameOver(
     merge(arena, player.matrix, player.pos);
     arenaSweep(arena, ARENA_WIDTH);
     if (gravityMode) {
-      /* handled elsewhere */
+      // handled in gravity animation
     }
     await safeResetPlayer(player);
     if (collide(arena, player)) {
-      if (!gameOver) {
-        gameOver = true;
-        updateOverlay();
-      }
-      return;
+      gameOver = true;
+      updateOverlay();
     }
   }
-}
-
-// --- Drawing ---
-function draw() {
-  context.fillStyle = "#122";
-  context.fillRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT);
-  drawMatrix(context, arena);
-  drawMatrix(context, player.matrix, player.pos, player.color);
-  context.save();
-  context.setTransform(1, 0, 0, 1, 0, 0);
-  context.strokeStyle = "#fff";
-  context.lineWidth = 2;
-  context.strokeRect(0, 0, canvas.width, canvas.height);
-  context.restore();
 }
 
 // --- Game Loop ---
 function update(time = 0) {
   if (gameOver || paused) {
-    draw();
+    draw(arena, player);
     return;
   }
+
   const deltaTime = (time - lastTime) / 1000;
   lastTime = time;
 
@@ -252,142 +222,36 @@ function update(time = 0) {
     }
   }
 
-  draw();
+  draw(arena, player);
   requestAnimationFrame(update);
 }
 
-// --- Async Safe Player Reset ---
+// --- Safe player reset wrapper ---
 async function safeResetPlayer(player: Player) {
   try {
     await resetPlayerFromBackend(player);
   } catch (e) {
     console.error("Failed to fetch next piece from server:", e);
-    setPaused(true); // Pause the game on error
+    setPaused(true);
     overlayText.textContent = "Connection Error";
     overlay.classList.add("show");
   }
 }
 
-// --- Settings Listeners ---
-if (lockCascadeToggle) {
-  lockCascadeToggle.checked = GAME_SETTINGS.lockDuringCascade;
-  lockCascadeToggle.addEventListener("change", () => {
-    GAME_SETTINGS.lockDuringCascade = lockCascadeToggle.checked;
-  });
-}
-if (cascadeSpeedSlider && cascadeSpeedLabel) {
-  cascadeSpeedSlider.value = GAME_SETTINGS.gravityCascadeDelayMs.toString();
-  cascadeSpeedLabel.textContent = `${cascadeSpeedSlider.value}ms`;
-  cascadeSpeedSlider.addEventListener("input", () => {
-    GAME_SETTINGS.gravityCascadeDelayMs = Number(cascadeSpeedSlider.value);
-    cascadeSpeedLabel.textContent = `${cascadeSpeedSlider.value}ms`;
-  });
-}
-if (gravitySpeedSlider && gravitySpeedLabel) {
-  gravitySpeedSlider.value = GAME_SETTINGS.customGravity.toString();
-  gravitySpeedLabel.textContent = `${Number(gravitySpeedSlider.value).toFixed(
-    2
-  )}s`;
-  gravitySpeedSlider.addEventListener("input", () => {
-    GAME_SETTINGS.customGravity = Number(gravitySpeedSlider.value);
-    gravitySpeedLabel.textContent = `${Number(gravitySpeedSlider.value).toFixed(
-      2
-    )}s`;
-  });
-}
-const gravityToggle = document.getElementById(
-  "gravity-toggle"
-) as HTMLInputElement | null;
-gravityToggle?.addEventListener("change", () =>
-  setGravityMode(gravityToggle.checked)
+// --- Input Setup ---
+bindInput(
+  player,
+  arena,
+  () =>
+    gameOver ||
+    Boolean(paused) ||
+    (isGravityAnimating && GAME_SETTINGS.lockDuringCascade),
+  dropAndMaybeAnimateGravity
 );
 
-// --- Keyboard ---
-document.addEventListener("keydown", (event) => {
-  if (
-    gameOver ||
-    (isGravityAnimating && GAME_SETTINGS.lockDuringCascade) ||
-    paused
-  )
-    return;
-  switch (event.key) {
-    case "ArrowLeft":
-      player.pos.x--;
-      if (collide(arena, player)) player.pos.x++;
-      break;
-    case "ArrowRight":
-      player.pos.x++;
-      if (collide(arena, player)) player.pos.x--;
-      break;
-    case "ArrowDown":
-      dropAndMaybeAnimateGravity();
-      break;
-    case "Shift":
-    case "Alt":
-      player.matrix = rotate(player.matrix, -1);
-      if (collide(arena, player)) player.matrix = rotate(player.matrix, 1);
-      break;
-    case " ":
-      player.matrix = rotate(player.matrix, 1);
-      if (collide(arena, player)) player.matrix = rotate(player.matrix, -1);
-      break;
-  }
-});
-
-// --- Touch/Control Buttons ---
-document.querySelectorAll(".control-btn").forEach((btn) => {
-  btn.addEventListener(
-    "touchstart",
-    (e) => {
-      if ((e as TouchEvent).touches.length > 1) e.preventDefault();
-    },
-    { passive: false }
-  );
-});
-document.getElementById("left")?.addEventListener("click", () => {
-  if (
-    gameOver ||
-    (isGravityAnimating && GAME_SETTINGS.lockDuringCascade) ||
-    paused
-  )
-    return;
-  player.pos.x--;
-  if (collide(arena, player)) player.pos.x++;
-});
-document.getElementById("right")?.addEventListener("click", () => {
-  if (
-    gameOver ||
-    (isGravityAnimating && GAME_SETTINGS.lockDuringCascade) ||
-    paused
-  )
-    return;
-  player.pos.x++;
-  if (collide(arena, player)) player.pos.x--;
-});
-document.getElementById("rotate")?.addEventListener("click", () => {
-  if (
-    gameOver ||
-    (isGravityAnimating && GAME_SETTINGS.lockDuringCascade) ||
-    paused
-  )
-    return;
-  player.matrix = rotate(player.matrix, 1);
-  if (collide(arena, player)) player.matrix = rotate(player.matrix, -1);
-});
-document.getElementById("down")?.addEventListener("click", () => {
-  if (
-    gameOver ||
-    (isGravityAnimating && GAME_SETTINGS.lockDuringCascade) ||
-    paused
-  )
-    return;
-  dropAndMaybeAnimateGravity();
-});
-
-// --- Start game ---
+// --- Start Game ---
 safeResetPlayer(player)
   .then(() => requestAnimationFrame(update))
   .catch((err) => {
     console.error("Failed to initialize player from backend", err);
-    // Optionally: show error UI, etc.
   });

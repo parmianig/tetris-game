@@ -10,24 +10,6 @@ export function createMatrix(w: number, h: number): Matrix {
   return matrix;
 }
 
-// Check collision
-export function collide(arena: number[][], player: Player): boolean {
-  const { matrix, pos } = player;
-  if (!matrix || !Array.isArray(matrix)) return false;
-
-  for (let y = 0; y < matrix.length; y++) {
-    const row = matrix[y];
-    if (!row) continue;
-
-    for (let x = 0; x < row.length; x++) {
-      if (row[x] !== 0 && (arena[y + pos.y]?.[x + pos.x] ?? 1) !== 0) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
 export function arenaSweep(arena: number[][], width: number) {
   for (let y = arena.length - 1; y >= 0; --y) {
     const row = arena[y];
@@ -68,7 +50,6 @@ export function merge(
   });
 }
 
-// engine.ts
 export function applyGravityStep(arena: Matrix): boolean {
   let changed = false;
   // Scan from bottom-2 up to top
@@ -111,4 +92,22 @@ export function applyGravity(arena: Matrix, _level: number): void {
       }
     }
   } while (changed); // Repeat until nothing falls further
+}
+
+// Check collision
+export function collide(arena: number[][], player: Player): boolean {
+  const { matrix, pos } = player;
+  if (!matrix || !Array.isArray(matrix)) return false;
+
+  for (let y = 0; y < matrix.length; y++) {
+    const row = matrix[y];
+    if (!row) continue;
+
+    for (let x = 0; x < row.length; x++) {
+      if (row[x] !== 0 && (arena[y + pos.y]?.[x + pos.x] ?? 1) !== 0) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
