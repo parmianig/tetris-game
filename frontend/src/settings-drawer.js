@@ -135,6 +135,16 @@ document.addEventListener("DOMContentLoaded", () => {
         GAME_SETTINGS.gravityCascadeDelayMs
       );
     });
+    const styleToggle = document.getElementById("traditional-style-toggle");
+    if (styleToggle) {
+      styleToggle.checked = GAME_SETTINGS.tetrominoStyle === "traditional";
+      styleToggle.addEventListener("change", () => {
+        GAME_SETTINGS.tetrominoStyle = styleToggle.checked
+          ? "traditional"
+          : "glass";
+        // Optional: Redraw board if needed
+      });
+    }
   }
 
   const versionFooter = document.getElementById("version-footer");

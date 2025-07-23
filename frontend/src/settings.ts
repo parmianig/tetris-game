@@ -4,4 +4,5 @@ export const GAME_SETTINGS = {
   lockDuringCascade: false,
   gravityCascadeDelayMs: 50,
   customGravity: 1.0,
+  tetrominoStyle: "glass", // "glass" | "traditional"
 };
