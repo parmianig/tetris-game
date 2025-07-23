@@ -5,7 +5,8 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 ---
 ## Changelog
 <!-- changelog -->
-## release/v1.1.10
+## release/v1.2.0
+* minor: added liquid glass tetromino style (primo)
 * patch: refinements delay after hold Press-and-Hold tap on mobile (primo)
 
 ---
