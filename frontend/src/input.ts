@@ -89,9 +89,9 @@ export function bindInput(
     drop();
   };
 
-  setupProlongedButton("left", moveLeft, 120, 500);
-  setupProlongedButton("right", moveRight, 120, 500);
-  setupProlongedButton("down", moveDown, 120, 500);
+  setupProlongedButton("left", moveLeft, 120, 450);
+  setupProlongedButton("right", moveRight, 120, 450);
+  setupProlongedButton("down", moveDown, 120, 450);
 
   // Single tap for rotate (no need for prolonged tap)
   document.getElementById("rotate")?.addEventListener("click", () =>
