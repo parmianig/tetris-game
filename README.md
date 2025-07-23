@@ -5,9 +5,9 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 ---
 ## Changelog
 <!-- changelog -->
-## release/v1.1.7
+## release/v1.1.8
+* patch: refinements delay after hold Press-and-Hold tap on mobile (primo)
 * patch: refinements Press-and-Hold tap on mobile (primo)
-* patch: try to enable Press-and-Hold tap on mobile (primo)
 
 ---
 
