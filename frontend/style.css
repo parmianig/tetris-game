@@ -482,3 +482,44 @@ body.drawer-open #drawer-overlay {
   z-index: 1004;
   position: relative;
 }
+
+.tetris-controls-corner {
+  display: flex;
+  justify-content: space-between;
+  width: 100vw;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+  padding: 0.8rem;
+  pointer-events: none;
+}
+
+.left-controls,
+.right-controls {
+  display: flex;
+  gap: 1rem;
+  pointer-events: all;
+}
+
+.right-controls {
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.control-btn {
+  min-width: 52px;
+  min-height: 52px;
+  font-size: 2rem;
+  border-radius: 1.2rem;
+  background: #222;
+}
+
+@media (max-width: 600px) {
+  .control-btn {
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 1.2rem;
+  }
+}
