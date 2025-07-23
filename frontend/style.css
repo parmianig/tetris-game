@@ -237,6 +237,11 @@ button,
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
+  min-width: 52px;
+  min-height: 52px;
+  font-size: 2rem;
+  border-radius: 1.2rem;
+  background: #222;
 }
 
 html,
@@ -506,14 +511,6 @@ body.drawer-open #drawer-overlay {
   flex-direction: column;
   justify-content: flex-end;
   gap: 0.5rem;
-}
-
-.control-btn {
-  min-width: 52px;
-  min-height: 52px;
-  font-size: 2rem;
-  border-radius: 1.2rem;
-  background: #222;
 }
 
 @media (max-width: 600px) {
