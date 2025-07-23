@@ -3,7 +3,7 @@ import type { Player } from "./types";
 
 export function bindInput(
   player: Player,
-  arena: Matrix, // <--- must be Matrix!
+  arena: Matrix,
   isDisabled: () => boolean,
   drop: () => void
 ) {
@@ -35,33 +35,62 @@ export function bindInput(
     }
   });
 
-  // Touch/Control UI
+  // --- Ergonomic mobile/desktop controls ---
+  // Helper for safe action
   const safe = (action: () => void) => {
     if (!isDisabled()) action();
   };
 
-  document.getElementById("left")?.addEventListener("click", () =>
-    safe(() => {
-      player.pos.x--;
-      if (collide(arena, player)) player.pos.x++;
-    })
-  );
+  // Prolonged tap logic (for left, right, down)
+  function setupProlongedButton(
+    id: string,
+    action: () => void,
+    repeatDelay = 80
+  ) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
 
-  document.getElementById("right")?.addEventListener("click", () =>
-    safe(() => {
-      player.pos.x++;
-      if (collide(arena, player)) player.pos.x--;
-    })
-  );
+    let interval: any = null;
+    const handleStart = (e: Event) => {
+      e.preventDefault();
+      safe(action);
+      interval = setInterval(() => safe(action), repeatDelay);
+    };
+    const handleEnd = () => {
+      if (interval) clearInterval(interval);
+      interval = null;
+    };
 
+    btn.addEventListener("touchstart", handleStart, { passive: false });
+    btn.addEventListener("mousedown", handleStart);
+    btn.addEventListener("touchend", handleEnd);
+    btn.addEventListener("touchcancel", handleEnd);
+    btn.addEventListener("mouseup", handleEnd);
+    btn.addEventListener("mouseleave", handleEnd);
+  }
+
+  // Move functions using real Tetris logic
+  const moveLeft = () => {
+    player.pos.x--;
+    if (collide(arena, player)) player.pos.x++;
+  };
+  const moveRight = () => {
+    player.pos.x++;
+    if (collide(arena, player)) player.pos.x--;
+  };
+  const moveDown = () => {
+    drop();
+  };
+
+  setupProlongedButton("left", moveLeft);
+  setupProlongedButton("right", moveRight);
+  setupProlongedButton("down", moveDown);
+
+  // Single tap for rotate (no need for prolonged tap)
   document.getElementById("rotate")?.addEventListener("click", () =>
     safe(() => {
       player.matrix = rotate(player.matrix, 1);
       if (collide(arena, player)) player.matrix = rotate(player.matrix, -1);
     })
   );
-
-  document
-    .getElementById("down")
-    ?.addEventListener("click", () => safe(() => drop()));
 }

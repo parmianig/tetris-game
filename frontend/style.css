@@ -242,6 +242,8 @@ button,
   font-size: 2rem;
   border-radius: 1.2rem;
   background: #222;
+  color: #fff;
+  border: 1px solid #444;
 }
 
 html,
@@ -496,21 +498,21 @@ body.drawer-open #drawer-overlay {
   bottom: 0;
   left: 0;
   z-index: 100;
-  padding: 0.8rem;
+  padding: 0.8rem 1rem;
   pointer-events: none;
 }
 
 .left-controls,
 .right-controls {
   display: flex;
-  gap: 1rem;
+  gap: 1.2rem;
   pointer-events: all;
 }
 
 .right-controls {
   flex-direction: column;
   justify-content: flex-end;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
 @media (max-width: 600px) {
