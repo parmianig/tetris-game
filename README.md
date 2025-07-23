@@ -5,9 +5,9 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 ---
 ## Changelog
 <!-- changelog -->
-## release/v1.1.4
+## release/v1.1.5
+* patch: test new button layout another one (primo)
 * patch: test new button layout (primo)
-* patch: remove pauseReason from main.ts in order to fix vercel deployment (primo)
 
 ---
 
