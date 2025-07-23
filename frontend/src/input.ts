@@ -45,19 +45,26 @@ export function bindInput(
   function setupProlongedButton(
     id: string,
     action: () => void,
-    repeatDelay = 80
+    repeatDelay = 90, // ms between repeats (after hold)
+    initialDelay = 350 // ms before repeat starts (on first press)
   ) {
     const btn = document.getElementById(id);
     if (!btn) return;
 
     let interval: any = null;
+    let timeout: any = null;
+
     const handleStart = (e: Event) => {
       e.preventDefault();
-      safe(action);
-      interval = setInterval(() => safe(action), repeatDelay);
+      safe(action); // Always trigger once immediately on press
+      timeout = setTimeout(() => {
+        interval = setInterval(() => safe(action), repeatDelay);
+      }, initialDelay);
     };
     const handleEnd = () => {
-      if (interval) clearInterval(interval);
+      clearTimeout(timeout);
+      clearInterval(interval);
+      timeout = null;
       interval = null;
     };
 
@@ -82,9 +89,9 @@ export function bindInput(
     drop();
   };
 
-  setupProlongedButton("left", moveLeft);
-  setupProlongedButton("right", moveRight);
-  setupProlongedButton("down", moveDown);
+  setupProlongedButton("left", moveLeft, 120, 700);
+  setupProlongedButton("right", moveRight, 120, 700);
+  setupProlongedButton("down", moveDown, 120, 700);
 
   // Single tap for rotate (no need for prolonged tap)
   document.getElementById("rotate")?.addEventListener("click", () =>
