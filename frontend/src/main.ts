@@ -1,4 +1,4 @@
-import { draw, playerDropWithGameOver } from "./game";
+import { draw, playerDropWithGameOver, safeResetPlayer } from "./game";
 import { bindInput } from "./input";
 import {
   createMatrix,
@@ -143,18 +143,18 @@ function updateNextPiecePreview(next: Tetromino | null) {
   if (!canvas || !next || !next.matrix) return;
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
-  drawMiniTetromino(ctx, next);
+  drawMiniTetrominoGlass(ctx, next);
 }
 
-// Draws the tetromino shape (smaller, responsive, glass/traditional style)
-function drawMiniTetromino(ctx: CanvasRenderingContext2D, tetro: Tetromino) {
+// --- Draws a glassmorphism ("liquid glass") mini tetromino ---
+function drawMiniTetrominoGlass(
+  ctx: CanvasRenderingContext2D,
+  tetro: Tetromino
+) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   if (!tetro?.matrix?.length || !Array.isArray(tetro.matrix)) return;
   const mat = tetro.matrix;
   const N = mat.length;
-
-  // Defensive: ensure all rows are arrays
-  for (let y = 0; y < N; ++y) if (!Array.isArray(mat[y])) return;
 
   // Calculate bounding box
   let minX = N,
@@ -163,7 +163,7 @@ function drawMiniTetromino(ctx: CanvasRenderingContext2D, tetro: Tetromino) {
     maxY = -1;
   for (let y = 0; y < N; ++y) {
     const row = mat[y];
-    if (!Array.isArray(row)) continue;
+    if (!row) continue; // Defensive, silences TS2532
     for (let x = 0; x < N; ++x) {
       if (row[x]) {
         minX = Math.min(minX, x);
@@ -173,13 +173,13 @@ function drawMiniTetromino(ctx: CanvasRenderingContext2D, tetro: Tetromino) {
       }
     }
   }
+  if (minX > maxX || minY > maxY) return;
 
-  // Block size & offset for centering
   const blockSize = Math.floor(
     Math.min(
       ctx.canvas.width / (maxX - minX + 1),
       ctx.canvas.height / (maxY - minY + 1)
-    ) * 0.9 // or 0.8 for more padding
+    ) * 0.9
   );
   const offsetX = Math.floor(
     (ctx.canvas.width - blockSize * (maxX - minX + 1)) / 2 - minX * blockSize
@@ -188,32 +188,61 @@ function drawMiniTetromino(ctx: CanvasRenderingContext2D, tetro: Tetromino) {
     (ctx.canvas.height - blockSize * (maxY - minY + 1)) / 2 - minY * blockSize
   );
 
-  ctx.save();
-  ctx.globalAlpha = 0.98;
-  ctx.fillStyle = tetro.color;
-  ctx.strokeStyle = "rgba(40,40,50,0.38)";
-  ctx.lineWidth = 2;
   for (let y = 0; y < N; ++y) {
     const row = mat[y];
-    if (!Array.isArray(row)) continue;
+    if (!row) continue;
     for (let x = 0; x < N; ++x) {
-      if (row[x]) {
-        ctx.fillRect(
-          x * blockSize + offsetX,
-          y * blockSize + offsetY,
-          blockSize - 1,
-          blockSize - 1
-        );
-        ctx.strokeRect(
-          x * blockSize + offsetX,
-          y * blockSize + offsetY,
-          blockSize - 1,
-          blockSize - 1
-        );
-      }
+      if (!row[x]) continue;
+      const bx = x * blockSize + offsetX;
+      const by = y * blockSize + offsetY;
+
+      // 1. Glassy base gradient
+      const grad = ctx.createLinearGradient(
+        bx,
+        by,
+        bx + blockSize,
+        by + blockSize
+      );
+      grad.addColorStop(0, "rgba(255,255,255,0.78)");
+      grad.addColorStop(0.14, tetro.color);
+      grad.addColorStop(0.65, "rgba(120,200,255,0.17)");
+      grad.addColorStop(1, "rgba(0,0,0,0.13)");
+
+      ctx.save();
+      ctx.globalAlpha = 0.94;
+      ctx.fillStyle = grad;
+      ctx.shadowColor = "#fff";
+      ctx.shadowBlur = 7;
+      ctx.fillRect(bx, by, blockSize - 1, blockSize - 1);
+      ctx.restore();
+
+      // 2. Glass reflection (top)
+      ctx.save();
+      ctx.globalAlpha = 0.18;
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.ellipse(
+        bx + blockSize * 0.56,
+        by + blockSize * 0.36,
+        blockSize * 0.34,
+        blockSize * 0.17,
+        Math.PI / 9,
+        0,
+        2 * Math.PI
+      );
+      ctx.fill();
+      ctx.restore();
+
+      // 3. Border glass
+      ctx.save();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(200,220,255,0.22)";
+      ctx.shadowColor = "rgba(100,180,255,0.24)";
+      ctx.shadowBlur = 2;
+      ctx.strokeRect(bx, by, blockSize - 1.2, blockSize - 1.2);
+      ctx.restore();
     }
   }
-  ctx.restore();
 }
 
 // --- Gravity Animation ---
@@ -264,18 +293,6 @@ function update(time = 0) {
   }
   draw(arena, player);
   requestAnimationFrame(update);
-}
-
-// --- Safe player reset wrapper ---
-async function safeResetPlayer(player: Player) {
-  try {
-    await resetPlayerFromBackend(player);
-  } catch (e) {
-    console.error("Failed to fetch next piece from server:", e);
-    setPaused(true);
-    if (overlayText) overlayText.textContent = "Connection Error";
-    if (overlay) overlay.classList.add("show");
-  }
 }
 
 // --- Input Setup ---

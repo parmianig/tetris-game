@@ -62,61 +62,40 @@ canvas {
     gap: 0.7rem;
   }
 
-    #next-preview-panel {
-      margin-left: 0;
-      margin-top: 0.5rem;
-      min-width: 0;
-      padding: 0;
-    }
+  #next-label,
+  .next-label {
+    font-size: 0.74rem;
+    margin-bottom: 1px;
+  }
 
-    #next-label,
-    .next-label {
-      font-size: 0.74rem;
-      margin-bottom: 1px;
-    }
+  #next-piece-canvas {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 5px;
+  }
 
-    #next-piece-canvas {
-      width: 32px !important;
-      height: 32px !important;
-      border-radius: 5px;
-    }
+  #next-label {
+    font-size: 0.77rem;
+  }
 
-    #next-preview-panel {
-      top: 7px;
-      margin-left: 4px;
-      min-width: 36px;
-      max-width: 54px;
-      border-radius: 9px;
-      padding: 4px 3px 6px 3px;
-    }
-
-    #next-label {
-      font-size: 0.77rem;
-    }
-
-    #next-piece-canvas {
-      width: 23px !important;
-      height: 23px !important;
-    }
-
-    .next-canvas-wrapper {
-      border-radius: 6px;
-      padding: 1px;
-    }
+  .next-canvas-wrapper {
+    border-radius: 6px;
+    padding: 1px;
+  }
 }
 
 @media (max-width: 400px) {
 
-    #next-piece-canvas {
-      width: 24px !important;
-      height: 24px !important;
-      border-radius: 3px;
-    }
+  #next-piece-canvas {
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 3px;
+  }
 
-    #next-label,
-    .next-label {
-      font-size: 0.68rem;
-    }
+  #next-label,
+  .next-label {
+    font-size: 0.68rem;
+  }
 }
 
 /* Controls container */
@@ -199,7 +178,6 @@ canvas {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  height: 100dvh;
   /* fixes iOS viewport issues */
   will-change: transform;
 }
@@ -378,6 +356,7 @@ body {
   display: block;
   fill: #fff;
 }
+
 #unpause-btn {
   margin-top: 2rem;
   padding: 0.75em 2em;
@@ -716,25 +695,6 @@ body.drawer-open .tetris-controls-corner {
   background: #444;
 }
 
-@media (max-width: 600px) {
-  .start-select button {
-    width: 72px;
-    font-size: 0.74rem !important;
-    min-width: 60px;
-  }
-}
-
-@media (max-width: 600px) {
-  .gameboy-controls {
-    position: fixed;
-    left: 50%;
-    bottom: 2.2rem;
-    transform: translateX(-50%);
-    width: auto;
-    z-index: 120;
-  }
-}
-
 @media (max-width: 400px) {
   .gameboy-controls {
     gap: 1rem;
@@ -929,38 +889,6 @@ body.drawer-open .gameboy-controls {
   border: 0 !important;
 }
 
-@media (max-width: 600px) {
-  #game-flex-row {
-    flex-direction: column;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 2.2rem;
-    width: 100%;
-  }
-
-  #next-preview-panel {
-    flex-direction: row;
-    margin-left: 0;
-    margin-top: 0.5rem;
-    min-width: 0;
-    width: 100%;
-    justify-content: center;
-  }
-
-  #next-piece-canvas {
-    background: rgba(13, 16, 22, 0.74);
-    border-radius: 0.7rem;
-    box-shadow: 0 0 3px #000a;
-    display: block;
-    margin: 0 auto;
-    width: 48px !important;
-    height: 48px !important;
-    border: 2px solid rgba(255, 255, 255, 0.22);
-    transition: box-shadow 0.2s;
-  }
-}
-
 #next-piece-preview.glass-card {
   background: rgba(30, 35, 45, 0.5);
   box-shadow: 0 6px 32px 0 rgba(20, 20, 25, 0.17);
@@ -989,9 +917,7 @@ body.drawer-open .gameboy-controls {
   #next-piece-canvas {
     min-width: 38px;
     min-height: 38px;
-    width: 38px;body,
-      html
-    height: 38px;
+    width: 38px;
   }
 }
 
@@ -1003,7 +929,6 @@ body.drawer-open .gameboy-controls {
 }
 
 
-
 @media (max-width: 900px) {
   #game-flex-row {
     gap: 1.1rem;
@@ -1011,20 +936,21 @@ body.drawer-open .gameboy-controls {
 
   #next-piece-preview.glass-card {
     background: rgba(30, 35, 45, 0.5);
-      box-shadow: 0 6px 32px 0 rgba(20, 20, 25, 0.17);
-      border-radius: 20px;
-      padding: 12px 12px 10px 12px;
-      min-width: 84px;
-      max-width: 120px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      -webkit-backdrop-filter: blur(14px) saturate(130%);
-      backdrop-filter: blur(14px) saturate(130%);
-      border: 2px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 6px 32px 0 rgba(20, 20, 25, 0.17);
+    border-radius: 20px;
+    padding: 12px 12px 10px 12px;
+    min-width: 84px;
+    max-width: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    -webkit-backdrop-filter: blur(14px) saturate(130%);
+    backdrop-filter: blur(14px) saturate(130%);
+    border: 2px solid rgba(255, 255, 255, 0.12);
     margin-top: 0;
-  margin-left: 0.5rem;    margin-left: 0;
+    margin-left: 0.5rem;
+    margin-left: 0;
     width: 100%;
   }
 
@@ -1077,23 +1003,7 @@ body.drawer-open .gameboy-controls {
   align-items: center;
 }
 
-#next-piece-canvas {
-  display: block;
-  width: 52px;
-  height: 52px;
-  background: #12181e;
-  border-radius: 8px;
-  margin: 0 auto;
-  border: 2px solid #fff;
-  box-shadow: 0 0 5px #0005;
-}
-
 @media (max-width: 600px) {
-  #next-preview-panel {
-    top: 7px;
-    right: 7px;
-    padding: 4px 8px 7px 8px;
-  }
 
   #next-piece-canvas {
     width: 38px;
@@ -1107,73 +1017,28 @@ body.drawer-open .gameboy-controls {
 
 #game-flex-row {
   display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: flex-start;
-    width: 100vw;
-    gap: 1.1rem;
-    margin-bottom: 1rem;
-    position: relative;
-  }
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem;
+  width: 100vw;
+  margin-bottom: 1rem;
+}
 
 /* Arena styling remains unchanged */
 
-#next-preview-panel {
-  position: absolute;
-    top: 18px;
-    left: 100%;
-    margin-left: 10px;
-    background: #181a22ee;
-    border: 2.5px solid #fff;
-    border-radius: 13px;
-    box-shadow: 0 2px 12px #0006;
-    padding: 7px 9px 10px 9px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 60px;
-    max-width: 85px;
-    z-index: 2;
-    transition: all 0.2s;
-  }
-
 #next-label {
-  font-size: 1.08rem;
-  color: #eaf6ff;
+  font-size: 0.95rem;
+  color: #e1eaff;
   font-weight: 700;
   letter-spacing: 0.04em;
-  margin-bottom: 3px;
-}
-
-.next-canvas-wrapper {
-  background: transparent;
-  padding: 0;
-  margin: 0;
-  border-radius: 12px;
+  margin-bottom: 4px;
+  text-shadow: 0 1.5px 3px #1a1e24a8;
 }
 
 .arena-wrapper {
   position: relative;
   display: inline-block;
-}
-
-@media (max-width: 600px) {
-  #next-preview-panel {
-    top: 4px;
-    right: -90px;
-    min-width: 60px;
-    max-width: 90px;
-    padding: 6px 6px 6px 6px;
-  }
-
-  #next-label {
-    font-size: 0.9rem;
-  }
-
-  #next-piece-canvas {
-    width: 38px;
-    height: 38px;
-  }
 }
 
 @media (max-width: 600px) {
@@ -1192,14 +1057,15 @@ body.drawer-open .gameboy-controls {
     font-size: 0.85rem;
   }
 
-    #tetris {
-      max-width: 96vw;
-      height: auto;
-      display: block;
-      margin: 0 auto;
-      background: #041415;
-      border: 3px solid #fff;
-      box-sizing: border-box; }
+  #tetris {
+    max-width: 96vw;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    background: #041415;
+    border: 3px solid #fff;
+    box-sizing: border-box;
+  }
 
   #next-piece-canvas {
     width: 38px;
@@ -1209,48 +1075,13 @@ body.drawer-open .gameboy-controls {
 }
 
 
-#next-preview-panel {
-  position: absolute;
-  top: 16px;
-  left: 100%;
-  margin-left: 16px;
-  background: #181a22f6;
-  border: 3px solid #fff;
-  border-radius: 18px;
-  box-shadow: 0 4px 16px #0008;
-  padding: 12px 18px 14px 18px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 86px;
-  max-width: 150px;
-  z-index: 2;
-}
-
-#next-label {
-  font-size: 1.05rem;
-  color: #e1eaff;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  margin-bottom: 5px;
-}
-
-.next-canvas-wrapper {
-  border-radius: 12px;
-  border: 2px solid #fff;
-  background: #141820;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 6px;
-  margin-top: 2px;
-}
-
 #next-piece-canvas {
-  width: 56px !important;
-  height: 56px !important;
-  background: #151a20;
+  width: 36px !important;
+  height: 36px !important;
+  background: #13181d;
   display: block;
+  border-radius: 6px;
+  margin: 0 auto;
 }
 
 /* Responsive tweaks for mobile */
@@ -1271,7 +1102,8 @@ body.drawer-open .gameboy-controls {
   }
 
   #game-area {
-    max-width: 100vw;
+    position: relative;
+    z-index: 1;
   }
 
   #tetris {
@@ -1279,15 +1111,22 @@ body.drawer-open .gameboy-controls {
     border-width: 2.2px;
   }
 
-  #next-preview-panel {
-    left: 100%;
-    margin-left: 7px;
-    top: 8px;
-    min-width: 62px;
-    max-width: 84px;
-    padding: 7px 8px 8px 8px;
-    border-radius: 14px;
-  }
+    #next-preview-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      margin-left: 2rem;
+      min-width: 90px;
+      padding: 14px 14px 10px 14px;
+      background: rgba(24, 26, 34, 0.52);
+      border: 2.5px solid rgba(255, 255, 255, 0.17);
+      border-radius: 16px;
+      box-shadow: 0 6px 28px 0 rgba(40, 48, 55, 0.15);
+      -webkit-backdrop-filter: blur(14px) saturate(130%);
+      backdrop-filter: blur(14px) saturate(130%);
+      z-index: 2;
+    }
 
   #next-label {
     font-size: 0.88rem;
@@ -1299,41 +1138,77 @@ body.drawer-open .gameboy-controls {
   }
 }
 
-#next-label {
-  font-size: 0.96rem;
-  color: #e1eaff;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  margin-bottom: 3px;
-}
+@media (max-width: 600px) {
+  #next-preview-panel {
+    top: 6px;
+    margin-left: 2px;
+    min-width: 31px;
+    max-width: 44px;
+    border-radius: 9px;
+    padding: 3px 2px 5px 2px;
+  }
 
-.next-canvas-wrapper {
-  border-radius: 8px;
-  border: 2px solid #fff;
-  background: #1a2027;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2px;
-  margin-top: 2px;
-}
+  #next-label {
+    font-size: 0.74rem;
+  }
 
-#next-piece-canvas {
-  width: 36px !important;
-  height: 36px !important;
-  background: #13181d;
-  display: block;
-  border-radius: 4px;
-}
+  #next-piece-canvas {
+    width: 18px !important;
+    height: 18px !important;
+  }
 
-/* Center controls below, always */
-.tetris-controls-corner {
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  margin-top: 1.1rem;
-}
+  @media (max-width: 900px) {
+    #game-flex-row {
+      gap: 0.7rem;
+    }
 
-.gameboy-controls {
-  margin: 0 auto;
+    #next-preview-panel {
+      margin-left: 7px;
+      min-width: 48px;
+      max-width: 60px;
+      padding: 6px 5px 5px 5px;
+      border-radius: 14px;
+      top: 7px;
+    }
+
+    #next-piece-canvas {
+      width: 26px !important;
+      height: 26px !important;
+      border-radius: 4px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    #game-flex-row {
+      flex-direction: column;
+      align-items: center;
+      width: 100vw;
+      gap: 0.4rem;
+    }
+
+    #game-area {
+      margin-bottom: 0.8rem;
+    }
+
+    #next-label {
+      font-size: 0.71rem;
+      margin-bottom: 1.5px;
+    }
+
+    #next-piece-canvas {
+      width: 17px !important;
+      height: 17px !important;
+      border-radius: 3px;
+      margin: 0 auto;
+    }
+
+        .next-canvas-wrapper {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 3px;
+          border-radius: 9px;
+          background: rgba(28, 31, 38, 0.23);
+          box-shadow: 0 2px 7px #0004, 0 0 0 2px rgba(120, 170, 255, 0.09) inset;   }
+  }
 }
