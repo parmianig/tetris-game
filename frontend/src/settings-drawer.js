@@ -40,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
           e.preventDefault();
         }
       } else {
-        // tab
         // Handle tab navigation when on last focusable element
         if (document.activeElement === last) {
           first.focus();
@@ -49,9 +48,8 @@ document.addEventListener("DOMContentLoaded", () => {
           // Allow default tab behavior for other elements
           return;
         }
-          first.focus();
-          e.preventDefault();
-        }
+        first.focus();
+        e.preventDefault();
       }
     });
   }
