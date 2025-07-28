@@ -39,7 +39,7 @@ const player: Player = {
   pos: { x: 3, y: 0 },
   matrix: [],
   color: "",
-  shape: "I", // Default value: must be a valid Shape
+  shape: "I",
   level: 1,
   origin: { x: 1, y: 1 },
   rotation: 0,
@@ -63,7 +63,6 @@ async function fetchNextTetromino(): Promise<Tetromino> {
 // --- Player Reset (from backend) ---
 export async function resetPlayerFromBackend(player: Player): Promise<void> {
   const tetro = nextTetromino ?? (await fetchNextTetromino());
-  // Deep copy (4x4 matrix guaranteed)
   player.matrix = tetro.matrix.map((row) => [...row]) as Matrix;
   player.color = tetro.color;
   player.shape = tetro.shape;
@@ -77,23 +76,17 @@ export async function resetPlayerFromBackend(player: Player): Promise<void> {
     Number.isFinite(tetro.origin.x) &&
     Number.isFinite(tetro.origin.y)
   ) {
-    origin = {
-      x: tetro.origin.x,
-      y: tetro.origin.y,
-    };
-    player.origin = {
-      x: tetro.origin.x, // e.g. 1.5 for I, 0.5 for O, 1 for T/S/Z/etc.
-      y: tetro.origin.y,
-    };
+    origin = { x: tetro.origin.x, y: tetro.origin.y };
+    player.origin = { x: tetro.origin.x, y: tetro.origin.y };
     player.rotation = 0;
   } else {
     origin = {
       x: (player.matrix[0]?.length ?? 4) / 2 - 0.5,
       y: (player.matrix.length ?? 4) / 2 - 0.5,
     };
+    player.origin = origin;
+    player.rotation = 0;
   }
-  player.origin = origin;
-  player.rotation = 0;
 
   player.pos.y = 0;
   player.pos.x = Math.floor(ARENA_WIDTH / 2) - Math.round(origin.x);
@@ -115,7 +108,6 @@ function setPaused(val: boolean, reason: PauseReason = "user") {
     requestAnimationFrame(update);
   }
 }
-
 (window as any).setPaused = (val: boolean, reason: PauseReason = "menu") =>
   setPaused(val, reason);
 
@@ -139,16 +131,136 @@ async function restartGame() {
   updateOverlay("hidden");
   requestAnimationFrame(update);
 }
-
 restartBtn?.addEventListener("click", () => {
   restartGame().catch(console.error);
 });
 
 // --- Next Piece Preview ---
 function updateNextPiecePreview(next: Tetromino | null) {
-  const preview = document.getElementById("next-piece");
-  if (!preview || !next) return;
-  preview.innerHTML = `<b>Next:</b> ${next.shape}`;
+  const canvas = document.getElementById(
+    "next-piece-canvas"
+  ) as HTMLCanvasElement | null;
+  if (!canvas || !next || !next.matrix) return;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  drawMiniTetromino(ctx, next, canvas.width);
+}
+
+// Draws the tetromino shape (smaller, responsive, glass/traditional style)
+function drawMiniTetromino(
+  ctx: CanvasRenderingContext2D,
+  tetro: Tetromino,
+  size = 64
+) {
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  if (!tetro || !tetro.matrix || !Array.isArray(tetro.matrix)) return;
+  const mat = tetro.matrix;
+  const N = mat.length;
+
+  // Defensive: ensure all rows are arrays
+  for (let y = 0; y < N; ++y) if (!Array.isArray(mat[y])) return;
+
+  // Calculate bounding box
+  let minX = N,
+    maxX = -1,
+    minY = N,
+    maxY = -1;
+  for (let y = 0; y < N; ++y) {
+    const row = mat[y];
+    if (!Array.isArray(row)) continue;
+    for (let x = 0; x < N; ++x) {
+      if (row[x]) {
+        minX = Math.min(minX, x);
+        maxX = Math.max(maxX, x);
+        minY = Math.min(minY, y);
+        maxY = Math.max(maxY, y);
+      }
+    }
+  }
+
+  // Block size & offset for centering
+  const blockSize = Math.floor(
+    Math.min(
+      ctx.canvas.width / (maxX - minX + 1),
+      ctx.canvas.height / (maxY - minY + 1)
+    ) * 0.7 // 0.7 = more padding for glass
+  );
+  const offsetX = Math.floor(
+    (ctx.canvas.width - blockSize * (maxX - minX + 1)) / 2 - minX * blockSize
+  );
+  const offsetY = Math.floor(
+    (ctx.canvas.height - blockSize * (maxY - minY + 1)) / 2 - minY * blockSize
+  );
+
+  ctx.save();
+
+  // Style: glass effect or classic
+  if (GAME_SETTINGS.tetrominoStyle === "glass") {
+    ctx.globalAlpha = 0.98;
+    for (let y = 0; y < N; ++y) {
+      const row = mat[y];
+      if (!Array.isArray(row)) continue;
+      for (let x = 0; x < N; ++x) {
+        if (row[x]) {
+          // Glass: gradient and shadow
+          const grad = ctx.createLinearGradient(
+            x * blockSize + offsetX,
+            y * blockSize + offsetY,
+            x * blockSize + offsetX + blockSize,
+            y * blockSize + offsetY + blockSize
+          );
+          grad.addColorStop(0, "#fff8");
+          grad.addColorStop(0.3, tetro.color);
+          grad.addColorStop(1, "#0005");
+          ctx.fillStyle = grad;
+          ctx.shadowColor = tetro.color;
+          ctx.shadowBlur = 8;
+          ctx.fillRect(
+            x * blockSize + offsetX,
+            y * blockSize + offsetY,
+            blockSize - 2,
+            blockSize - 2
+          );
+          ctx.shadowBlur = 0;
+          ctx.strokeStyle = "#fff8";
+          ctx.lineWidth = 1.5;
+          ctx.strokeRect(
+            x * blockSize + offsetX + 0.5,
+            y * blockSize + offsetY + 0.5,
+            blockSize - 3,
+            blockSize - 3
+          );
+        }
+      }
+    }
+  } else {
+    // Traditional flat style
+    ctx.globalAlpha = 1.0;
+    ctx.fillStyle = tetro.color;
+    ctx.strokeStyle = "#222";
+    ctx.lineWidth = 2;
+    for (let y = 0; y < N; ++y) {
+      const row = mat[y];
+      if (!Array.isArray(row)) continue;
+      for (let x = 0; x < N; ++x) {
+        if (row[x]) {
+          ctx.fillRect(
+            x * blockSize + offsetX,
+            y * blockSize + offsetY,
+            blockSize - 1,
+            blockSize - 1
+          );
+          ctx.strokeRect(
+            x * blockSize + offsetX,
+            y * blockSize + offsetY,
+            blockSize - 1,
+            blockSize - 1
+          );
+        }
+      }
+    }
+  }
+  ctx.restore();
 }
 
 // --- Gravity Animation ---
@@ -223,6 +335,11 @@ bindInput(
     (gameState.isGravityAnimating && GAME_SETTINGS.lockDuringCascade),
   dropAndMaybeAnimateGravity
 );
+
+// --- Listen for style changes for glass/traditional preview ---
+window.addEventListener("tetromino-style-change", () => {
+  updateNextPiecePreview(nextTetromino);
+});
 
 // --- Start Game ---
 safeResetPlayer(player)

@@ -72,12 +72,16 @@
     <!-- Game Wrapper -->
     <section id="game-wrapper" aria-label="Game Area">
       <h1>Tetris</h1>
-      <div id="game-area">
-        <canvas id="tetris" width="240" height="400" aria-label="Tetris game area" tabindex="0"></canvas>
+      <div id="game-flex-row">
+        <div id="game-area">
+          <canvas id="tetris" width="240" height="400" aria-label="Tetris game area" tabindex="0"></canvas>
+        </div>
+        <div id="next-piece-preview" class="glass-card">
+          <div class="next-label">Next</div>
+          <canvas id="next-piece-canvas" width="38" height="38" aria-label="Next piece preview"></canvas>  </div>
       </div>
       <section id="ui-status">
         <div id="status-bar" aria-live="polite"></div>
-        <div id="next-piece" aria-label="Next piece"></div>
         <div id="game-over" aria-label="Game Over"></div>
         <div id="pause-menu" aria-label="Pause Menu"></div>
       </section>
