@@ -14,12 +14,6 @@ import { gameState } from "./gameState";
 import type { Player, Tetromino } from "./types";
 
 // --- DOM Elements ---
-const overlay = document.getElementById(
-  "game-overlay"
-) as HTMLDivElement | null;
-const overlayText = document.getElementById(
-  "overlay-text"
-) as HTMLSpanElement | null;
 const restartBtn = document.getElementById(
   "restart"
 ) as HTMLButtonElement | null;
