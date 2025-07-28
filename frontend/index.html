@@ -1,109 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tetris Game</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tetris Game</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
 
-  <body>
-    <!-- Hamburger Button -->
-    <button id="settings-hamburger" class="icon-btn" aria-label="Show settings" aria-controls="settings-drawer"
-      aria-expanded="false">
-      <span class="bar"></span>
-      <span class="bar"></span>
-      <span class="bar"></span>
+<body>
+  <!-- Hamburger Button -->
+  <button id="settings-hamburger" class="icon-btn" aria-label="Show settings" aria-controls="settings-drawer"
+    aria-expanded="false" type="button">
+    <span class="bar"></span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+  </button>
+
+  <!-- Game Over Overlay -->
+  <div id="game-overlay" class="overlay hidden">
+    <div class="overlay-content">
+      <div id="overlay-text" aria-live="polite"></div>
+      <div class="overlay-buttons">
+        <button id="resume-btn" type="button" class="hidden control-btn">Resume</button>
+        <button id="restart" type="button" class="hidden control-btn">Restart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Drawer -->
+  <div id="drawer-overlay"></div>
+  <aside id="settings-drawer" aria-label="Game Settings" tabindex="-1">
+    <button id="settings-close" aria-label="Close settings" type="button">&times;</button>
+    <section id="settings" aria-label="Game Settings">
+      <h2>Settings</h2>
+      <div class="setting-row">
+        <label for="gravity-toggle">
+          <input type="checkbox" id="gravity-toggle" />
+          Enable Gravity Animation
+        </label>
+      </div>
+      <div class="setting-row">
+        <label>
+          <input type="checkbox" id="lock-cascade-toggle" checked />
+          Lock Controls During Cascade
+        </label>
+      </div>
+      <div>
+        <label for="gravity-speed">
+          Gravity Speed (sec per drop): <span id="gravity-speed-label">1.0</span>
+        </label>
+        <input type="range" id="gravity-speed" min="0.1" max="2" step="0.1" value="1.0" />
+      </div>
+      <div>
+        <label for="cascade-speed">
+          Cascade Delay (ms): <span id="cascade-speed-label">50</span>
+        </label>
+        <input type="range" id="cascade-speed" min="0" max="200" step="10" value="50" />
+      </div>
+      <div class="setting-row">
+        <label>
+          <input type="checkbox" id="traditional-style-toggle" />
+          Traditional Tetromino Style
+        </label>
+      </div>
+    </section>
+    <div id="version-footer" class="version-footer"></div>
+  </aside>
+
+  <main id="main-content">
+    <!-- Game Wrapper -->
+    <section id="game-wrapper" aria-label="Game Area">
+      <h1>Tetris</h1>
+      <div id="game-area">
+        <canvas id="tetris" width="240" height="400" aria-label="Tetris game area" tabindex="0"></canvas>
+      </div>
+      <section id="ui-status">
+        <div id="status-bar" aria-live="polite"></div>
+        <div id="next-piece" aria-label="Next piece"></div>
+        <div id="game-over" aria-label="Game Over"></div>
+        <div id="pause-menu" aria-label="Pause Menu"></div>
+      </section>
+    </section>
+
+    <!-- Controls -->
+    <button id="pause-btn" type="button" aria-label="Pause" tabindex="0" class="control-btn">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="5" y="4" width="5" height="16" rx="2" />
+        <rect x="14" y="4" width="5" height="16" rx="2" />
+      </svg>
     </button>
+  </main>
 
-    <!-- Game Over Overlay -->
-    <div id="game-overlay" class="overlay hidden">
-      <div class="overlay-content">
-        <div id="overlay-text" aria-live="polite"></div>
-        <div class="overlay-buttons">
-          <button id="resume-btn" type="button" class="hidden control-btn">Resume</button>
-          <button id="restart" type="button" class="hidden control-btn">Restart</button>
+  <nav id="controls" aria-label="Game Controls" class="tetris-controls-corner">
+    <div class="gameboy-controls">
+      <div class="dpad">
+        <button id="dpad-up" aria-label="Up" title="Up" type="button" class="dpad-btn up">
+          <span class="sr-only">Up</span>
+        </button>
+        <div class="dpad-middle">
+          <button id="dpad-left" aria-label="Left" title="Left" type="button" class="dpad-btn left">
+            <span class="sr-only">Left</span>
+          </button>
+          <button id="dpad-center" tabindex="-1" disabled class="dpad-center" type="button" aria-hidden="true"></button>
+          <button id="dpad-right" aria-label="Right" title="Right" type="button" class="dpad-btn right">
+            <span class="sr-only">Right</span>
+          </button>
         </div>
+        <button id="dpad-down" aria-label="Down" title="Down" type="button" class="dpad-btn down">
+          <span class="sr-only">Down</span>
+        </button>
       </div>
+      <div class="ab-buttons">
+        <button id="btn-b" class="ab-btn b-btn" type="button">B</button>
+        <button id="btn-a" class="ab-btn a-btn" type="button">A</button>
       </div>
+      <div class="start-select">
+        <button id="btn-select" class="select-btn" aria-label="Select">SELECT</button>
+        <button id="btn-start" class="start-btn" aria-label="Start">START</button>
+      </div>
+    </div>
+  </nav>
 
-    <!-- Settings Drawer -->
-    <div id="drawer-overlay"></div>
-    <aside id="settings-drawer" aria-label="Game Settings" tabindex="-1">
-      <button id="settings-close" aria-label="Close settings">&times;</button>
-      <section id="settings" aria-label="Game Settings">
-        <h2>Settings</h2>
-        <div class="setting-row">
-          <label for="gravity-toggle">
-            <input type="checkbox" id="gravity-toggle" />
-            Enable Gravity Animation
-          </label>
-        </div>
-        <div class="setting-row">
-          <label>
-            <input type="checkbox" id="lock-cascade-toggle" checked />
-            Lock Controls During Cascade
-          </label>
-        </div>
-        <div>
-          <label for="gravity-speed">
-            Gravity Speed (sec per drop): <span id="gravity-speed-label">1.0</span>
-          </label>
-          <input type="range" id="gravity-speed" min="0.1" max="2" step="0.1" value="1.0" />
-        </div>
-        <div>
-          <label for="cascade-speed">
-            Cascade Delay (ms): <span id="cascade-speed-label">50</span>
-          </label>
-          <input type="range" id="cascade-speed" min="0" max="200" step="10" value="50" />  </div>
-          <div class="setting-row">
-            <label>
-              <input type="checkbox" id="traditional-style-toggle" />
-              Traditional Tetromino Style
-            </label>
-          </div>
-      </section>
-      <div id="version-footer" class="version-footer"></div>
-    </aside>
-
-    <main id="main-content">
-      <!-- Game Wrapper -->
-      <section id="game-wrapper" aria-label="Game Area">
-        <h1>Tetris</h1>
-        <div id="game-area">
-          <canvas id="tetris" width="240" height="400" aria-label="Tetris game area" tabindex="0"></canvas>
-        </div>
-        <section id="ui-status">
-          <div id="status-bar" aria-live="polite"></div>
-          <div id="next-piece" aria-label="Next piece"></div>
-          <div id="game-over" aria-label="Game Over"></div>
-          <div id="pause-menu" aria-label="Pause Menu"></div>
-        </section>
-      </section>
-
-      <!-- Controls -->
-      <!-- Pause Button: ONLY ONE, styled consistently, no blur on pause -->
-      <button id="pause-btn" type="button" aria-label="Pause" tabindex="0" class="control-btn">
-        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="5" y="4" width="5" height="16" rx="2" />
-          <rect x="14" y="4" width="5" height="16" rx="2" />
-        </svg>
-      </button>
-      <nav id="controls" aria-label="Game Controls" class="tetris-controls-corner">
-        <div class="left-controls">
-          <button id="left" type="button" aria-label="Move Left" class="control-btn">←</button>
-          <button id="down" type="button" aria-label="Drop Down" class="control-btn">↓</button>
-          <button id="rotate" type="button" aria-label="Rotate" class="control-btn">⟳</button>
-          <div class="right-controls">
-            <button id="right" type="button" aria-label="Move Right" class="control-btn">→</button>
-          </div>
-        </div>
-      </nav>
-
-    </main>
-
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+  <script type="module" src="/src/main.ts"></script>
+</body>
 
 </html>

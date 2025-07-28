@@ -11,29 +11,7 @@ import { GAME_SETTINGS } from "./settings";
 import "./settings-drawer";
 import { updateOverlay } from "./ui";
 import { gameState } from "./gameState";
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-if (!BACKEND_URL) throw new Error("Missing VITE_BACKEND_URL env variable");
-
-(window as any).GAME_SETTINGS = GAME_SETTINGS;
-
-// --- Types ---
-export interface Tetromino {
-  shape: string;
-  matrix: number[][];
-  color: string;
-}
-interface Position {
-  x: number;
-  y: number;
-}
-interface Player {
-  pos: Position;
-  matrix: Matrix;
-  color: string;
-  shape: string;
-  level: number;
-}
+import type { Shape, Player, Tetromino } from "./types";
 
 // --- DOM Elements ---
 const overlay = document.getElementById(
@@ -61,8 +39,10 @@ const player: Player = {
   pos: { x: 3, y: 0 },
   matrix: [],
   color: "",
-  shape: "",
+  shape: "I", // Default value: must be a valid Shape
   level: 1,
+  origin: { x: 1, y: 1 },
+  rotation: 0,
 };
 
 const gravityLevels: number[] = [
@@ -83,13 +63,40 @@ async function fetchNextTetromino(): Promise<Tetromino> {
 // --- Player Reset (from backend) ---
 export async function resetPlayerFromBackend(player: Player): Promise<void> {
   const tetro = nextTetromino ?? (await fetchNextTetromino());
+  // Deep copy (4x4 matrix guaranteed)
   player.matrix = tetro.matrix.map((row) => [...row]) as Matrix;
   player.color = tetro.color;
   player.shape = tetro.shape;
+
+  // Defensive: ensure .origin from backend, else fallback to matrix center
+  let origin: { x: number; y: number };
+  if (
+    tetro.origin &&
+    typeof tetro.origin.x === "number" &&
+    typeof tetro.origin.y === "number" &&
+    Number.isFinite(tetro.origin.x) &&
+    Number.isFinite(tetro.origin.y)
+  ) {
+    origin = {
+      x: tetro.origin.x,
+      y: tetro.origin.y,
+    };
+    player.origin = {
+      x: tetro.origin.x, // e.g. 1.5 for I, 0.5 for O, 1 for T/S/Z/etc.
+      y: tetro.origin.y,
+    };
+    player.rotation = 0;
+  } else {
+    origin = {
+      x: (player.matrix[0]?.length ?? 4) / 2 - 0.5,
+      y: (player.matrix.length ?? 4) / 2 - 0.5,
+    };
+  }
+  player.origin = origin;
+  player.rotation = 0;
+
   player.pos.y = 0;
-  player.pos.x = Math.floor(
-    (ARENA_WIDTH - (player.matrix[0]?.length ?? 0)) / 2
-  );
+  player.pos.x = Math.floor(ARENA_WIDTH / 2) - Math.round(origin.x);
   player.level = 1;
   nextTetromino = await fetchNextTetromino();
   updateNextPiecePreview(nextTetromino);
@@ -99,7 +106,7 @@ export async function resetPlayerFromBackend(player: Player): Promise<void> {
 function setPaused(val: boolean, reason: PauseReason = "user") {
   if (val) {
     gameState.paused = true;
-    updateOverlay("paused", reason); // <-- pass the reason!
+    updateOverlay("paused", reason);
   } else {
     gameState.paused = false;
     updateOverlay("hidden");
@@ -123,7 +130,7 @@ resumeBtn?.addEventListener("click", () => setPaused(false));
 async function restartGame() {
   for (const row of arena) row.fill(0);
   player.level = 1;
-  gameState.gameOver = false; // <-- Use shared state!
+  gameState.gameOver = false;
   gameState.paused = false;
   gameState.isGravityAnimating = false;
   dropAccumulator = 0;

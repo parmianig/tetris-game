@@ -4,6 +4,8 @@
     "./app"
   ],
   "cSpell.words": [
+    "gameboy",
+    "Renderable",
     "Tetris",
     "tetromino",
     "tetrominoes",

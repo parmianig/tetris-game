@@ -5,7 +5,7 @@ import { collide, merge, applyGravity, arenaSweep } from "./engine";
 import { ARENA_WIDTH, ARENA_HEIGHT, TILE_SIZE } from "./constants";
 import { resetPlayerFromBackend } from "./main";
 import { updateOverlay } from "./ui";
-import { gameState } from "./gameState"; // NEW: import shared state
+import { gameState } from "./gameState";
 
 // Canvas setup
 const canvas = document.getElementById("tetris") as HTMLCanvasElement;
@@ -36,7 +36,7 @@ export function playerDrop(
       applyGravity(arena, player.level);
     }
     arenaSweep(arena, ARENA_WIDTH);
-    resetPlayer(player);
+    resetPlayer(player); // fallback for serverless mode
 
     if (collide(arena, player)) {
       gameState.gameOver = true;
@@ -46,9 +46,9 @@ export function playerDrop(
 }
 
 // --- Safe player reset wrapper ---
-async function safeResetPlayer(player: Player) {
+export async function safeResetPlayer(player: Player) {
   try {
-    await resetPlayerFromBackend(player);
+    await resetPlayerFromBackend(player); // <-- This is the real async reset
   } catch (e) {
     console.error("Failed to fetch next piece from server:", e);
     gameState.paused = true;
@@ -68,10 +68,8 @@ export async function playerDropWithGameOver(
     player.pos.y--;
     merge(arena, player.matrix, player.pos, player.color);
     arenaSweep(arena, ARENA_WIDTH);
-    if (gravityMode) {
-      // handled in gravity animation
-    }
-    await safeResetPlayer(player);
+    // Gravity animation handled elsewhere
+    await safeResetPlayer(player); // <-- Async reset
     if (collide(arena, player)) {
       gameState.gameOver = true;
       updateOverlay("gameover");
@@ -80,12 +78,13 @@ export async function playerDropWithGameOver(
 }
 
 // Dummy fallback (can be overridden during serverless mode)
-function resetPlayer(player: Player) {
+export function resetPlayer(player: Player) {
   player.pos = { x: 3, y: 0 };
   player.matrix = [
     [0, 1, 0],
     [1, 1, 1],
     [0, 0, 0],
   ];
-  // Optionally reset color/shape/level here if needed
+  player.origin = { x: 1, y: 1 }; // Center for classic T
+  player.level = 1; // <-- Add this line!
 }

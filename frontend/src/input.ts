@@ -1,4 +1,9 @@
-import { rotate, collide, type Matrix } from "./engine";
+import {
+  attemptSRSRotation,
+  collide,
+  type Matrix,
+  wrapRotation,
+} from "./engine";
 import type { Player } from "./types";
 
 export function bindInput(
@@ -7,97 +12,88 @@ export function bindInput(
   isDisabled: () => boolean,
   drop: () => void
 ) {
-  // Keyboard controls
-  document.addEventListener("keydown", (event) => {
+  /**
+   * Try to rotate via SRS.
+   * On success, update player.matrix, pos, and rotation state.
+   */
+  function tryRotate(dir: 1 | -1) {
+    const result = attemptSRSRotation(player, arena, dir);
+    if (result.rotated) {
+      player.matrix = result.matrix;
+      player.pos.x += result.offset.x;
+      player.pos.y += result.offset.y;
+      player.rotation = wrapRotation(player.rotation + dir);
+    }
+  }
+
+  // --- Keyboard controls ---
+  document.addEventListener("keydown", (e) => {
     if (isDisabled()) return;
 
-    switch (event.key) {
+    switch (e.key) {
       case "ArrowLeft":
         player.pos.x--;
         if (collide(arena, player)) player.pos.x++;
         break;
+
       case "ArrowRight":
         player.pos.x++;
         if (collide(arena, player)) player.pos.x--;
         break;
+
       case "ArrowDown":
         drop();
         break;
+
       case "ArrowUp":
-        if (event.shiftKey) {
-          player.matrix = rotate(player.matrix, -1); // Counterclockwise
-          if (collide(arena, player)) player.matrix = rotate(player.matrix, 1);
-        } else {
-          player.matrix = rotate(player.matrix, 1); // Clockwise
-          if (collide(arena, player)) player.matrix = rotate(player.matrix, -1);
-        }
+      case "x":
+        tryRotate(1);
+        break;
+
+      case "z":
+        tryRotate(-1);
         break;
     }
   });
 
-  // --- Ergonomic mobile/desktop controls ---
-  // Helper for safe action
-  const safe = (action: () => void) => {
-    if (!isDisabled()) action();
+  // --- Touch / Button helpers ---
+  const safe = (fn: () => void) => {
+    if (!isDisabled()) fn();
   };
 
-  // Prolonged tap logic (for left, right, down)
-  function setupProlongedButton(
-    id: string,
-    action: () => void,
-    repeatDelay = 90, // ms between repeats (after hold)
-    initialDelay = 350 // ms before repeat starts (on first press)
-  ) {
+  function setupButton(id: string, fn: () => void) {
     const btn = document.getElementById(id);
     if (!btn) return;
-
-    let interval: any = null;
-    let timeout: any = null;
-
-    const handleStart = (e: Event) => {
-      e.preventDefault();
-      safe(action); // Always trigger once immediately on press
-      timeout = setTimeout(() => {
-        interval = setInterval(() => safe(action), repeatDelay);
-      }, initialDelay);
-    };
-    const handleEnd = () => {
-      clearTimeout(timeout);
-      clearInterval(interval);
-      timeout = null;
-      interval = null;
-    };
-
-    btn.addEventListener("touchstart", handleStart, { passive: false });
-    btn.addEventListener("mousedown", handleStart);
-    btn.addEventListener("touchend", handleEnd);
-    btn.addEventListener("touchcancel", handleEnd);
-    btn.addEventListener("mouseup", handleEnd);
-    btn.addEventListener("mouseleave", handleEnd);
+    btn.addEventListener("mousedown", () => safe(fn));
+    btn.addEventListener(
+      "touchstart",
+      (ev) => {
+        ev.preventDefault();
+        safe(fn);
+      },
+      { passive: false }
+    );
   }
 
-  // Move functions using real Tetris logic
-  const moveLeft = () => {
+  setupButton("left", () => {
     player.pos.x--;
     if (collide(arena, player)) player.pos.x++;
-  };
-  const moveRight = () => {
+  });
+  setupButton("right", () => {
     player.pos.x++;
     if (collide(arena, player)) player.pos.x--;
-  };
-  const moveDown = () => {
-    drop();
-  };
+  });
+  setupButton("down", () => drop());
 
-  setupProlongedButton("left", moveLeft, 120, 450);
-  setupProlongedButton("right", moveRight, 120, 450);
-  setupProlongedButton("down", moveDown, 120, 450);
+  setupButton("rotate", () => safe(() => tryRotate(1)));
+  setupButton("rotate-ccw", () => safe(() => tryRotate(-1)));
 
-  // Single tap for rotate (no need for prolonged tap)
-  document.getElementById("rotate")?.addEventListener("click", () =>
+  // (Optional) Game-Boy controls:
+  setupButton("btn-a", () => safe(() => tryRotate(1)));
+  setupButton("btn-b", () => safe(() => tryRotate(-1)));
+  setupButton("btn-start", () =>
     safe(() => {
-      player.matrix = rotate(player.matrix, 1);
-      if (collide(arena, player)) player.matrix = rotate(player.matrix, -1);
+      if ((window as any).setPaused) (window as any).setPaused(true);
     })
   );
 }

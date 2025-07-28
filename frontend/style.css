@@ -490,18 +490,6 @@ body.drawer-open #drawer-overlay {
   position: relative;
 }
 
-.tetris-controls-corner {
-  display: flex;
-  justify-content: space-between;
-  width: 100vw;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  z-index: 100;
-  padding: 0.8rem 1rem;
-  pointer-events: none;
-}
-
 .left-controls,
 .right-controls {
   display: flex;
@@ -521,4 +509,333 @@ body.drawer-open #drawer-overlay {
     min-height: 40px;
     font-size: 1.2rem;
   }
+}
+
+body.drawer-open .tetris-controls-corner {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.25s;
+}
+
+@media (max-width: 600px) {
+  .tetris-controls-corner {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 95vw;
+    bottom: 1.5rem;
+    z-index: 120;
+    /* Keep it above the blurred main */
+  }
+}
+
+.gameboy-controls {
+  position: fixed;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  gap: 2.2rem;
+  z-index: 120;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dpad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.dpad button {
+  background: #222;
+  border: 2px solid #555;
+  border-radius: 6px;
+  width: 44px;
+  height: 44px;
+  margin: 2px;
+  font-size: 1.6rem;
+  color: #fff;
+}
+
+.dpad>div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+#ab-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ab-buttons button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #a55;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 54px;
+  height: 54px;
+  font-size: 2rem;
+  margin: 0.2rem 0;
+  box-shadow: 0 1px 3px #2226;
+}
+
+/* Select/Start */
+.start-select {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-left: 2rem;
+}
+
+.start-select button {
+  background: #222;
+  color: #fff;
+  border: 2px solid #555;
+  border-radius: 18px;
+  min-width: 92px;
+  max-width: 140px;
+  width: 115px;
+  height: 36px;
+  font-size: 1.01rem !important;
+  /* Try from 1.01rem down to 0.8rem as needed */
+  font-family: 'Press Start 2P', 'VT323', monospace, Arial, sans-serif;
+  letter-spacing: 0.11em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 8px;
+  -webkit-user-select: none;
+  user-select: none;
+  overflow: hidden;
+  white-space: nowrap;
+  box-shadow: 0 1px 6px #0006;
+  padding: 0;
+}
+
+.start-select button:active {
+  background: #444;
+}
+
+@media (max-width: 600px) {
+  .start-select button {
+    width: 72px;
+    font-size: 0.74rem !important;
+    min-width: 60px;
+  }
+}
+
+@media (max-width: 600px) {
+  .gameboy-controls {
+    position: fixed;
+    left: 50%;
+    bottom: 2.2rem;
+    transform: translateX(-50%);
+    width: auto;
+    z-index: 120;
+  }
+}
+
+@media (max-width: 400px) {
+  .gameboy-controls {
+    gap: 1rem;
+    bottom: 0.6rem;
+  }
+
+  .dpad button,
+  .ab-buttons button {
+    width: 38px;
+    height: 38px;
+    font-size: 1.2rem;
+  }
+
+  .ab-buttons button {
+    width: 44px;
+    height: 44px;
+    font-size: 1.5rem;
+  }
+
+  .start-select button {
+    width: 42px;
+    height: 20px;
+    font-size: 0.8rem;
+  }
+}
+
+.dpad button:active,
+.ab-buttons button:active,
+.start-select button:active {
+  background: #666 !important;
+  box-shadow: 0 2px 7px #111a;
+  color: #ffc;
+}
+
+.tetris-controls-corner {
+  position: fixed;
+  left: 50%;
+  bottom: 2.2rem;
+  transform: translateX(-50%);
+  z-index: 120;
+  transition: opacity 0.22s;
+}
+
+body.drawer-open #controls,
+body.drawer-open .tetris-controls-corner,
+body.drawer-open .gameboy-controls {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.22s;
+}
+
+body.drawer-open .gameboy-controls {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.22s;
+}
+
+.dpad-middle {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+}
+
+.dpad-btn,
+.dpad-center {
+  background: #3a393a;
+  border: 3px solid #222;
+  box-shadow: 0 2px 6px #0008, inset 0 1px 2px #8883;
+  width: 42px;
+  height: 42px;
+  margin: 0;
+  border-radius: 8px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.12s;
+  font-size: 2rem;
+  color: #d5d5d5;
+}
+
+.dpad-btn:active {
+  box-shadow: 0 0 2px #000b, inset 0 2px 6px #555c;
+}
+
+.dpad-center {
+  background: none;
+  border: none;
+  box-shadow: none;
+  width: 32px;
+  height: 32px;
+  pointer-events: none;
+}
+
+/* Triangular arrows (CSS only) */
+.dpad-btn.up::before {
+  content: "";
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  border-bottom: 22px solid #bcbcbc;
+  position: absolute;
+  top: 10px;
+}
+
+.dpad-btn.down::before {
+  content: "";
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  border-top: 22px solid #bcbcbc;
+  position: absolute;
+  bottom: 10px;
+}
+
+.dpad-btn.left::before {
+  content: "";
+  border-top: 16px solid transparent;
+  border-bottom: 16px solid transparent;
+  border-right: 22px solid #bcbcbc;
+  position: absolute;
+  left: 8px;
+}
+
+.dpad-btn.right::before {
+  content: "";
+  border-top: 16px solid transparent;
+  border-bottom: 16px solid transparent;
+  border-left: 22px solid #bcbcbc;
+  position: absolute;
+  right: 8px;
+}
+
+/* AB Buttons */
+.ab-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-left: 2.2rem;
+}
+
+.ab-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 65% 35%, #e18787 65%, #7e2020 100%);
+  border: 3px solid #7e2020;
+  box-shadow: 0 3px 12px #0007, 0 1px 2px #fff7 inset;
+  color: #fff;
+  font-size: 2rem;
+  font-family: Arial Black, Arial, sans-serif;
+  letter-spacing: 0.1em;
+  text-shadow: 0 2px 4px #802, 0 0 0 #fff;
+  margin: 0;
+  transition: box-shadow 0.1s;
+}
+
+.ab-btn:active {
+  box-shadow: 0 1px 3px #000b, 0 0px 1px #fff7 inset;
+}
+
+.start-btn,
+.select-btn {
+  width: 78px;
+  height: 25px;
+  border-radius: 16px;
+  background: #dad9ca;
+  border: 2px solid #aaa;
+  color: #312c49;
+  font-family: 'Share Tech Mono', 'Consolas', monospace;
+  font-size: 1.18rem;
+  letter-spacing: 0.22em;
+  box-shadow: 0 2px 6px #1112, 0 1px 1.5px #fff7 inset;
+  text-shadow: 0 0.5px 0.5px #fff9;
+  margin: 0;
+  transition: background 0.2s, box-shadow 0.1s;
+}
+
+.start-btn:active,
+.select-btn:active {
+  background: #bdbcae;
+  box-shadow: 0 0.5px 2px #000b inset;
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
