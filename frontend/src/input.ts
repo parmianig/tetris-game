@@ -74,6 +74,12 @@ export function bindInput(
         drop();
         break;
       case "ArrowUp":
+        if (e.shiftKey) {
+          tryRotate(player, arena, -1); // Counterclockwise with Shift
+        } else {
+          tryRotate(player, arena, 1); // Clockwise
+        }
+        break;
       case "x":
         tryRotate(player, arena, 1);
         break;
@@ -84,7 +90,6 @@ export function bindInput(
         drop();
         break;
       case "Enter":
-        // ENTER key as pause
         const pauseBtn = document.getElementById(
           "pause-btn"
         ) as HTMLButtonElement | null;
