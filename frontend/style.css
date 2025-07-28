@@ -54,36 +54,6 @@ canvas {
   text-align: center;
 }
 
-/* Responsive adjustments */
-@media (max-width: 600px) {
-  #game-flex-row {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.7rem;
-  }
-
-  #next-label,
-  .next-label {
-    font-size: 0.74rem;
-    margin-bottom: 1px;
-  }
-
-  #next-piece-canvas {
-    width: 32px !important;
-    height: 32px !important;
-    border-radius: 5px;
-  }
-
-  #next-label {
-    font-size: 0.77rem;
-  }
-
-  .next-canvas-wrapper {
-    border-radius: 6px;
-    padding: 1px;
-  }
-}
-
 @media (max-width: 400px) {
 
   #next-piece-canvas {
@@ -208,14 +178,6 @@ canvas {
 body.drawer-open #main-content {
   filter: blur(1.5px) brightness(0.9);
   pointer-events: none;
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-  #settings-drawer {
-    width: 80vw;
-    min-width: 180px;
-  }
 }
 
 #settings {
@@ -571,30 +533,10 @@ body.drawer-open #drawer-overlay {
   gap: 0.6rem;
 }
 
-@media (max-width: 600px) {
-  .control-btn {
-    min-width: 40px;
-    min-height: 40px;
-    font-size: 1.2rem;
-  }
-}
-
 body.drawer-open .tetris-controls-corner {
   opacity: 0 !important;
   pointer-events: none !important;
   transition: opacity 0.25s;
-}
-
-@media (max-width: 600px) {
-  .tetris-controls-corner {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 95vw;
-    bottom: 1.5rem;
-    z-index: 120;
-    /* Keep it above the blurred main */
-  }
 }
 
 .gameboy-controls {
@@ -955,21 +897,9 @@ body.drawer-open .gameboy-controls {
   align-items: center;
 }
 
-@media (max-width: 600px) {
-
-  #next-piece-canvas {
-    width: 38px;
-    height: 38px;
-  }
-
-  #next-label {
-    font-size: 0.85rem;
-  }
-}
-
 #game-flex-row {
   display: flex;
-  flex-direction: row;
+  flex-direction: row !important;
   justify-content: center;
   align-items: flex-start;
   width: 100vw;
@@ -1018,36 +948,17 @@ body.drawer-open .gameboy-controls {
   }
 }
 
-  @media (max-width: 600px) {
-    #game-flex-row {
-      flex-direction: column;
-      align-items: center;
-      width: 100vw;
-      gap: 0.4rem;
-    }
-
-    #game-area {
-      margin-bottom: 0.8rem;
-    }
-
-    #next-label {
-      font-size: 0.71rem;
-      margin-bottom: 1.5px;
-    }
-
-    #next-piece-canvas {
-      width: 17px !important;
-      height: 17px !important;
-      border-radius: 3px;
-      margin: 0 auto;
-    }
-
-    .next-canvas-wrapper {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 3px;
-      border-radius: 9px;
-      background: rgba(28, 31, 38, 0.23);
-      box-shadow: 0 2px 7px #0004, 0 0 0 2px rgba(120, 170, 255, 0.09) inset;   }
+@media (max-width: 600px) {
+  #next-preview-panel {
+    margin-left: 6px;
+    min-width: 36px;
+    max-width: 44px;
+    padding: 3px 2px 5px 2px;
+    /* REMOVE: don't use absolute here, let flex do its job */
   }
+
+  #game-flex-row {
+    flex-direction: row !important;
+    gap: 0.3rem;
+  }
+}
