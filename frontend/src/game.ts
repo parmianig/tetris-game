@@ -1,7 +1,7 @@
 import type { Player } from "./types";
 import { drawMatrix } from "./render";
 import type { Matrix } from "./engine";
-import { collide, merge, applyGravity, arenaSweep } from "./engine";
+import { collide, merge, arenaSweep } from "./engine";
 import { ARENA_WIDTH, ARENA_HEIGHT, TILE_SIZE } from "./constants";
 import { resetPlayerFromBackend } from "./main";
 import { updateOverlay } from "./ui";

@@ -45,6 +45,12 @@ document.addEventListener("DOMContentLoaded", () => {
         if (document.activeElement === last) {
           first.focus();
           e.preventDefault();
+        } else {
+          // Allow default tab behavior for other elements
+          return;
+        }
+          first.focus();
+          e.preventDefault();
         }
       }
     });

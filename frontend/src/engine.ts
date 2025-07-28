@@ -1,4 +1,4 @@
-import type { Player, Shape } from "./types";
+import type { Player } from "./types";
 import { SRS_KICK_TABLE, getSRSKey } from "./srs";
 export type Matrix = (number | string)[][];
 
