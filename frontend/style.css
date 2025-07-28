@@ -906,29 +906,6 @@ body.drawer-open .gameboy-controls {
   margin: 0 0 16px 0;
 }
 
-@media (max-width: 600px) {
-  #next-piece-preview.glass-card {
-    min-width: 64px;
-    max-width: 92px;
-    padding: 7px 4px 6px 4px;
-  }
-
-  .next-canvas-wrapper,
-  #next-piece-canvas {
-    min-width: 38px;
-    min-height: 38px;
-    width: 38px;
-  }
-}
-
-#next-piece-preview.traditional-card {
-  background: #0f1f1f;
-  border: 2px solid #aaa;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px #0008;
-}
-
-
 @media (max-width: 900px) {
   #game-flex-row {
     gap: 1.1rem;
@@ -957,31 +934,6 @@ body.drawer-open .gameboy-controls {
   #next-piece-canvas {
     width: 38px;
     height: 38px;
-  }
-}
-
-@media (max-width: 600px) {
-  #game-flex-row {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  #next-piece-preview.glass-card {
-    margin-left: 0;
-    margin-top: 0.6rem;
-    width: 100%;
-    min-width: 0;
-    max-width: 96vw;
-    border-radius: 18px;
-    padding: 6px 4px 6px 4px;
-  }
-
-  #next-piece-canvas {
-    width: 38px !important;
-    height: 38px !important;
-    border-radius: 12px;
-    margin: 0 auto;
   }
 }
 
@@ -1020,9 +972,9 @@ body.drawer-open .gameboy-controls {
   flex-direction: row;
   justify-content: center;
   align-items: flex-start;
-  gap: 2rem;
   width: 100vw;
-  margin-bottom: 1rem;
+  gap: 1.1rem;
+  position: relative;
 }
 
 /* Arena styling remains unchanged */
@@ -1041,126 +993,30 @@ body.drawer-open .gameboy-controls {
   display: inline-block;
 }
 
-@media (max-width: 600px) {
-  #next-preview-panel {
-    top: 0;
-    left: 100%;
-    margin-left: 8px;
-    padding: 6px 8px 8px 8px;
-    min-width: 60px;
-    max-width: 90px;
-    min-height: 42px;
-    border-radius: 14px;
-  }
-
-  #next-label {
-    font-size: 0.85rem;
-  }
-
-  #tetris {
-    max-width: 96vw;
-    height: auto;
-    display: block;
-    margin: 0 auto;
-    background: #041415;
-    border: 3px solid #fff;
-    box-sizing: border-box;
-  }
-
-  #next-piece-canvas {
-    width: 38px;
-    height: 38px;
-    border-radius: 7px;
-  }
-}
-
-
-#next-piece-canvas {
-  width: 36px !important;
-  height: 36px !important;
-  background: #13181d;
-  display: block;
-  border-radius: 6px;
-  margin: 0 auto;
-}
-
-/* Responsive tweaks for mobile */
-@media (max-width: 600px) {
-  #game-wrapper {
-    padding-top: 0.3rem;
-    min-height: 98vh;
-  }
-
+@media (max-width: 700px) {
   #game-flex-row {
-    gap: 0.3rem;
+    flex-direction: row-reverse;
+    /* <--- FLIPS the order for mobile */
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.7rem;
     width: 100vw;
-    min-width: 0;
   }
 
-  .arena-wrapper {
-    max-width: 100vw;
-  }
-
-  #game-area {
-    position: relative;
-    z-index: 1;
-  }
-
-  #tetris {
-    max-width: 94vw;
-    border-width: 2.2px;
-  }
-
-    #next-preview-panel {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      margin-left: 2rem;
-      min-width: 90px;
-      padding: 14px 14px 10px 14px;
-      background: rgba(24, 26, 34, 0.52);
-      border: 2.5px solid rgba(255, 255, 255, 0.17);
-      border-radius: 16px;
-      box-shadow: 0 6px 28px 0 rgba(40, 48, 55, 0.15);
-      -webkit-backdrop-filter: blur(14px) saturate(130%);
-      backdrop-filter: blur(14px) saturate(130%);
-      z-index: 2;
-    }
-
-  #next-label {
-    font-size: 0.88rem;
-  }
-
-  #next-piece-canvas {
-    width: 36px !important;
-    height: 36px !important;
-  }
-}
-
-@media (max-width: 600px) {
   #next-preview-panel {
-    top: 6px;
-    margin-left: 2px;
-    min-width: 31px;
-    max-width: 44px;
-    border-radius: 9px;
-    padding: 3px 2px 5px 2px;
+    /* Optional: adjust margins/padding for mobile alignment */
+    margin-right: 0;
+    margin-left: 0;
+    left: auto;
+    right: auto;
+    top: 0;
+    position: static;
+    min-width: 52px;
+    max-width: 80px;
+    padding: 7px 4px 6px 4px;
+    border-radius: 12px;
   }
-
-    #game-flex-row {
-      flex-direction: row;
-      /* keep row! */
-      align-items: flex-start;
-      gap: 1.2rem;
-    }
-
-    #next-piece-canvas {
-      width: 27px !important;
-      height: 27px !important;
-    }
 }
-
 
   @media (max-width: 600px) {
     #game-flex-row {
