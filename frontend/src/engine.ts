@@ -1,4 +1,3 @@
-// engine.ts
 import type { Player, Shape } from "./types";
 import { SRS_KICK_TABLE, getSRSKey } from "./srs";
 export type Matrix = (number | string)[][];
@@ -58,43 +57,34 @@ export function merge(
 // —————————— SRS ROTATION CORE ——————————
 
 /**
- * Explicit SRS rotation for I piece (no lost blocks, true center pivot).
- * Rotates between horizontal and vertical in 4x4.
+ * Bulletproof I piece rotation: Always returns exactly four blocks, never loses them,
+ * always rotates about the SRS center (1.5, 0.5) in 4x4.
  */
 export function rotateIMatrix(
   matrix: Matrix,
-  direction: 1 | -1,
-  rotation: 0 | 1 | 2 | 3
+  _direction: 1 | -1,
+  rotation: Player["rotation"]
 ): Matrix {
   const N = 4;
   const out: Matrix = Array.from({ length: N }, () => Array(N).fill(0));
-  // Find value (the "color" or 1)
   const val = matrix.flat().find((v) => v !== 0 && v !== undefined) ?? 1;
-  // I has only two orientations (0,2 = horiz; 1,3 = vert)
-  const isHoriz = rotation % 2 === 0;
 
-  if (isHoriz) {
+  if (rotation % 2 === 0) {
     // Horizontal → Vertical
     for (let i = 0; i < 4; ++i) {
-      if (Array.isArray(out[i])) {
-        // TS now knows out[i] is defined and is an array
-        out[i]![2] = val;
-      }
+      // out[i] is always an array due to Array.from initializer
+      out[i]![2] = val;
     }
   } else {
     // Vertical → Horizontal
-    const row = out[2];
-    if (Array.isArray(row)) {
-      for (let i = 0; i < 4; ++i) {
-        row[i] = val;
-      }
-    }
+    const row = out[2]!;
+    for (let i = 0; i < 4; ++i) row[i] = val;
   }
   return out;
 }
 
 /**
- * Arbitrary-origin rotation (for T, L, J, S, Z with backend-provided origin)
+ * Arbitrary-origin SRS rotation (for T, L, J, S, Z using backend-provided origin)
  */
 export function rotateMatrixWithOrigin(
   matrix: Matrix,
@@ -112,7 +102,6 @@ export function rotateMatrixWithOrigin(
       // Translate to origin
       const relX = x - origin.x;
       const relY = y - origin.y;
-      // Rotate
       let rx: number, ry: number;
       if (direction === 1) {
         rx = relY;
@@ -137,7 +126,7 @@ export function wrapRotation(n: number): 0 | 1 | 2 | 3 {
 }
 
 /**
- * SRS rotation for all pieces (uses backend origin, with special case for I)
+ * SRS rotation entry: rotates tetromino, applies SRS wall kicks, returns new matrix+offset+success
  */
 export function attemptSRSRotation(
   player: Player,

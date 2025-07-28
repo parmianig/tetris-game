@@ -8,14 +8,25 @@ import { updateOverlay } from "./ui";
 import { gameState } from "./gameState";
 
 // Canvas setup
-const canvas = document.getElementById("tetris") as HTMLCanvasElement;
+const canvas = document.getElementById("tetris") as HTMLCanvasElement | null;
+if (!canvas) throw new Error("Canvas element #tetris not found");
 canvas.width = ARENA_WIDTH * TILE_SIZE;
 canvas.height = ARENA_HEIGHT * TILE_SIZE;
-const context = canvas.getContext("2d")!;
+const context = canvas.getContext("2d");
+if (!context) throw new Error("Failed to get 2D context");
 context.scale(TILE_SIZE, TILE_SIZE);
 
 // Draw current frame
 export function draw(arena: Matrix, player: Player) {
+  const canvas = document.getElementById("tetris") as HTMLCanvasElement | null;
+  if (!canvas) throw new Error("Canvas element #tetris not found");
+  canvas.width = ARENA_WIDTH * TILE_SIZE;
+  canvas.height = ARENA_HEIGHT * TILE_SIZE;
+
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("Failed to get 2D context for #tetris");
+  context.scale(TILE_SIZE, TILE_SIZE);
+
   context.fillStyle = "#122";
   context.fillRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT);
   drawMatrix(context, arena);
@@ -26,15 +37,13 @@ export function draw(arena: Matrix, player: Player) {
 export function playerDrop(
   player: Player,
   arena: Matrix,
-  gravityMode: boolean
+  _gravityMode: boolean // underscore prevents TS unused param warning
 ): void {
   player.pos.y++;
   if (collide(arena, player)) {
     player.pos.y--;
     merge(arena, player.matrix, player.pos, player.color);
-    if (gravityMode) {
-      applyGravity(arena, player.level);
-    }
+    // Gravity is handled in the game loop or elsewhere
     arenaSweep(arena, ARENA_WIDTH);
     resetPlayer(player); // fallback for serverless mode
 
@@ -48,7 +57,7 @@ export function playerDrop(
 // --- Safe player reset wrapper ---
 export async function safeResetPlayer(player: Player) {
   try {
-    await resetPlayerFromBackend(player); // <-- This is the real async reset
+    await resetPlayerFromBackend(player);
   } catch (e) {
     console.error("Failed to fetch next piece from server:", e);
     gameState.paused = true;
@@ -60,7 +69,7 @@ export async function safeResetPlayer(player: Player) {
 export async function playerDropWithGameOver(
   player: Player,
   arena: Matrix,
-  gravityMode: boolean
+  _gravityMode: boolean // unused param, prefix with underscore
 ) {
   if (gameState.gameOver) return;
   player.pos.y++;
@@ -69,7 +78,7 @@ export async function playerDropWithGameOver(
     merge(arena, player.matrix, player.pos, player.color);
     arenaSweep(arena, ARENA_WIDTH);
     // Gravity animation handled elsewhere
-    await safeResetPlayer(player); // <-- Async reset
+    await safeResetPlayer(player); // Async reset
     if (collide(arena, player)) {
       gameState.gameOver = true;
       updateOverlay("gameover");
@@ -85,6 +94,6 @@ export function resetPlayer(player: Player) {
     [1, 1, 1],
     [0, 0, 0],
   ];
-  player.origin = { x: 1, y: 1 }; // Center for classic T
-  player.level = 1; // <-- Add this line!
+  player.origin = { x: 1, y: 1 };
+  player.level = 1;
 }

@@ -11,7 +11,7 @@ import { GAME_SETTINGS } from "./settings";
 import "./settings-drawer";
 import { updateOverlay } from "./ui";
 import { gameState } from "./gameState";
-import type { Shape, Player, Tetromino } from "./types";
+import type { Player, Tetromino } from "./types";
 
 // --- DOM Elements ---
 const overlay = document.getElementById(

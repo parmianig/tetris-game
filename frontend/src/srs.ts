@@ -1,3 +1,5 @@
+import type { Shape } from "./types";
+
 // srs.ts
 export type SRS_Orientation = 0 | 1 | 2 | 3;
 
@@ -153,7 +155,7 @@ export const SRS_KICK_TABLE: Record<string, [number, number][]> = {
   ],
 };
 
-export function getSRSKey(shape: string, from: number, to: number): string {
+export function getSRSKey(shape: Shape, from: number, to: number): string {
   if (shape === "I") return `I-${from}>${to}`;
   if (shape === "O") return `O-${from}>${to}`;
   return `JLSTZ-${from}>${to}`;
