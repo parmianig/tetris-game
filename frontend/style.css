@@ -32,18 +32,6 @@ canvas {
   box-sizing: border-box;
 }
 
-/* Smaller font for "Next" label */
-#next-label,
-.next-label {
-  color: #e2eafc;
-  font-size: 0.84rem;
-  /* Smaller font */
-  font-weight: 600;
-  margin-bottom: 3px;
-  letter-spacing: 0.02em;
-  text-align: center;
-}
-
 /* "Next" label styling */
 #next-label,
 .next-label {
@@ -53,20 +41,6 @@ canvas {
   margin-bottom: 2px;
   letter-spacing: 0.04em;
   text-align: center;
-}
-
-@media (max-width: 400px) {
-
-  #next-piece-canvas {
-    width: 24px !important;
-    height: 24px !important;
-    border-radius: 3px;
-  }
-
-  #next-label,
-  .next-label {
-    font-size: 0.68rem;
-  }
 }
 
 /* Controls container */
@@ -642,36 +616,6 @@ body.drawer-open .tetris-controls-corner {
   background: #444;
 }
 
-@media (max-width: 400px) {
-  .gameboy-controls {
-      gap: 0.2rem;
-      padding: 0 1vw;
-      width: 100vw;
-      max-width: 100vw;
-    }
-
-        .dpad button,
-        .ab-buttons button {
-          min-width: 32px;
-          min-height: 32px;
-          width: 44px;
-          height: 44px;
-          font-size: 1.2rem;
-          margin: 2px;   }
-
-  .ab-buttons button {
-    width: 44px;
-    height: 44px;
-    font-size: 1.5rem;
-  }
-
-  .start-select button {
-    width: 42px;
-    height: 20px;
-    font-size: 0.8rem;
-  }
-}
-
 .dpad button:active,
 .ab-buttons button:active,
 .start-select button:active {
@@ -888,16 +832,6 @@ body.drawer-open .gameboy-controls {
   }
 }
 
-@media (max-width: 400px) {
-  #next-piece-preview.glass-card {
-    padding: 3px 2px 2px 2px;
-  }
-
-  .next-label {
-    font-size: 1rem;
-  }
-}
-
 #game-area {
   margin: 0;
   padding: 0;
@@ -971,20 +905,65 @@ body.drawer-open .gameboy-controls {
     gap: 0.3rem;
   }
 
-    .gameboy-controls {
-      gap: 0.7rem;
-      padding: 0 1vw;
-      width: 100vw;
-      max-width: 100vw;
-      left: 50%;
-      bottom: 0.6rem;
-      transform: translateX(-50%);
-    }
+  .gameboy-controls {
+    gap: 0.7rem;
+    padding: 0 1vw;
+    width: 100vw;
+    max-width: 100vw;
+    left: 50%;
+    bottom: 0.6rem;
+    transform: translateX(-50%);
+  }
 
-        .dpad button,
-        .ab-buttons button {
-          width: 36px;
-          height: 36px;
-          font-size: 1rem;
-          margin: 1px; }
+  .dpad button,
+  .ab-buttons button {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+    margin: 1px; }
+}
+
+@media (max-width: 400px) {
+  #next-piece-preview.glass-card {
+    padding: 3px 2px 2px 2px;
+  }
+
+  .next-label {
+    font-size: 1rem;
+  }
+
+  .gameboy-controls {
+    gap: 0.2rem;
+    padding: 0 1vw;
+    width: 100vw;
+    max-width: 100vw;
+  }
+
+  .dpad button,
+  .ab-buttons button {
+    min-width: 32px;
+    min-height: 32px;
+    width: 44px;
+    height: 44px;
+    font-size: 1.2rem;
+    margin: 2px;
+  }
+
+
+  .start-select button {
+    width: 42px;
+    height: 20px;
+    font-size: 0.8rem;
+  }
+
+  #next-piece-canvas {
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 3px;
+  }
+
+  #next-label,
+  .next-label {
+    font-size: 0.68rem;
+  }
 }

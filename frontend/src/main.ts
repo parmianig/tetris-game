@@ -11,6 +11,7 @@ import { GAME_SETTINGS } from "./settings";
 import "./settings-drawer";
 import { updateOverlay } from "./ui";
 import { gameState } from "./gameState";
+import { showSpinner, hideSpinner } from "./spinner/spinner";
 import type { Player, Tetromino } from "./types";
 
 // --- DOM Elements ---
@@ -306,8 +307,13 @@ window.addEventListener("tetromino-style-change", () => {
 });
 
 // --- Start Game ---
+showSpinner();
 safeResetPlayer(player)
-  .then(() => requestAnimationFrame(update))
+  .then(() => {
+    hideSpinner();
+    requestAnimationFrame(update);
+  })
   .catch((err) => {
+    showSpinner("Failed to connect to backend. Please wait…");
     console.error("Failed to initialize player from backend", err);
   });

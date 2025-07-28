@@ -9,6 +9,11 @@
 </head>
 
 <body>
+  <div id="spinner-overlay" class="spinner-overlay show" role="status" aria-live="polite">
+    <canvas id="tetromino-spinner-canvas" width="128" height="128"></canvas>
+    <div id="spinner-message">Loading game…</div>
+  </div>
+
   <!-- Hamburger Button -->
   <button id="settings-hamburger" class="icon-btn" aria-label="Show settings" aria-controls="settings-drawer"
     aria-expanded="false" type="button">

@@ -1,0 +1,46 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.spinner-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(7, 13, 21, 0.85);
+  transition: opacity 0.35s cubic-bezier(.4, 0, .2, 1);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  pointer-events: all;
+}
+
+.spinner-overlay:not(.show) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#tetromino-spinner-canvas {
+  width: 128px;
+  /* Large spinner, matches your canvas */
+  height: 128px;
+  background: transparent;
+  margin-bottom: 2rem;
+  display: block;
+}
+
+#spinner-message {
+  color: #eaf6ff;
+  font-size: 2.4rem;
+  font-family: 'Share Tech Mono', 'VT323', 'Press Start 2P', Arial, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-shadow: 0 2px 12px #000b, 0 1px 1px #fff2;
+}
