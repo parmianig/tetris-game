@@ -143,17 +143,13 @@ function updateNextPiecePreview(next: Tetromino | null) {
   if (!canvas || !next || !next.matrix) return;
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
-  drawMiniTetromino(ctx, next, canvas.width);
+  drawMiniTetromino(ctx, next);
 }
 
 // Draws the tetromino shape (smaller, responsive, glass/traditional style)
-function drawMiniTetromino(
-  ctx: CanvasRenderingContext2D,
-  tetro: Tetromino,
-  size = 64
-) {
+function drawMiniTetromino(ctx: CanvasRenderingContext2D, tetro: Tetromino) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  if (!tetro || !tetro.matrix || !Array.isArray(tetro.matrix)) return;
+  if (!tetro?.matrix?.length || !Array.isArray(tetro.matrix)) return;
   const mat = tetro.matrix;
   const N = mat.length;
 
@@ -183,7 +179,7 @@ function drawMiniTetromino(
     Math.min(
       ctx.canvas.width / (maxX - minX + 1),
       ctx.canvas.height / (maxY - minY + 1)
-    ) * 0.7 // 0.7 = more padding for glass
+    ) * 0.9 // or 0.8 for more padding
   );
   const offsetX = Math.floor(
     (ctx.canvas.width - blockSize * (maxX - minX + 1)) / 2 - minX * blockSize
@@ -193,70 +189,27 @@ function drawMiniTetromino(
   );
 
   ctx.save();
-
-  // Style: glass effect or classic
-  if (GAME_SETTINGS.tetrominoStyle === "glass") {
-    ctx.globalAlpha = 0.98;
-    for (let y = 0; y < N; ++y) {
-      const row = mat[y];
-      if (!Array.isArray(row)) continue;
-      for (let x = 0; x < N; ++x) {
-        if (row[x]) {
-          // Glass: gradient and shadow
-          const grad = ctx.createLinearGradient(
-            x * blockSize + offsetX,
-            y * blockSize + offsetY,
-            x * blockSize + offsetX + blockSize,
-            y * blockSize + offsetY + blockSize
-          );
-          grad.addColorStop(0, "#fff8");
-          grad.addColorStop(0.3, tetro.color);
-          grad.addColorStop(1, "#0005");
-          ctx.fillStyle = grad;
-          ctx.shadowColor = tetro.color;
-          ctx.shadowBlur = 8;
-          ctx.fillRect(
-            x * blockSize + offsetX,
-            y * blockSize + offsetY,
-            blockSize - 2,
-            blockSize - 2
-          );
-          ctx.shadowBlur = 0;
-          ctx.strokeStyle = "#fff8";
-          ctx.lineWidth = 1.5;
-          ctx.strokeRect(
-            x * blockSize + offsetX + 0.5,
-            y * blockSize + offsetY + 0.5,
-            blockSize - 3,
-            blockSize - 3
-          );
-        }
-      }
-    }
-  } else {
-    // Traditional flat style
-    ctx.globalAlpha = 1.0;
-    ctx.fillStyle = tetro.color;
-    ctx.strokeStyle = "#222";
-    ctx.lineWidth = 2;
-    for (let y = 0; y < N; ++y) {
-      const row = mat[y];
-      if (!Array.isArray(row)) continue;
-      for (let x = 0; x < N; ++x) {
-        if (row[x]) {
-          ctx.fillRect(
-            x * blockSize + offsetX,
-            y * blockSize + offsetY,
-            blockSize - 1,
-            blockSize - 1
-          );
-          ctx.strokeRect(
-            x * blockSize + offsetX,
-            y * blockSize + offsetY,
-            blockSize - 1,
-            blockSize - 1
-          );
-        }
+  ctx.globalAlpha = 0.98;
+  ctx.fillStyle = tetro.color;
+  ctx.strokeStyle = "rgba(40,40,50,0.38)";
+  ctx.lineWidth = 2;
+  for (let y = 0; y < N; ++y) {
+    const row = mat[y];
+    if (!Array.isArray(row)) continue;
+    for (let x = 0; x < N; ++x) {
+      if (row[x]) {
+        ctx.fillRect(
+          x * blockSize + offsetX,
+          y * blockSize + offsetY,
+          blockSize - 1,
+          blockSize - 1
+        );
+        ctx.strokeRect(
+          x * blockSize + offsetX,
+          y * blockSize + offsetY,
+          blockSize - 1,
+          blockSize - 1
+        );
       }
     }
   }
