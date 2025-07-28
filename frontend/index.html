@@ -73,12 +73,18 @@
     <section id="game-wrapper" aria-label="Game Area">
       <h1>Tetris</h1>
       <div id="game-flex-row">
-        <div id="game-area">
-          <canvas id="tetris" width="240" height="400" aria-label="Tetris game area" tabindex="0"></canvas>
+        <div class="arena-wrapper" style="position:relative; display:inline-block;">
+          <div id="game-area">
+            <canvas id="tetris" width="240" height="400" aria-label="Tetris game area" tabindex="0"></canvas>
+          </div>
+          <!-- Next piece panel positioned absolutely relative to arena-wrapper -->
+          <div id="next-preview-panel">
+            <div id="next-label">Next</div>
+            <div class="next-canvas-wrapper">
+              <canvas id="next-piece-canvas" width="64" height="64"></canvas>
+            </div>
+          </div>
         </div>
-        <div id="next-piece-preview" class="glass-card">
-          <div class="next-label">Next</div>
-          <canvas id="next-piece-canvas" width="38" height="38" aria-label="Next piece preview"></canvas>  </div>
       </div>
       <section id="ui-status">
         <div id="status-bar" aria-live="polite"></div>

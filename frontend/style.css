@@ -26,18 +26,6 @@ canvas {
   gap: 1rem;
 }
 
-#game-flex-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 1.2rem;
-  justify-content: center;
-  width: 100%;
-}
-
-#game-area {
-  position: relative;
-}
-
 /* Smaller font for "Next" label */
 #next-label,
 .next-label {
@@ -50,22 +38,6 @@ canvas {
   text-align: center;
 }
 
-/* Next piece box - minimal, frameless, tight */
-#next-preview-panel {
-  display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 54px;
-    margin-left: 18px;
-    padding: 0 2px;
-    background: none;
-    border: none;
-    box-shadow: none;
-    border-radius: 0;
-    position: relative;
-    top: 0;
-  }
-
 /* "Next" label styling */
 #next-label,
 .next-label {
@@ -75,30 +47,6 @@ canvas {
   margin-bottom: 2px;
   letter-spacing: 0.04em;
   text-align: center;
-}
-
-/* Canvas for next piece - small, no outer frame */
-#next-piece-canvas {
-  background: #11171d;
-  border: 2px solid #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 3px #000a;
-  width: 44px !important;
-  height: 44px !important;
-  margin: 0;
-  padding: 0;
-  display: block;
-}
-
-.next-canvas-wrapper {
-  padding: 0;
-  margin: 0;
-  border: none;
-  background: none;
-  box-shadow: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 /* Responsive adjustments */
@@ -953,18 +901,6 @@ body.drawer-open .gameboy-controls {
   border: 0 !important;
 }
 
-
-
-#next-label {
-  color: #ccc;
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-  letter-spacing: 1px;
-  text-align: center;
-}
-
-
-
 @media (max-width: 600px) {
   #game-flex-row {
     flex-direction: column;
@@ -982,11 +918,6 @@ body.drawer-open .gameboy-controls {
     min-width: 0;
     width: 100%;
     justify-content: center;
-  }
-
-  #next-label {
-    font-size: 0.9rem;
-    margin: 0 0.4rem 0 0;
   }
 
   #next-piece-canvas {
@@ -1018,17 +949,6 @@ body.drawer-open .gameboy-controls {
   border: 2px solid rgba(255, 255, 255, 0.12);
   margin: 0 0 16px 0;
 }
-
-.next-label {
-  font-size: 1.16rem;
-  color: #e2eafc;
-  font-weight: 600;
-  text-align: center;
-  margin-bottom: 8px;
-  letter-spacing: 0.05em;
-}
-
-
 
 @media (max-width: 600px) {
   #next-piece-preview.glass-card {
@@ -1117,5 +1037,151 @@ body.drawer-open .gameboy-controls {
 
   .next-label {
     font-size: 1rem;
+  }
+}
+
+#game-area {
+  position: relative;
+  display: inline-block;
+}
+
+#next-piece-canvas {
+  display: block;
+  width: 52px;
+  height: 52px;
+  background: #12181e;
+  border-radius: 8px;
+  margin: 0 auto;
+  border: 2px solid #fff;
+  box-shadow: 0 0 5px #0005;
+}
+
+@media (max-width: 600px) {
+  #next-preview-panel {
+    top: 7px;
+    right: 7px;
+    padding: 4px 8px 7px 8px;
+  }
+
+  #next-piece-canvas {
+    width: 38px;
+    height: 38px;
+  }
+
+  #next-label {
+    font-size: 0.85rem;
+  }
+}
+
+#game-flex-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  gap: 0;
+  /* don't add margin between children */
+}
+
+/* Arena styling remains unchanged */
+
+#next-preview-panel {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  /* exactly at the right edge of arena */
+  margin-left: 20px;
+  /* gap between arena and preview */
+  z-index: 20;
+  background: #181a22f2;
+  border: 3px solid #fff;
+  border-radius: 22px;
+  box-shadow: 0 4px 16px #0008;
+  padding: 10px 14px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 90px;
+  max-width: 140px;
+  min-height: 74px;
+}
+
+#next-label {
+  font-size: 1.08rem;
+  color: #eaf6ff;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 3px;
+}
+
+.next-canvas-wrapper {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  border-radius: 12px;
+}
+
+.arena-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+#next-preview-panel {
+  position: absolute;
+  top: 10px;
+  right: -110px;
+  /* Pushes it outside the arena */
+  z-index: 20;
+  background: #181a22f2;
+  border: 3px solid #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 16px #0008;
+  padding: 10px 12px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 78px;
+  max-width: 140px;
+}
+
+@media (max-width: 600px) {
+  #next-preview-panel {
+    top: 4px;
+    right: -90px;
+    min-width: 60px;
+    max-width: 90px;
+    padding: 6px 6px 6px 6px;
+  }
+
+  #next-label {
+    font-size: 0.9rem;
+  }
+
+  #next-piece-canvas {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (max-width: 600px) {
+  #next-preview-panel {
+    top: 0;
+    left: 100%;
+    margin-left: 8px;
+    padding: 6px 8px 8px 8px;
+    min-width: 60px;
+    max-width: 90px;
+    min-height: 42px;
+    border-radius: 14px;
+  }
+
+  #next-label {
+    font-size: 0.85rem;
+  }
+
+  #next-piece-canvas {
+    width: 38px;
+    height: 38px;
+    border-radius: 7px;
   }
 }
