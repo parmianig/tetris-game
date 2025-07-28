@@ -5,9 +5,9 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 ---
 ## Changelog
 <!-- changelog -->
-## release/v2.2.1
+## release/v2.2.2
+* patch: second fix loading spinner (primo)
 * patch: fix loading spinner (primo)
-* minor: added loading spinner (primo)
 
 ---
 
