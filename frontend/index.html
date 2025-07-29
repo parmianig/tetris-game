@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tetris Game</title>
   <link rel="stylesheet" href="style.css" />
-  <!-- Optionally: <link rel="stylesheet" href="mobile.css" /> -->
 </head>
 
 <body>
@@ -16,7 +15,7 @@
     <span class="bar"></span><span class="bar"></span><span class="bar"></span>
   </button>
 
-  <!-- Overlays (Game Over, Pause, etc.) -->
+  <!-- Overlay for Game Over, Pause, etc. -->
   <div id="game-overlay" class="overlay hidden">
     <div class="overlay-content">
       <div id="overlay-text" aria-live="polite"></div>
@@ -54,19 +53,19 @@
     <div id="version-footer" class="version-footer"></div>
   </aside>
 
-  <!-- GAME + CONTROLS FLEX CONTAINER -->
   <main id="main-content">
     <div class="tetris-viewport">
-      <!-- Game Arena & Preview -->
+      <!-- Arena & Preview: now stacked on mobile, row on desktop -->
       <section id="game-wrapper" aria-label="Game Area">
         <h1>Tetris</h1>
         <div id="game-flex-row">
           <div id="game-area">
-            <canvas id="tetris"></canvas>
+            <canvas id="tetris" tabindex="0"></canvas>
           </div>
           <div id="next-preview-panel">
             <div id="next-label">Next</div>
-              <canvas id="next-piece-canvas" width="48" height="48"></canvas>
+            <!-- REMOVE outer div/frame, just canvas -->
+            <canvas id="next-piece-canvas" width="48" height="48"></canvas>
           </div>
         </div>
         <section id="ui-status">
@@ -81,7 +80,8 @@
           </svg>
         </button>
       </section>
-      <!-- Controls Always Below -->
+
+      <!-- Controls: always directly below arena on mobile, centered -->
       <nav id="controls" aria-label="Game Controls" class="tetris-controls-corner">
         <div class="gameboy-controls">
           <div class="dpad">
