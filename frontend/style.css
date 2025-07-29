@@ -14,18 +14,17 @@ body {
   -webkit-touch-callout: none;
 }
 
-.tetris-viewport {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-  width: 100vw;
-  background: #111;
-  box-sizing: border-box;
-  justify-content: flex-start;
-  overflow: hidden;
-  /* or your main bg */
-  position: relative;
+:root {
+  --vh: 100vh;
+  --arena-border: 3px solid #fff;
+  --arena-bg: #122;
+  --gameboy-gap: 1.2rem;
+  --dpad-btn-size: 44px;
+  --ab-btn-size: 48px;
+  --select-btn-h: 38px;
+  --select-btn-fs: 0.97rem;
+  --select-btn-minw: 80px;
+  --safe-area-bottom: env(safe-area-inset-bottom, 24px);
 }
 
 .tetris-header {
@@ -187,17 +186,6 @@ canvas {
 
 #settings-close:focus {
   outline: 2px solid #ff0;
-}
-
-#main-content {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  box-sizing: border-box;
-  margin-left: 0;
-  transition: filter 0.2s;
 }
 
 body.drawer-open #main-content {
@@ -561,9 +549,12 @@ body.drawer-open .tetris-controls-corner {
   flex-direction: row;
   justify-content: center;
   align-items: flex-end;
-  gap: 1.2rem;
+  gap: var(--gameboy-gap);
+  padding-bottom: max(2vw, var(--safe-area-bottom));
   width: auto;
   margin: 0 auto;
+  /* fallback for older browsers */
+  box-sizing: border-box;
 }
 
 .dpad {
@@ -622,24 +613,28 @@ body.drawer-open .tetris-controls-corner {
 .start-select button,
 .select-btn,
 .start-btn {
-  height: 38px;
-  font-size: 0.97rem;
-  /* ↓ from 1.1rem */
-  font-weight: 500;
-  /* Regular, not bold */
-  letter-spacing: 0.01em;
+  min-width: 70px;
+  max-width: 120px;
+  height: 36px;
+  padding: 0 12px;
+  font-size: clamp(0.8rem, 3vw, 1.13rem);
+  font-weight: 600;
   border-radius: 16px;
-  padding: 0 8px;
-  /* Slightly less padding */
   display: flex;
   align-items: center;
   justify-content: center;
   border: 2px solid #aaa;
   background: #222;
   color: #fff;
-  margin-bottom: 0.7rem;
+  margin-bottom: 0.5rem;
   box-sizing: border-box;
   text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* prevent text from expanding button */
+  line-height: 1;
+  letter-spacing: 0.03em;
 }
 
 
@@ -669,6 +664,12 @@ body.drawer-open .gameboy-controls {
   opacity: 0 !important;
   pointer-events: none !important;
   transition: opacity 0.22s;
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  z-index: 120;
+  padding-bottom: max(2vw, env(safe-area-inset-bottom, 24px));
 }
 
 body.drawer-open .gameboy-controls {
@@ -760,8 +761,8 @@ body.drawer-open .gameboy-controls {
 }
 
 .ab-btn {
-  width: 48px;
-  height: 48px;
+  width: var(--ab-btn-size);
+  height: var(--ab-btn-size);
   font-size: 1.35rem;
   border-radius: 50%;
 }
@@ -869,11 +870,11 @@ body {
 
 #main-content,
 .tetris-viewport {
-  min-height: 100vh;
-  width: 100vw;
+  min-height: var(--real-vh, 100vh);
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100vw;
   justify-content: flex-start;
   box-sizing: border-box;
 }
@@ -888,22 +889,30 @@ body {
   position: static;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 @media (max-width: 600px) {
 
   .dpad button,
   .ab-btn {
-    width: 40px;
-    height: 40px;
+    width: var(--dpad-btn-size);
+    height: var(--dpad-btn-size);
     font-size: 1.1rem;
   }
 
-  .start-select button {
-    font-size: 0.82rem !important;
-    min-width: 64px;
-    max-width: 86px;
-    height: 23px;
-    padding: 0 4px;
-  }
+    .start-select button,
+    .select-btn,
+    .start-btn {
+      font-size: 0.79rem !important;
+      min-width: 60px;
+      max-width: 90px;
+      height: 22px;
+      padding: 0 5px;
+    }
 
   .gameboy-controls {
     gap: 1rem;
@@ -913,5 +922,31 @@ body {
 @media (max-width: 700px) {
   .gameboy-controls {
     gap: 0.7rem;
+  }
+    .start-select button,
+    .select-btn,d
+      min-width: 56px;
+      max-width: 95px;
+      height: 28px;
+      font-size: clamp(0.7rem, 4vw, 0.93rem);
+      padding: 0 8px;
+    }
+}
+
+@media (pointer: coarse) {
+  .gameboy-controls,
+  #controls {
+    padding-bottom: max(2vw, var(--safe-area-bottom));
+  }
+}
+
+@media (max-width: 350px) {
+  .start-select button,
+  .select-btn,
+  .start-btn {
+    min-width: 42px;
+    max-width: 75px;
+    font-size: clamp(0.6rem, 4vw, 0.81rem);
+    padding: 0 4px;
   }
 }

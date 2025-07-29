@@ -12,8 +12,8 @@ This is a modern browser-based Tetris game built with **TypeScript**, **Vite**, 
 ---
 
 ## Versioning
-APP_VERSION: 2.3.2
-FRONTEND_VERSION: 2.3.2
+APP_VERSION: 2.3.3
+FRONTEND_VERSION: 2.3.3
 BACKEND_VERSION: 2.0.0
 
 ## 🚀 Features

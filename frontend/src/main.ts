@@ -58,6 +58,39 @@ function isMobile(): boolean {
   );
 }
 
+// ---- Safe Area and Viewport Height Patch ----
+function setRealVh() {
+  document.documentElement.style.setProperty(
+    "--real-vh",
+    `${window.innerHeight}px`
+  );
+}
+function applySafeAreaToControls() {
+  const controls = document.querySelector(".gameboy-controls") as HTMLElement;
+  if (controls) {
+    controls.style.paddingBottom = `max(2vw, env(safe-area-inset-bottom, 24px))`;
+  }
+  const controlsNav = document.getElementById("controls");
+  if (controlsNav) {
+    controlsNav.style.paddingBottom = `max(2vw, env(safe-area-inset-bottom, 24px))`;
+  }
+}
+window.addEventListener("resize", () => {
+  setRealVh();
+  applySafeAreaToControls();
+});
+window.addEventListener("orientationchange", () => {
+  setRealVh();
+  applySafeAreaToControls();
+});
+setRealVh();
+applySafeAreaToControls();
+
+if (isMobile()) {
+  window.scrollTo(0, 0);
+  window.addEventListener("focus", () => window.scrollTo(0, 0));
+}
+
 // --- DOM Elements ---
 const restartBtn = document.getElementById(
   "restart"
