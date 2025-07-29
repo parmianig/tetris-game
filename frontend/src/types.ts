@@ -1,6 +1,7 @@
 // types.ts
 export type Shape = "I" | "O" | "T" | "S" | "Z" | "J" | "L";
-import type { Matrix } from "./engine";
+
+export type Matrix = (number | string)[][];
 
 export interface Player {
   pos: { x: number; y: number };
@@ -18,3 +19,5 @@ export interface Tetromino {
   color: string;
   origin: { x: number; y: number };
 }
+
+export type ScrollLockAction = "lock" | "unlock";

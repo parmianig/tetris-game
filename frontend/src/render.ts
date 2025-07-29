@@ -1,5 +1,5 @@
-import type { Matrix } from "./engine";
 import { GAME_SETTINGS } from "./settings";
+import type { Matrix } from "./types";
 
 // Main draw function, now delegates to helpers
 export function drawMatrix(

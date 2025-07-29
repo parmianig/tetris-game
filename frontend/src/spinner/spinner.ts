@@ -1,6 +1,5 @@
 // src/spinner/spinner.ts
 import { SPINNER_TETROMINOS } from "./tetrominoDefs"; // ✅ Imports the actual array to use at runtime
-import "./spinner.css";
 
 let spinnerIndex = 0;
 let spinnerAngle = 0;

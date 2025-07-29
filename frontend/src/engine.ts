@@ -1,23 +1,20 @@
-import type { Player } from "./types";
+import type { Matrix, Player } from "./types";
 import { SRS_KICK_TABLE, getSRSKey } from "./srs";
-export type Matrix = (number | string)[][];
 
 // Utility for deep copy
 function copyMatrix(matrix: Matrix): Matrix {
-  return matrix.map((row) => (Array.isArray(row) ? [...row] : []));
+  return matrix.map((row) => [...row]);
 }
 
 // —————————— ARENA & MERGE ——————————
 export function createMatrix(w: number, h: number): Matrix {
-  const mat: Matrix = [];
-  while (h--) mat.push(new Array(w).fill(0));
-  return mat;
+  return Array.from({ length: h }, () => new Array(w).fill(0));
 }
 
 export function arenaSweep(arena: Matrix, width: number) {
   for (let y = arena.length - 1; y >= 0; --y) {
     const row = arena[y];
-    if (!Array.isArray(row)) continue;
+    if (!row) continue;
     if (row.every((cell) => cell !== 0)) {
       arena.splice(y, 1);
       arena.unshift(new Array(width).fill(0));
@@ -33,21 +30,18 @@ export function merge(
   color: string
 ) {
   playerMatrix.forEach((row, y) => {
-    if (!Array.isArray(row)) return;
+    if (!row) return;
     row.forEach((value, x) => {
       if (value !== 0 && value !== undefined) {
         const ay = y + offset.y;
         const ax = x + offset.x;
         if (
-          typeof ay === "number" &&
           ay >= 0 &&
           ay < arena.length &&
-          Array.isArray(arena[ay]) &&
-          typeof ax === "number" &&
           ax >= 0 &&
-          ax < arena[ay].length
+          ax < (arena[ay]?.length ?? 0)
         ) {
-          arena[ay][ax] = color;
+          arena[ay]![ax] = color;
         }
       }
     });
@@ -56,10 +50,6 @@ export function merge(
 
 // —————————— SRS ROTATION CORE ——————————
 
-/**
- * Bulletproof I piece rotation: Always returns exactly four blocks, never loses them,
- * always rotates about the SRS center (1.5, 0.5) in 4x4.
- */
 export function rotateIMatrix(
   matrix: Matrix,
   _direction: 1 | -1,
@@ -70,22 +60,13 @@ export function rotateIMatrix(
   const val = matrix.flat().find((v) => v !== 0 && v !== undefined) ?? 1;
 
   if (rotation % 2 === 0) {
-    // Horizontal → Vertical
-    for (let i = 0; i < 4; ++i) {
-      // out[i] is always an array due to Array.from initializer
-      out[i]![2] = val;
-    }
+    for (let i = 0; i < 4; ++i) out[i]![2] = val;
   } else {
-    // Vertical → Horizontal
-    const row = out[2]!;
-    for (let i = 0; i < 4; ++i) row[i] = val;
+    for (let i = 0; i < 4; ++i) out[2]![i] = val;
   }
   return out;
 }
 
-/**
- * Arbitrary-origin SRS rotation (for T, L, J, S, Z using backend-provided origin)
- */
 export function rotateMatrixWithOrigin(
   matrix: Matrix,
   direction: 1 | -1,
@@ -95,13 +76,12 @@ export function rotateMatrixWithOrigin(
   const out: Matrix = Array.from({ length: N }, () => Array(N).fill(0));
   for (let y = 0; y < N; ++y) {
     const row = matrix[y];
-    if (!Array.isArray(row)) continue;
+    if (!row) continue; // Defensive: row may be undefined
     for (let x = 0; x < N; ++x) {
       const v = row[x];
-      if (v === undefined || v === 0) continue;
-      // Translate to origin
-      const relX = x - origin.x;
-      const relY = y - origin.y;
+      if (!v) continue;
+      const relX = x - origin.x,
+        relY = y - origin.y;
       let rx: number, ry: number;
       if (direction === 1) {
         rx = relY;
@@ -110,12 +90,9 @@ export function rotateMatrixWithOrigin(
         rx = -relY;
         ry = relX;
       }
-      // Translate back
-      const nx = Math.round(rx + origin.x);
-      const ny = Math.round(ry + origin.y);
-      if (nx >= 0 && nx < N && ny >= 0 && ny < N && Array.isArray(out[ny])) {
-        out[ny][nx] = v;
-      }
+      const nx = Math.round(rx + origin.x),
+        ny = Math.round(ry + origin.y);
+      if (nx >= 0 && nx < N && ny >= 0 && ny < N) out[ny]![nx] = v;
     }
   }
   return out;
@@ -125,9 +102,6 @@ export function wrapRotation(n: number): 0 | 1 | 2 | 3 {
   return (((n % 4) + 4) % 4) as 0 | 1 | 2 | 3;
 }
 
-/**
- * SRS rotation entry: rotates tetromino, applies SRS wall kicks, returns new matrix+offset+success
- */
 export function attemptSRSRotation(
   player: Player,
   arena: Matrix,
@@ -168,26 +142,17 @@ export function collideWithMatrix(
   matrix: Matrix,
   pos: { x: number; y: number }
 ): boolean {
-  const H = arena.length;
-  const W = Array.isArray(arena[0]) ? arena[0].length : 0;
+  const H = arena.length,
+    W = arena[0]?.length ?? 0;
   for (let y = 0; y < matrix.length; y++) {
     const row = matrix[y];
-    if (!Array.isArray(row)) continue;
+    if (!row) continue;
     for (let x = 0; x < row.length; x++) {
       const v = row[x];
       if (!v) continue;
-      const ay = y + pos.y;
-      const ax = x + pos.x;
-      if (
-        typeof ay !== "number" ||
-        typeof ax !== "number" ||
-        ay < 0 ||
-        ay >= H ||
-        ax < 0 ||
-        ax >= W ||
-        !Array.isArray(arena[ay]) ||
-        arena[ay][ax] !== 0
-      ) {
+      const ay = y + pos.y,
+        ax = x + pos.x;
+      if (ay < 0 || ay >= H || ax < 0 || ax >= W || arena[ay]?.[ax] !== 0) {
         return true;
       }
     }
@@ -206,8 +171,15 @@ export function applyGravityStep(arena: Matrix): boolean {
     const next = arena[y + 1];
     if (!Array.isArray(row) || !Array.isArray(next)) continue;
     for (let x = 0; x < row.length; x++) {
-      if (row[x] && next[x] === 0) {
-        next[x] = row[x] as string | number;
+      const val = row[x];
+      // Only move valid numbers that are not zero, and only into empty slots
+      if (
+        typeof val === "number" &&
+        val !== 0 &&
+        typeof next[x] === "number" &&
+        next[x] === 0
+      ) {
+        next[x] = val;
         row[x] = 0;
         moved = true;
       }
@@ -226,7 +198,7 @@ export function getCenterOfGravity(matrix: Matrix): { x: number; y: number } {
     count = 0;
   for (let y = 0; y < matrix.length; y++) {
     const row = matrix[y];
-    if (!Array.isArray(row)) continue;
+    if (!row) continue; // ← Defensive: skip undefined rows
     for (let x = 0; x < row.length; x++) {
       const v = row[x];
       if (v !== 0 && v !== undefined) {

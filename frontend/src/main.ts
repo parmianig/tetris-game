@@ -1,18 +1,38 @@
 import { draw, playerDropWithGameOver, safeResetPlayer } from "./game";
 import { bindInput } from "./input";
-import {
-  createMatrix,
-  applyGravityStep,
-  arenaSweep,
-  type Matrix,
-} from "./engine";
+import { createMatrix, applyGravityStep, arenaSweep } from "./engine";
 import { ARENA_WIDTH, ARENA_HEIGHT } from "./constants";
 import { GAME_SETTINGS } from "./settings";
 import "./settings-drawer";
 import { updateOverlay } from "./ui";
 import { gameState } from "./gameState";
 import { showSpinner, hideSpinner } from "./spinner/spinner";
-import type { Player, Tetromino } from "./types";
+import type { Matrix, Player, Tetromino } from "./types";
+
+// --- Scroll Lock Utilities ---
+function setScrollLock(action: "lock" | "unlock") {
+  if (action === "lock") {
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.width = "100vw";
+    document.body.style.height = "100vh";
+    window.scrollTo(0, 0);
+  } else if (action === "unlock") {
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.width = "";
+    document.body.style.height = "";
+  }
+}
+
+function isMobile(): boolean {
+  return (
+    /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(
+      navigator.userAgent
+    ) ||
+    (window.innerWidth <= 800 && window.innerHeight <= 600)
+  );
+}
 
 // --- DOM Elements ---
 const restartBtn = document.getElementById(
@@ -62,7 +82,6 @@ export async function resetPlayerFromBackend(player: Player): Promise<void> {
   player.color = tetro.color;
   player.shape = tetro.shape;
 
-  // Defensive: ensure .origin from backend, else fallback to matrix center
   let origin: { x: number; y: number };
   if (
     tetro.origin &&
@@ -72,7 +91,7 @@ export async function resetPlayerFromBackend(player: Player): Promise<void> {
     Number.isFinite(tetro.origin.y)
   ) {
     origin = { x: tetro.origin.x, y: tetro.origin.y };
-    player.origin = { x: tetro.origin.x, y: tetro.origin.y };
+    player.origin = origin;
     player.rotation = 0;
   } else {
     origin = {
@@ -95,9 +114,11 @@ function setPaused(val: boolean, reason: PauseReason = "user") {
   if (val) {
     gameState.paused = true;
     updateOverlay("paused", reason);
+    if (isMobile()) setScrollLock("unlock"); // Allow scroll when paused/menu
   } else {
     gameState.paused = false;
     updateOverlay("hidden");
+    if (isMobile()) setScrollLock("lock"); // Relock when resuming
   }
   if (!gameState.paused && !gameState.gameOver) {
     requestAnimationFrame(update);
@@ -151,14 +172,13 @@ function drawMiniTetrominoGlass(
   const mat = tetro.matrix;
   const N = mat.length;
 
-  // Calculate bounding box
   let minX = N,
     maxX = -1,
     minY = N,
     maxY = -1;
   for (let y = 0; y < N; ++y) {
     const row = mat[y];
-    if (!row) continue; // Defensive, silences TS2532
+    if (!row) continue;
     for (let x = 0; x < N; ++x) {
       if (row[x]) {
         minX = Math.min(minX, x);
@@ -191,7 +211,6 @@ function drawMiniTetrominoGlass(
       const bx = x * blockSize + offsetX;
       const by = y * blockSize + offsetY;
 
-      // 1. Glassy base gradient
       const grad = ctx.createLinearGradient(
         bx,
         by,
@@ -211,7 +230,6 @@ function drawMiniTetrominoGlass(
       ctx.fillRect(bx, by, blockSize - 1, blockSize - 1);
       ctx.restore();
 
-      // 2. Glass reflection (top)
       ctx.save();
       ctx.globalAlpha = 0.18;
       ctx.fillStyle = "#fff";
@@ -226,15 +244,6 @@ function drawMiniTetrominoGlass(
         2 * Math.PI
       );
       ctx.fill();
-      ctx.restore();
-
-      // 3. Border glass
-      ctx.save();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = "rgba(200,220,255,0.22)";
-      ctx.shadowColor = "rgba(100,180,255,0.24)";
-      ctx.shadowBlur = 2;
-      ctx.strokeRect(bx, by, blockSize - 1.2, blockSize - 1.2);
       ctx.restore();
     }
   }
@@ -305,6 +314,31 @@ bindInput(
 window.addEventListener("tetromino-style-change", () => {
   updateNextPiecePreview(nextTetromino);
 });
+
+// --- Mobile Experience Enhancements ---
+if (isMobile()) {
+  setScrollLock("lock");
+  document.body.style.touchAction = "none"; // Disables all gestures/zoom/scroll!
+  document.body.style.webkitTouchCallout = "none";
+  document.body.style.webkitUserSelect = "none";
+  document.body.style.userSelect = "none";
+  // Prevent double tap zoom/magnifier/glass (Safari, iOS, Android)
+  document.addEventListener(
+    "touchstart",
+    (e) => {
+      if (e.touches.length > 1) e.preventDefault();
+    },
+    { passive: false }
+  );
+
+  document.addEventListener(
+    "gesturestart",
+    (e) => {
+      e.preventDefault();
+    },
+    { passive: false }
+  );
+}
 
 // --- Start Game ---
 showSpinner();

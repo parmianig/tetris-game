@@ -1,10 +1,5 @@
-import {
-  attemptSRSRotation,
-  collide,
-  type Matrix,
-  wrapRotation,
-} from "./engine";
-import type { Player } from "./types";
+import { attemptSRSRotation, collide, wrapRotation } from "./engine";
+import type { Matrix, Player } from "./types";
 
 const buttonMap = {
   "dpad-left": (player: Player, arena: Matrix) => {
@@ -27,19 +22,16 @@ const buttonMap = {
   "btn-b": (player: Player, arena: Matrix) => {
     tryRotate(player, arena, -1);
   },
-  // PATCH: Start button acts just like pause button!
   "btn-start": () => {
     const pauseBtn = document.getElementById(
       "pause-btn"
     ) as HTMLButtonElement | null;
-    if (pauseBtn)
-      pauseBtn.click(); // triggers actual pause logic/UI and resumes if already paused
-    // Optional fallback if pauseBtn missing:
+    if (pauseBtn) pauseBtn.click();
     else if ((window as any).setPaused)
       (window as any).setPaused(!(window as any).gameState?.paused, "user");
   },
   "btn-select": () => {
-    // You can add logic for Select if you want
+    // Add select logic if needed
   },
 };
 
@@ -75,9 +67,9 @@ export function bindInput(
         break;
       case "ArrowUp":
         if (e.shiftKey) {
-          tryRotate(player, arena, -1); // Counterclockwise with Shift
+          tryRotate(player, arena, -1); // Shift+ArrowUp = CCW
         } else {
-          tryRotate(player, arena, 1); // Clockwise
+          tryRotate(player, arena, 1); // ArrowUp = CW
         }
         break;
       case "x":
@@ -89,16 +81,18 @@ export function bindInput(
       case " ":
         drop();
         break;
-      case "Enter":
+      case "Enter": {
+        // Block scope for const to avoid SonarQube S6836
         const pauseBtn = document.getElementById(
           "pause-btn"
         ) as HTMLButtonElement | null;
         if (pauseBtn) pauseBtn.click();
         break;
+      }
     }
   });
 
-  // Button controls: tap/hold
+  // --- Button controls: tap/hold ---
   Object.entries(buttonMap).forEach(([id, fn]) => {
     const btn = document.getElementById(id);
     if (!btn) return;
