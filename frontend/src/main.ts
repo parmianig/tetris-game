@@ -10,6 +10,30 @@ import { showSpinner, hideSpinner } from "./spinner/spinner";
 import type { Matrix, Player, Tetromino } from "./types";
 
 // --- Scroll Lock Utilities ---
+function lockScroll() {
+  document.documentElement.style.overflow = "hidden";
+  document.documentElement.style.position = "fixed";
+  document.documentElement.style.height = "100vh";
+  document.documentElement.style.width = "100vw";
+  document.body.style.overflow = "hidden";
+  document.body.style.position = "fixed";
+  document.body.style.height = "100vh";
+  document.body.style.width = "100vw";
+  // For mobile safari:
+  window.scrollTo(0, 0);
+}
+
+function unlockScroll() {
+  document.documentElement.style.overflow = "";
+  document.documentElement.style.position = "";
+  document.documentElement.style.height = "";
+  document.documentElement.style.width = "";
+  document.body.style.overflow = "";
+  document.body.style.position = "";
+  document.body.style.height = "";
+  document.body.style.width = "";
+}
+
 function setScrollLock(action: "lock" | "unlock") {
   if (action === "lock") {
     document.body.style.overflow = "hidden";
@@ -113,10 +137,12 @@ export async function resetPlayerFromBackend(player: Player): Promise<void> {
 function setPaused(val: boolean, reason: PauseReason = "user") {
   if (val) {
     gameState.paused = true;
+    unlockScroll();
     updateOverlay("paused", reason);
     if (isMobile()) setScrollLock("unlock"); // Allow scroll when paused/menu
   } else {
     gameState.paused = false;
+    lockScroll();
     updateOverlay("hidden");
     if (isMobile()) setScrollLock("lock"); // Relock when resuming
   }
@@ -319,9 +345,16 @@ window.addEventListener("tetromino-style-change", () => {
 if (isMobile()) {
   setScrollLock("lock");
   document.body.style.touchAction = "none"; // Disables all gestures/zoom/scroll!
-  document.body.style.webkitTouchCallout = "none";
-  document.body.style.webkitUserSelect = "none";
   document.body.style.userSelect = "none";
+
+  document.addEventListener(
+    "touchmove",
+    (e) => {
+      e.preventDefault();
+    },
+    { passive: false }
+  );
+
   // Prevent double tap zoom/magnifier/glass (Safari, iOS, Android)
   document.addEventListener(
     "touchstart",

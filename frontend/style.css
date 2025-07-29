@@ -1,16 +1,18 @@
 body,
 html {
-  min-height: 100%;
-  height: 100%;
+  overscroll-behavior: none;
+  touch-action: none;
+  /* Prevent scrolling and pinch-zoom on mobile */
+  height: 100vh;
   width: 100vw;
+  overflow: hidden !important;
+  position: fixed;
+  min-height: 100%;
   margin: 0;
   padding: 0;
   background: #111;
   color: #fff;
   font-family: Arial, sans-serif;
-  overscroll-behavior: none;
-  overflow: hidden !important;
-  touch-action: none;
   -webkit-user-select: none !important;
   user-select: none !important;
   -webkit-touch-callout: none !important;
