@@ -65,6 +65,7 @@ function setRealVh() {
     `${window.innerHeight}px`
   );
 }
+
 function applySafeAreaToControls() {
   const controls = document.querySelector(".gameboy-controls") as HTMLElement;
   if (controls) {

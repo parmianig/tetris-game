@@ -9,13 +9,13 @@
 </head>
 
 <body>
-  <!-- Hamburger (Settings) Button -->
+  <!-- Hamburger Button -->
   <button id="settings-hamburger" class="icon-btn" aria-label="Show settings" aria-controls="settings-drawer"
     aria-expanded="false" type="button">
     <span class="bar"></span><span class="bar"></span><span class="bar"></span>
   </button>
 
-  <!-- Overlay for Game Over, Pause, etc. -->
+  <!-- Game Overlay (pause/game over) -->
   <div id="game-overlay" class="overlay hidden">
     <div class="overlay-content">
       <div id="overlay-text" aria-live="polite"></div>
@@ -32,85 +32,106 @@
     <button id="settings-close" aria-label="Close settings" type="button">&times;</button>
     <section id="settings" aria-label="Game Settings">
       <h2>Settings</h2>
-      <div class="setting-row">
-        <label><input type="checkbox" id="gravity-toggle" />Enable Gravity Animation</label>
+      <div class="setting-row"><label><input type="checkbox" id="gravity-toggle" />Enable Gravity Animation</label>
       </div>
-      <div class="setting-row">
-        <label><input type="checkbox" id="lock-cascade-toggle" checked />Lock Controls During Cascade</label>
-      </div>
-      <div>
-        <label for="gravity-speed">Gravity Speed (sec per drop): <span id="gravity-speed-label">1.0</span></label>
+      <div class="setting-row"><label><input type="checkbox" id="lock-cascade-toggle" checked />Lock Controls During
+          Cascade</label></div>
+      <div><label for="gravity-speed">Gravity Speed (sec per drop): <span id="gravity-speed-label">1.0</span></label>
         <input type="range" id="gravity-speed" min="0.1" max="2" step="0.1" value="1.0" />
       </div>
-      <div>
-        <label for="cascade-speed">Cascade Delay (ms): <span id="cascade-speed-label">50</span></label>
+      <div><label for="cascade-speed">Cascade Delay (ms): <span id="cascade-speed-label">50</span></label>
         <input type="range" id="cascade-speed" min="0" max="200" step="10" value="50" />
       </div>
-      <div class="setting-row">
-        <label><input type="checkbox" id="traditional-style-toggle" />Traditional Tetromino Style</label>
-      </div>
+      <div class="setting-row"><label><input type="checkbox" id="traditional-style-toggle" />Traditional Tetromino
+          Style</label></div>
     </section>
     <div id="version-footer" class="version-footer"></div>
   </aside>
 
+  <!-- Main Content -->
   <main id="main-content">
-    <div class="tetris-viewport">
-      <!-- Arena & Preview: now stacked on mobile, row on desktop -->
-      <section id="game-wrapper" aria-label="Game Area">
-        <h1>Tetris</h1>
-        <div id="game-flex-row">
-          <div id="game-area">
-            <canvas id="tetris" tabindex="0"></canvas>
-          </div>
-          <div id="next-preview-panel">
-            <div id="next-label">Next</div>
-            <!-- REMOVE outer div/frame, just canvas -->
-            <canvas id="next-piece-canvas" width="48" height="48"></canvas>
-          </div>
+    <section id="game-wrapper" aria-label="Game Area">
+      <h1>Tetris</h1>
+      <div id="game-flex-row">
+        <div id="game-area">
+          <canvas id="tetris" tabindex="0"></canvas>
         </div>
-        <section id="ui-status">
-          <div id="status-bar" aria-live="polite"></div>
-          <div id="game-over" aria-label="Game Over"></div>
-          <div id="pause-menu" aria-label="Pause Menu"></div>
-        </section>
-        <button id="pause-btn" type="button" aria-label="Pause" tabindex="0" class="control-btn">
-          <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
-            <rect x="5" y="4" width="5" height="16" rx="2" />
-            <rect x="14" y="4" width="5" height="16" rx="2" />
-          </svg>
-        </button>
+        <div id="next-preview-panel">
+          <div id="next-label">Next</div>
+          <canvas id="next-piece-canvas" width="48" height="48"></canvas>
+        </div>
+      </div>
+      <section id="ui-status">
+        <div id="status-bar" aria-live="polite"></div>
+        <div id="game-over" aria-label="Game Over"></div>
+        <div id="pause-menu" aria-label="Pause Menu"></div>
       </section>
+      <button id="pause-btn" type="button" aria-label="Pause" tabindex="0" class="control-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="5" y="4" width="5" height="16" rx="2" />
+          <rect x="14" y="4" width="5" height="16" rx="2" />
+        </svg>
+      </button>
+    </section>
 
-      <!-- Controls: always directly below arena on mobile, centered -->
-      <nav id="controls" aria-label="Game Controls" class="tetris-controls-corner">
-        <div class="gameboy-controls">
-          <div class="dpad">
-            <button id="dpad-up" aria-label="Up" title="Up" type="button" class="dpad-btn up"><span
-                class="sr-only">Up</span></button>
-            <div class="dpad-middle">
-              <button id="dpad-left" aria-label="Left" title="Left" type="button" class="dpad-btn left"><span
-                  class="sr-only">Left</span></button>
-              <button id="dpad-center" tabindex="-1" disabled class="dpad-center" type="button"
-                aria-hidden="true"></button>
-              <button id="dpad-right" aria-label="Right" title="Right" type="button" class="dpad-btn right"><span
-                  class="sr-only">Right</span></button>
-            </div>
-            <button id="dpad-down" aria-label="Down" title="Down" type="button" class="dpad-btn down"><span
-                class="sr-only">Down</span></button>
+    <!-- Controls, always visible and below the arena -->
+    <nav id="controls" aria-label="Game Controls">
+      <div class="gameboy-controls">
+        <div class="dpad">
+          <button id="dpad-up" aria-label="Up" class="dpad-btn up"><span class="sr-only">Up</span></button>
+          <div class="dpad-middle">
+            <button id="dpad-left" aria-label="Left" class="dpad-btn left"><span class="sr-only">Left</span></button>
+            <button id="dpad-center" tabindex="-1" disabled class="dpad-center" aria-hidden="true"></button>
+            <button id="dpad-right" aria-label="Right" class="dpad-btn right"><span
+                class="sr-only">Right</span></button>
           </div>
-          <div class="ab-buttons">
-            <button id="btn-b" class="ab-btn b-btn" type="button">B</button>
-            <button id="btn-a" class="ab-btn a-btn" type="button">A</button>
-          </div>
-          <div class="start-select">
-            <button id="btn-select" class="select-btn" aria-label="Select">SELECT</button>
-            <button id="btn-start" class="start-btn" aria-label="Start">START</button>
-          </div>
+          <button id="dpad-down" aria-label="Down" class="dpad-btn down"><span class="sr-only">Down</span></button>
         </div>
-      </nav>
-    </div>
+        <div class="ab-buttons">
+          <button id="btn-b" class="ab-btn b-btn" type="button">B</button>
+          <button id="btn-a" class="ab-btn a-btn" type="button">A</button>
+        </div>
+        <div class="start-select">
+          <button id="btn-select" class="select-btn" aria-label="Select">SELECT</button>
+          <button id="btn-start" class="start-btn" aria-label="Start">START</button>
+        </div>
+      </div>
+    </nav>
   </main>
+
+  <!-- Main JS Entry -->
   <script type="module" src="/src/main.ts"></script>
+  <!-- Layout autosizing for arena/controls -->
+  <script>
+    function fitTetrisLayout() {
+      // Get all main elements
+      const mainContent = document.getElementById('main-content');
+      const controls = document.querySelector('.gameboy-controls');
+      const arenaBox = document.getElementById('game-area');
+      // Defensive: stop if any not found
+      if (!mainContent || !controls || !arenaBox) return;
+      // True viewport height
+      const vh = window.innerHeight;
+      // Space needed for controls
+      const controlsRect = controls.getBoundingClientRect();
+      // Arena max height: viewport minus controls minus header minus small margin
+      const header = document.querySelector('h1');
+      const headerH = header ? header.getBoundingClientRect().height : 0;
+      const arenaMaxHeight = vh - controlsRect.height - headerH - 28;
+      // Keep aspect ratio 10:20 (0.5), but don't overflow width
+      let arenaW = Math.min(window.innerWidth * 0.97, 440);
+      let arenaH = Math.floor(arenaW * 2);
+      if (arenaH > arenaMaxHeight) {
+        arenaH = arenaMaxHeight;
+        arenaW = arenaH / 2;
+      }
+      arenaBox.style.width = `${arenaW}px`;
+      arenaBox.style.height = `${arenaH}px`;
+    }
+    window.addEventListener('resize', fitTetrisLayout);
+    window.addEventListener('orientationchange', fitTetrisLayout);
+    window.addEventListener('DOMContentLoaded', fitTetrisLayout);
+  </script>
 </body>
 
 </html>

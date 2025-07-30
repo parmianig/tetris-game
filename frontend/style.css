@@ -1,30 +1,23 @@
 html,
 body {
-  height: 100%;
   margin: 0;
   padding: 0;
-  background: #111;
+  width: 100vw;
+  height: 100vh;
   overflow: hidden !important;
-  touch-action: none;
-  overscroll-behavior: none;
+  background: #111;
   font-family: Arial, sans-serif;
-  color: #fff;
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
 }
 
 :root {
-  --vh: 100vh;
-  --arena-border: 3px solid #fff;
-  --arena-bg: #122;
-  --gameboy-gap: 1.2rem;
-  --dpad-btn-size: 44px;
-  --ab-btn-size: 48px;
-  --select-btn-h: 38px;
-  --select-btn-fs: 0.97rem;
-  --select-btn-minw: 80px;
-  --safe-area-bottom: env(safe-area-inset-bottom, 24px);
+  --arena-aspect: 0.5;
+  /* 10/20 */
+  --arena-max-width: 440px;
+  --arena-max-height: 54vh;
+  --controls-gap: 2vw;
+  --min-control-btn: 32px;
+  --max-control-btn: 52px;
+  --safe-area-bottom: env(safe-area-inset-bottom, 20px);
 }
 
 .tetris-header {
@@ -40,30 +33,27 @@ body {
 }
 
 #tetris-arena-box {
-  /* Make arena box flexible and responsive */
-  max-width: 96vw;
-  width: auto;
-  max-height: 52vh;
-  /* leave space for controls, header */
-  aspect-ratio: 10 / 20;
-  /* typical Tetris ratio, change if your board is different */
-  border: 2px solid #fff;
-  background: #122;
-  box-sizing: border-box;
-  margin-bottom: 0.5em;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  aspect-ratio: 10/20;
+    width: 96vw;
+    max-width: 440px;
+    max-height: 54vh;
+    /* allow controls below */
+    border: 2px solid #fff;
+    background: #122;
+    margin: 0 auto 0.5em auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #tetris {
   display: block;
-  margin: 0 auto;
-  background: #122;
-  max-width: 100vw;
-  max-height: 100vh;
   width: 100%;
   height: 100%;
+  background: #122;
+  aspect-ratio: 10/20;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .start-select button span {
@@ -94,6 +84,7 @@ canvas {
   flex-direction: column;
   align-items: center;
   margin: 0;
+  flex-shrink: 0;
 }
 
 /* "Next" label styling */
@@ -105,31 +96,6 @@ canvas {
   margin-bottom: 2px;
   letter-spacing: 0.04em;
   text-align: center;
-}
-
-/* Control buttons (including pause) */
-#controls button,
-#pause-btn {
-  font-size: 1.5rem;
-  padding: 0.75rem 1.25rem;
-  background-color: #1a1a1a;
-  color: white;
-  border: 1px solid #444;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: background-color 0.3s, border-color 0.3s;
-}
-
-#controls button:hover,
-#controls button.pressed,
-#pause-btn:hover {
-  background-color: #333;
-  border-color: #888;
-}
-
-#controls button:active,
-#pause-btn:active {
-  background-color: #666;
 }
 
 /* Hamburger menu button */
@@ -559,30 +525,30 @@ body.drawer-open .tetris-controls-corner {
   flex-direction: row;
   justify-content: center;
   align-items: flex-end;
-  gap: var(--gameboy-gap);
-  padding-bottom: max(2vw, var(--safe-area-bottom));
-  width: auto;
-  margin: 0 auto;
-  /* fallback for older browsers */
+  width: 100vw;
+  gap: var(--controls-gap);
   box-sizing: border-box;
 }
 
 .dpad {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.15rem;
+  gap: min(1vw, 6px);
+  margin-right: 1.5vw;
 }
 
-.dpad button {
+.dpad button,
+.ab-btn {
+  width: clamp(var(--min-control-btn), 8vw, var(--max-control-btn));
+  height: clamp(var(--min-control-btn), 8vw, var(--max-control-btn));
   background: #222;
   border: 2px solid #555;
-  border-radius: 6px;
-  width: 44px;
-  height: 44px;
+  border-radius: 7px;
   margin: 2px;
-  font-size: 1.6rem;
+  font-size: 1.3rem;
   color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 .dpad>div {
@@ -610,6 +576,14 @@ body.drawer-open .tetris-controls-corner {
   font-size: 2rem;
   margin: 0.2rem 0;
   box-shadow: 0 1px 3px #2226;
+}
+
+.dpad,
+.ab-buttons,
+.start-select {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Select/Start */
@@ -668,25 +642,107 @@ body.drawer-open .tetris-controls-corner {
   z-index: 5;
 }
 
-body.drawer-open #controls,
-body.drawer-open .tetris-controls-corner,
-body.drawer-open .gameboy-controls {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  transition: opacity 0.22s;
-  position: fixed;
-  left: 50%;
-  bottom: 0;
-  transform: translateX(-50%);
-  z-index: 120;
-  padding-bottom: max(2vw, env(safe-area-inset-bottom, 24px));
+.dpad-middle {
+  display: flex;
+  flex-direction: row;
+  gap: min(1vw, 6px);
 }
 
-body.drawer-open .gameboy-controls {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  transition: opacity 0.22s;
+.dpad-center {
+  background: none;
+  border: none;
+  pointer-events: none;
 }
+
+.ab-buttons {
+  gap: min(2vw, 12px);
+  margin-left: 1vw;
+  margin-right: 1vw;
+}
+
+.ab-btn {
+  border-radius: 50%;
+  background: #a55;
+  font-size: 1.2rem;
+  box-shadow: 0 1px 3px #2226;
+  border: none;
+}
+
+.start-select {
+  gap: min(2vw, 10px);
+  margin-left: 2vw;
+}
+
+.start-select button,
+.select-btn,
+.start-btn {
+  min-width: 54px;
+  max-width: 95px;
+  height: clamp(18px, 4vw, 32px);
+  padding: 0 8px;
+  font-size: clamp(0.7rem, 4vw, 0.97rem);
+  font-weight: 600;
+  border-radius: 16px;
+  border: 2px solid #aaa;
+  background: #222;
+  color: #fff;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.2rem;
+}
+
+/* --- End Controls --- */
+
+/* Responsive tweaks for tiny screens */
+@media (max-width: 500px),
+(max-height: 700px) {
+  #game-area {
+    max-width: 96vw;
+    max-height: 44vh;
+  }
+
+  .dpad button,
+  .ab-btn {
+    width: clamp(28px, 9vw, 44px);
+    height: clamp(28px, 9vw, 44px);
+    font-size: 1.05rem;
+  }
+
+  .start-select button {
+    min-width: 38px;
+    max-width: 68px;
+    font-size: clamp(0.6rem, 4vw, 0.84rem);
+    height: clamp(15px, 4vw, 22px);
+  }
+}
+
+/* Never scroll on body or html */
+html,
+body,
+#main-content {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  touch-action: none;
+}
+
+canvas,
+#tetris {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 
 .dpad-middle {
   display: flex;
@@ -860,10 +916,10 @@ body.drawer-open .gameboy-controls {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 320px;
-  max-width: 80vw;
+  width: 80vw;
+  max-width: var(--arena-max-width);
   height: auto;
-  max-height: 62vh;
+  max-height: var(--arena-max-height);
   box-sizing: border-box;
 }
 
@@ -878,14 +934,28 @@ body {
   /* iOS disable callout/magnifier */
 }
 
-#main-content,
-.tetris-viewport {
-  min-height: var(--real-vh, 100vh);
+#main-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100vw;
+  min-height: 100vh;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+#main-content,
+.tetris-viewport {
+  display: flex;
+  flex-direction: column;
+  min-height: var(--real-vh, 100vh);
+  height: var(--real-vh, 100vh);
+  align-items: center;
+  width: 100vw;
+  flex: 1 1 auto;
   justify-content: flex-start;
+  overflow: hidden;
+  /* Prevent scroll if desired */
   box-sizing: border-box;
 }
 
