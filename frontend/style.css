@@ -510,7 +510,7 @@ body.drawer-open .tetris-controls-corner {
   width: 100vw;
   gap: var(--controls-gap);
   box-sizing: border-box;
-  padding-bottom: max(2vw, var(--safe-area-bottom));
+  padding-bottom: max(3.5vh, env(safe-area-inset-bottom, 20px));
   flex-shrink: 0;
   overflow: visible;
 }
