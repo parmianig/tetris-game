@@ -4,20 +4,9 @@ body {
   padding: 0;
   width: 100vw;
   height: 100vh;
-  overflow: hidden !important;
+  overflow: hidden;
   background: #111;
   font-family: Arial, sans-serif;
-}
-
-:root {
-  --arena-aspect: 0.5;
-  /* 10/20 */
-  --arena-max-width: 440px;
-  --arena-max-height: 54vh;
-  --controls-gap: 2vw;
-  --min-control-btn: 32px;
-  --max-control-btn: 52px;
-  --safe-area-bottom: env(safe-area-inset-bottom, 20px);
 }
 
 .tetris-header {
@@ -33,27 +22,23 @@ body {
 }
 
 #tetris-arena-box {
-  aspect-ratio: 10/20;
-    width: 96vw;
-    max-width: 440px;
-    max-height: 54vh;
-    /* allow controls below */
-    border: 2px solid #fff;
-    background: #122;
-    margin: 0 auto 0.5em auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: min(96vw, calc((100vh - 180px) * 0.5));
+  /* subtract estimated controls height */
+  max-height: 54vh;
+  background: #122;
+  border: 2px solid #fff;
+  margin: 0 auto 1rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 #tetris {
-  display: block;
   width: 100%;
   height: 100%;
+  display: block;
   background: #122;
-  aspect-ratio: 10/20;
-  max-width: 100%;
-  max-height: 100%;
 }
 
 .start-select button span {
@@ -79,12 +64,12 @@ canvas {
 }
 
 #game-wrapper {
-  width: 100vw;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 0;
-  flex-shrink: 0;
+  width: 100%;
+  flex-grow: 1;
+  box-sizing: border-box;
 }
 
 /* "Next" label styling */
@@ -255,9 +240,6 @@ button,
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
-  min-width: 52px;
-  min-height: 52px;
-  font-size: 2rem;
   border-radius: 1.2rem;
   background: #222;
   color: #fff;
@@ -522,12 +504,15 @@ body.drawer-open .tetris-controls-corner {
 /* Gameboy controls in a row, centered */
 .gameboy-controls {
   display: flex;
-  flex-direction: row;
   justify-content: center;
   align-items: flex-end;
+  flex-wrap: wrap;
   width: 100vw;
   gap: var(--controls-gap);
   box-sizing: border-box;
+  padding-bottom: max(2vw, var(--safe-area-bottom));
+  flex-shrink: 0;
+  overflow: visible;
 }
 
 .dpad {
@@ -537,18 +522,24 @@ body.drawer-open .tetris-controls-corner {
 
 .dpad button,
 .ab-btn {
-  width: clamp(var(--min-control-btn), 8vw, var(--max-control-btn));
-  height: clamp(var(--min-control-btn), 8vw, var(--max-control-btn));
+  width: clamp(32px, 10vw, 52px);
+  height: clamp(32px, 10vw, 52px);
   background: #222;
-  border: 2px solid #555;
-  border-radius: 7px;
-  margin: 2px;
-  font-size: 1.3rem;
   color: #fff;
+  border: 2px solid #555;
+  border-radius: 8px;
+  font-size: clamp(0.75rem, 2.5vw, 1rem);
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  padding: 0 0.5em;
   box-sizing: border-box;
+  text-align: center;
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dpad>div {
@@ -584,43 +575,8 @@ body.drawer-open .tetris-controls-corner {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 0.5rem;
 }
-
-/* Select/Start */
-.start-select {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-left: 2rem;
-}
-
-.start-select button,
-.select-btn,
-.start-btn {
-  min-width: 70px;
-  max-width: 120px;
-  height: 36px;
-  padding: 0 12px;
-  font-size: clamp(0.8rem, 3vw, 1.13rem);
-  font-weight: 600;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #aaa;
-  background: #222;
-  color: #fff;
-  margin-bottom: 0.5rem;
-  box-sizing: border-box;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  /* prevent text from expanding button */
-  line-height: 1;
-  letter-spacing: 0.03em;
-}
-
 
 .tetris-controls-corner {
   position: static !important;
@@ -654,12 +610,6 @@ body.drawer-open .tetris-controls-corner {
   pointer-events: none;
 }
 
-.ab-buttons {
-  gap: min(2vw, 12px);
-  margin-left: 1vw;
-  margin-right: 1vw;
-}
-
 .ab-btn {
   border-radius: 50%;
   background: #a55;
@@ -669,31 +619,10 @@ body.drawer-open .tetris-controls-corner {
 }
 
 .start-select {
-  gap: min(2vw, 10px);
-  margin-left: 2vw;
-}
-
-.start-select button,
-.select-btn,
-.start-btn {
-  min-width: 54px;
-  max-width: 95px;
-  height: clamp(18px, 4vw, 32px);
-  padding: 0 8px;
-  font-size: clamp(0.7rem, 4vw, 0.97rem);
-  font-weight: 600;
-  border-radius: 16px;
-  border: 2px solid #aaa;
-  background: #222;
-  color: #fff;
-  box-sizing: border-box;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-align: center;
-  line-height: 1;
-  letter-spacing: 0.03em;
-  margin-bottom: 0.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-left: 2rem;
 }
 
 /* --- End Controls --- */
@@ -722,14 +651,6 @@ body.drawer-open .tetris-controls-corner {
 }
 
 /* Never scroll on body or html */
-html,
-body,
-#main-content {
-  overflow: hidden !important;
-  overscroll-behavior: none !important;
-  touch-action: none;
-}
-
 canvas,
 #tetris {
   -webkit-user-select: none;
@@ -741,13 +662,6 @@ canvas,
 *::before,
 *::after {
   box-sizing: border-box;
-}
-
-
-.dpad-middle {
-  display: flex;
-  flex-direction: row;
-  gap: 0.15rem;
 }
 
 .dpad-btn,
@@ -768,17 +682,16 @@ canvas,
   color: #d5d5d5;
 }
 
-.dpad-btn:active {
-  box-shadow: 0 0 2px #000b, inset 0 2px 6px #555c;
+#tetris-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-height: 100dvh;
+  overflow: hidden;
 }
 
-.dpad-center {
-  background: none;
-  border: none;
-  box-shadow: none;
-  width: 32px;
-  height: 32px;
-  pointer-events: none;
+.dpad-btn:active {
+  box-shadow: 0 0 2px #000b, inset 0 2px 6px #555c;
 }
 
 /* Triangular arrows (CSS only) */
@@ -824,13 +737,6 @@ canvas,
   flex-direction: column;
   gap: 2rem;
   margin-left: 2.2rem;
-}
-
-.ab-btn {
-  width: var(--ab-btn-size);
-  height: var(--ab-btn-size);
-  font-size: 1.35rem;
-  border-radius: 50%;
 }
 
 .ab-btn:active {
@@ -910,17 +816,17 @@ canvas,
 }
 
 #game-area {
-  aspect-ratio: 10/20;
+  aspect-ratio: 10 / 20;
+  width: min(92vw, 360px);
+  /* Max width constraint */
+  max-height: calc(100dvh - 260px);
+  /* Reserve ~260px for controls+header */
   background: #122;
-  border: 3px solid #fff;
+  border: 2px solid #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 80vw;
-  max-width: var(--arena-max-width);
-  height: auto;
-  max-height: var(--arena-max-height);
-  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 #main-content,
@@ -938,9 +844,9 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   width: 100vw;
-  min-height: 100vh;
-  box-sizing: border-box;
+  height: 100vh;
   overflow: hidden;
 }
 
@@ -969,65 +875,97 @@ body {
   position: static;
 }
 
-*,
+.select-btn,
+.start-btn {
+  min-width: 64px;
+  height: 32px;
+  font-size: 0.7rem;
+  padding: 0 6px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100px;
+  border-radius: 14px;
+  font-weight: 600;
+  line-height: 1;
+}
+
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
+.spinner-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.spinner-overlay.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+#tetromino-spinner-canvas {
+  width: 96px;
+  height: 96px;
+  margin-bottom: 1.2rem;
+}
+
+#spinner-message {
+  color: #ffffffcc;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: center;
+}
+
 @media (max-width: 600px) {
 
-  .dpad button,
+  #tetris-arena-box {
+      width: min(96vw, calc((100vh - 140px) * 0.5));
+  }
+
+.dpad button,
   .ab-btn {
-    width: var(--dpad-btn-size);
-    height: var(--dpad-btn-size);
-    font-size: 1.1rem;
+    width: 44px;
+    height: 44px;
+    font-size: 1rem;
   }
 
-    .start-select button,
-    .select-btn,
-    .start-btn {
-      font-size: 0.79rem !important;
-      min-width: 60px;
-      max-width: 90px;
-      height: 22px;
-      padding: 0 5px;
-    }
+.start-select button {
+  min-width: 60px;
+  height: 22px;
+  font-size: 0.79rem;
+  padding: 0 5px; }
 
-  .gameboy-controls {
-    gap: 1rem;
-  }
-}
-
-@media (max-width: 700px) {
-  .gameboy-controls {
-    gap: 0.7rem;
-  }
-    .start-select button,
-    .select-btn,
-    .start-btn {
-      min-width: 56px;
-      max-width: 95px;
-      height: 28px;
-      font-size: clamp(0.7rem, 4vw, 0.93rem);
-      padding: 0 8px;
-    }
-}
-
-@media (pointer: coarse) {
-  .gameboy-controls,
-  #controls {
-    padding-bottom: max(2vw, var(--safe-area-bottom));
-  }
-}
-
-@media (max-width: 350px) {
-  .start-select button,
   .select-btn,
   .start-btn {
-    min-width: 42px;
-    max-width: 75px;
-    font-size: clamp(0.6rem, 4vw, 0.81rem);
-    padding: 0 4px;
+    font-size: 0.79rem !important;
+    min-width: 60px;
+    max-width: 90px;
+    height: 22px;
+    padding: 0 5px;
+  }
+
+  .gameboy-controls {
+    gap: 0,5rem;
+  }
+}
+
+@media (max-width: 400px) {
+
+  .select-btn,
+  .start-btn {
+    font-size: 0.65rem;
+    min-width: 60px;
+    padding: 0 5px;
   }
 }
