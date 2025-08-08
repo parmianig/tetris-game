@@ -2,11 +2,10 @@ html,
 body {
   margin: 0;
   padding: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
-  background: #111;
-  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom, rgb(44, 48, 66), rgb(43, 43, 45));
 }
 
 .tetris-header {
@@ -34,11 +33,16 @@ body {
   box-sizing: border-box;
 }
 
+#game-area>canvas,
 #tetris {
+  background: var(--board);
+  border-radius: 12px;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, .10),
+    inset 0 14px 22px rgba(0, 0, 0, .45);
   width: 100%;
   height: 100%;
   display: block;
-  background: #122;
 }
 
 .start-select button span {
@@ -52,7 +56,11 @@ body {
 }
 
 h1 {
-  margin-top: 1rem;
+  color: #e9efff;
+  font-weight: 800;
+  letter-spacing: .02em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, .25);
+  margin: .6rem 0 0;
 }
 
 canvas {
@@ -70,6 +78,7 @@ canvas {
   width: 100%;
   flex-grow: 1;
   box-sizing: border-box;
+  margin: 0;
 }
 
 /* "Next" label styling */
@@ -107,7 +116,8 @@ canvas {
 
 /* Hide hamburger when drawer open */
 #settings-drawer.open~#settings-hamburger {
-  display: none;
+  pointer-events: auto;
+  touch-action: manipulation;
 }
 
 /* Slide-in drawer */
@@ -129,6 +139,25 @@ canvas {
   gap: 1.25rem;
   /* fixes iOS viewport issues */
   will-change: transform;
+}
+
+input[type="range"]::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #488cff;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #488cff;
+  cursor: pointer;
+  margin-top: -8px;
+  touch-action: pan-x;
 }
 
 #settings-drawer.open {
@@ -184,11 +213,21 @@ body.drawer-open #main-content {
   display: flex;
   align-items: center;
   gap: 0.8rem;
+  width: 100%;
 }
 
 input[type="range"] {
   flex: 1;
   margin-right: 0.5em;
+  height: 4px;
+  border-radius: 2px;
+  background: #ccc;
+  outline: none;
+  transition: background 0.2s;
+  pointer-events: auto;
+  /* ✅ Ensure interaction */
+  touch-action: pan-y;
+    /* ✅ Allow touch drag */
 }
 
 /* Game Overlay: used for Game Over and Pause */
@@ -469,18 +508,15 @@ body.drawer-open #drawer-overlay {
 
 .version-footer {
   margin-top: auto;
-  /* stick to bottom */
   padding: 1rem 0 0.5rem 0;
   color: #ff4e4e;
-  /* vivid red */
-  background: none;
   font-family: monospace;
   font-size: 1rem;
   text-align: center;
   letter-spacing: 0.04em;
   z-index: 1004;
   position: relative;
-}
+  }
 
 .left-controls,
 .right-controls {
@@ -773,33 +809,34 @@ canvas,
 }
 
 #game-flex-row {
+  gap: min(5vw, 28px);
+  align-items: flex-start;
+  margin-top: 1.2rem;
   display: flex;
   flex-direction: row;
   justify-content: center;
-  align-items: flex-start;
   width: 100vw;
-  gap: 2vw;
   margin-bottom: 1em;
-  margin-top: 1em;
 }
 
 /* Arena styling remains unchanged */
 #next-label {
-  font-size: 1.2rem;
-  color: #cee4ff;
-  margin-bottom: 0.3em;
-  font-family: 'Share Tech Mono', 'VT323', 'Press Start 2P', Arial, sans-serif;
-  font-weight: bold;
-  letter-spacing: 0.02em;
+  color: #cfe0ff;
+    font-weight: 800;
+    font-size: .98rem;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, .35);
+    margin-bottom: 4px;
 }
 
 .next-canvas-wrapper,
 #next-piece-canvas {
-  border: 2px solid #fff;
-  background: #000;
-  padding: 2px;
-  margin-top: 0.2em;
-  border-radius: 7px;
+  background: #0b1530;
+  border: 3px solid var(--outline);
+  border-radius: 10px;
+  padding: 0;
+  box-shadow: inset 0 10px 16px rgba(0, 0, 0, .45);
+  width: 56px;
+  height: 56px;
 }
 
 .arena-wrapper {
@@ -808,21 +845,28 @@ canvas,
 }
 
 #next-preview-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-left: 2vw;
-  margin-top: 0;
+  background: linear-gradient(180deg, var(--panel) 0%, var(--panel2) 100%);
+    border: 3px solid var(--outline);
+    border-radius: 14px;
+    padding: 10px 8px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .35), inset 0 2px 0 rgba(255, 255, 255, .15);
+    gap: 8px;
+    min-width: 72px;
 }
 
 #game-area {
+  background: linear-gradient(180deg, #2e4b9a 0%, #2a3d7a 100%);
+  border: 6px solid var(--frame);
+  border-radius: 18px;
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, .35),
+    inset 0 2px 0 rgba(255, 255, 255, .15);
+  padding: 10px;
   aspect-ratio: 10 / 20;
   width: min(92vw, 360px);
   /* Max width constraint */
   max-height: calc(100dvh - 260px);
   /* Reserve ~260px for controls+header */
-  background: #122;
-  border: 2px solid #fff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -927,6 +971,34 @@ body {
   text-align: center;
 }
 
+#hold-preview-panel {
+  background: linear-gradient(180deg, var(--panel) 0%, var(--panel2) 100%);
+  border: 3px solid var(--outline);
+  border-radius: 14px;
+  padding: 10px 8px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .35), inset 0 2px 0 rgba(255, 255, 255, .15);
+  gap: 8px;
+  min-width: 72px;
+}
+
+#hold-label {
+  color: #cfe0ff;
+  font-weight: 800;
+  font-size: .98rem;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .35);
+  margin-bottom: 4px;
+}
+
+#hold-piece-canvas {
+  background: #0b1530;
+  border: 3px solid var(--outline);
+  border-radius: 10px;
+  padding: 0;
+  box-shadow: inset 0 10px 16px rgba(0, 0, 0, .45);
+  width: 56px;
+  height: 56px;
+}
+
 @media (max-width: 600px) {
 
   #tetris-arena-box {
@@ -961,6 +1033,15 @@ body {
 }
 
 @media (max-width: 400px) {
+  #hold-preview-panel {
+      padding: 8px 6px;
+      min-width: 64px;
+    }
+
+    #hold-piece-canvas {
+      width: 48px;
+      height: 48px;
+    }
 
   .select-btn,
   .start-btn {
@@ -968,4 +1049,70 @@ body {
     min-width: 60px;
     padding: 0 5px;
   }
+
+  #next-preview-panel {
+    padding: 8px 6px;
+    min-width: 64px;
+  }
+
+  #next-piece-canvas {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (min-width: 768px) {
+
+    #main-content {
+      justify-content: center !important;
+    }
+
+    #controls {
+      display: none !important;
+    }
+
+    /* Slightly larger but still capped */
+    #game-area {
+      width: min(38vw, 460px);
+      max-height: 86vh;
+    }
+
+    #game-flex-row {
+      margin: 2vh 0;
+    }
+}
+
+@media (min-width: 1025px) {
+
+  /* keep page layout, but don't vertically center everything */
+  #main-content {
+    justify-content: flex-start;
+  }
+
+  #game-wrapper h1 {
+    margin: 1.25rem 0 1.25rem;
+  }
+
+    #game-flex-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      /* spacer | arena | preview */
+      align-items: start;
+      justify-items: center;
+      width: 100%;
+      gap: 0;
+    }
+
+    #game-area {
+      grid-column: 2;
+      margin: 0 auto;
+    }
+
+    #next-preview-panel {
+      grid-column: 3;
+      justify-self: start;
+      margin-left: 18px;
+      margin-top: 2px;
+    }
+
 }
