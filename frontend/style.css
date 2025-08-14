@@ -924,50 +924,129 @@ canvas,
   }
 }
 
-/* =========================================================
-   MOBILE: put NEXT to the RIGHT of the arena (like desktop)
-   Keeps everything inside the viewport and preserves 10:20.
-   =======================================================*/
+/* ================================================
+   MOBILE controls: [ D-pad | A/B | SELECT/START ]
+   + extra bottom clearance above browser chrome
+   ================================================ */
 @media (max-width: 767.98px) {
+  :root {
+    /* raise the whole controls block a bit more */
+    --controls-bottom-gap: clamp(22px, 6vh, 56px);
+  }
 
-  /* Grid: [ARENA | NEXT] */
+  /* 2-column grid: [ ARENA | NEXT ] */
   #game-flex-row {
-    display: grid;
+    display: grid !important;
     grid-template-columns: minmax(0, 1fr) auto;
-    /* arena grows, next auto */
     grid-auto-rows: auto;
     align-items: start;
     justify-content: center;
-    column-gap: clamp(8px, 4vw, 18px);
-    padding: 0 clamp(10px, 5vw, 16px);
-    /* avoid edge clipping */
-    width: 100%;
+    column-gap: clamp(10px, 4vw, 18px);
+    /* keep a little side padding so nothing hugs the edge */
+    padding-left: clamp(10px, 5vw, 16px);
+    padding-right: clamp(10px, 5vw, 16px);
   }
 
-  /* Arena uses the leftover width or height-limited width, whichever is smaller */
+  /* Arena stays in the first column */
   #game-area {
     grid-column: 1;
     grid-row: 1;
-    /* recompute available height with controls reserved */
-    --avail-h: calc(100dvh - var(--top-gap) - var(--controls-block) - 24px);
-    width: min(100%, calc(var(--avail-h) / 2));
-    /* 10:20 aspect respected */
-    max-height: var(--avail-h);
   }
 
-  /* NEXT goes to the right; undo the earlier "order:-1" */
+  /* NEXT panel sits to the right, never above the arena */
   #next-preview-panel {
     order: 0 !important;
-    grid-column: 2;
-    grid-row: 1;
+    /* override any earlier order:-1 */
+    grid-column: 2 !important;
+    grid-row: 1 !important;
     align-self: start;
-    margin: 0;
+    margin: 0 !important;
   }
 
-  /* Scale NEXT panel a bit on narrow screens so both fit comfortably */
+  /* Slightly scale the preview on narrow phones so both fit nicely */
   #next-piece-canvas {
-    width: clamp(44px, 14vw, 56px);
-    height: clamp(44px, 14vw, 56px);
+    width: clamp(44px, 14vw, 56px) !important;
+    height: clamp(44px, 14vw, 56px) !important;
+  }
+
+  /* sit higher off the bottom */
+  #controls {
+    margin-bottom: calc(var(--controls-bottom-gap) + var(--safe-bottom)) !important;
+  }
+
+  /* 3-column grid for controls */
+  .gameboy-controls {
+    display: grid !important;
+    grid-template-columns: auto auto auto;
+    /* D-pad | A/B | Start/Select */
+    align-items: end;
+    justify-content: center;
+    column-gap: clamp(12px, 4vw, 22px);
+    row-gap: 12px;
+    width: 100%;
+  }
+
+  /* left column = D-pad */
+  .dpad {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0 !important;
+  }
+
+  /* middle column = A/B */
+  .ab-buttons {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0 !important;
+    gap: 1.4rem;
+  }
+
+  /* right column = SELECT / START (stacked) */
+  .start-select {
+    grid-column: 3;
+    grid-row: 1;
+    margin: 0 !important;
+    align-items: center;
+    /* keeps the pills centered next to A/B */
+    gap: .75rem;
+  }
+
+  /* keep pills readable but compact */
+  .select-btn,
+  .start-btn {
+    min-width: 82px;
+    height: 34px;
+    font-size: .85rem;
+    padding: 0 10px;
+    white-space: nowrap;
+  }
+}
+
+/* tiny phones: nudge spacing but keep the layout */
+@media (max-width: 360px) {
+  .gameboy-controls {
+    column-gap: 10px;
+  }
+
+  .select-btn,
+  .start-btn {
+    min-width: 76px;
+    height: 32px;
+    font-size: .8rem;
+  }
+}
+
+/* Very narrow phones: slightly tighter spacing so everything fits */
+@media (max-width: 360px) {
+  .gameboy-controls {
+    column-gap: 10px;
+  }
+
+  .select-btn,
+  .start-btn {
+    min-width: 76px;
+    height: 32px;
+    font-size: .8rem;
   }
 }
 
