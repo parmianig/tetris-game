@@ -1,126 +1,331 @@
+/* ==========================================================================
+   TETRIS UI — FULL STYLESHEET
+   --------------------------------------------------------------------------
+   Goals:
+   - Arena always fits viewport and keeps 10:20 aspect (1:2).
+   - No overlap between fixed top buttons and arena (top spacer).
+   - "Next" panel never clips (above arena on phones; right on desktop).
+   - Mobile controls visible, centered, padded from bottom safe-area.
+   - Desktop hides controls; arena centered under page title.
+   ========================================================================== */
+
+/* ==== Theme / Layout Vars ================================================= */
+
+:root {
+  /* Background */
+  --bg-top: #2c3042;
+  --bg-bot: #2b2b2d;
+
+  /* Panels and frame */
+  --panel: #2b3352;
+  --panel2: #262c44;
+  --outline: #3b56b6;
+  --frame: #3758b7;
+
+  /* Playfield */
+  --board: #0f2324;
+
+  /* Safe-area (iOS etc.) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  /* Top UI (menu & pause) */
+  --ui-size: 48px;
+  /* button box size */
+  --ui-gap: 28px;
+  /* distance from the very top edge */
+  --ui-top: calc(var(--safe-top) + var(--ui-gap));
+  --side-l: calc(var(--safe-left) + 16px);
+  --side-r: calc(var(--safe-right) + 16px);
+
+  /* Spacer so arena never sits under top buttons */
+  --top-gap: calc(var(--ui-top) + var(--ui-size) + 12px);
+
+  /* Space reserved for on-screen controls (mobile) */
+  --controls-block: clamp(180px, 30vh, 340px);
+}
+
+/* ==== Global / Resets ===================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
+  min-height: 100%;
   overflow: hidden;
-  background: linear-gradient(to bottom, rgb(44, 48, 66), rgb(43, 43, 45));
+  /* fixed-viewport app */
+  background: linear-gradient(to bottom, var(--bg-top), var(--bg-bot));
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
-.tetris-header {
-  margin-top: 0.8em;
+/* Utility helpers */
+.hidden {
+  display: none !important;
 }
 
-.tetris-main-area {
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* ==== Page Shell ========================================================== */
+
+#tetris-layout {
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: center;
-  width: 100vw;
+  flex-direction: column;
+  align-items: center;
+  max-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
 }
 
-#tetris-arena-box {
-  width: min(96vw, calc((100vh - 180px) * 0.5));
-  /* subtract estimated controls height */
-  max-height: 54vh;
-  background: #122;
-  border: 2px solid #fff;
-  margin: 0 auto 1rem auto;
+/* The main app viewport */
+#main-content {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
-}
-
-#game-area>canvas,
-#tetris {
-  background: var(--board);
-  border-radius: 12px;
-  box-shadow:
-    inset 0 0 0 2px rgba(255, 255, 255, .10),
-    inset 0 14px 22px rgba(0, 0, 0, .45);
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.start-select button span {
-  display: block;
-  width: 100%;
-  text-align: center;
-  font-size: inherit;
+  /* center by default on mobile */
+  width: 100vw;
+  height: 100dvh;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  position: relative;
 }
 
+/* Title */
+#game-wrapper h1,
 h1 {
   color: #e9efff;
   font-weight: 800;
   letter-spacing: .02em;
   text-shadow: 0 2px 10px rgba(0, 0, 0, .25);
-  margin: .6rem 0 0;
+  margin: .15rem 0 .35rem;
+  text-align: center;
 }
 
-canvas {
+/* Create real space under the fixed top buttons so the arena never sits under them */
+#game-wrapper::before {
+  content: "";
   display: block;
-  background: #122;
-  margin: 0 auto;
-  max-width: 100%;
-  height: auto;
+  height: var(--top-gap);
 }
 
+/* Wrapper for arena + side panels */
 #game-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
   flex-grow: 1;
-  box-sizing: border-box;
   margin: 0;
 }
 
-/* "Next" label styling */
-#next-label,
-.next-label {
-  color: #e2eafc;
-  font-size: 0.98rem;
-  font-weight: 600;
-  margin-bottom: 2px;
-  letter-spacing: 0.04em;
-  text-align: center;
+/* ==== Arena Row (Mobile-first) =========================================== */
+
+#game-flex-row {
+  display: flex;
+  flex-direction: column;
+  /* column on phones */
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  margin: .25rem 0 .5rem;
+  padding: 0 12px;
 }
 
-/* Hamburger menu button */
-#settings-hamburger {
-  position: fixed;
-  top: 1rem;
-  left: 1rem;
-  z-index: 1002;
-  width: 48px;
-  height: 48px;
-  background: #333;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+/* Put NEXT above arena on phones so it never clips off-screen */
+#next-preview-panel {
+  order: -1;
+}
+
+/* ==== Arena Frame (outer blue bezel) ===================================== */
+
+#game-area {
+  background: linear-gradient(180deg, #2e4b9a 0%, #2a3d7a 100%);
+  border: 6px solid var(--frame);
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .35), inset 0 2px 0 rgba(255, 255, 255, .15);
+  padding: 10px;
+
+  /* The playfield is 10×20 (1:2) */
+  aspect-ratio: 10 / 20;
+
+  /* Fit to viewport:
+     - height is limited by what's left after top buttons + controls block
+     - width ≤ 92vw AND width ≤ (available height / 2) to keep 1:2 ratio */
+  --avail-h: calc(100dvh - var(--top-gap) - var(--controls-block) - 24px);
+  width: min(92vw, calc(var(--avail-h) / 2));
+  max-height: var(--avail-h);
+
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Canvas (playfield) */
+#game-area>canvas,
+#tetris {
+  width: 100%;
+  height: 100%;
+  background: var(--board);
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .10), inset 0 14px 22px rgba(0, 0, 0, .45);
+  display: block;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: pixelated;
+}
+
+/* Legacy wrapper off */
+#tetris-arena-box {
+  display: none;
+}
+
+/* ==== NEXT / HOLD Panes =================================================== */
+
+#next-preview-panel,
+#hold-preview-panel {
+  background: linear-gradient(180deg, var(--panel) 0%, var(--panel2) 100%);
+  border: 3px solid var(--outline);
+  border-radius: 14px;
+  padding: 10px 8px;
+  min-width: 72px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .35), inset 0 2px 0 rgba(255, 255, 255, .15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+#next-label,
+#hold-label {
+  color: #cfe0ff;
+  font-weight: 800;
+  font-size: .98rem;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .35);
+  margin-bottom: 4px;
+}
+
+#next-piece-canvas,
+#hold-piece-canvas {
+  width: 56px;
+  height: 56px;
+  background: #0b1530;
+  border: 3px solid var(--outline);
+  border-radius: 10px;
+  padding: 0;
+  box-shadow: inset 0 10px 16px rgba(0, 0, 0, .45);
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: pixelated;
+}
+
+/* ==== Fixed Top Buttons (aligned & padded from edges) ===================== */
+
+#settings-hamburger,
+#pause-btn {
+  position: fixed !important;
+  top: var(--ui-top) !important;
+  z-index: 1002 !important;
+
+  width: var(--ui-size) !important;
+  height: var(--ui-size) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  background: #333 !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .08) !important;
+}
+
+/* exact horizontal anchors with safe areas */
+#settings-hamburger {
+  left: var(--side-l) !important;
+}
+
+#pause-btn {
+  right: var(--side-r) !important;
 }
 
 #settings-hamburger:focus {
   outline: 2px solid #ff0;
 }
 
-/* Hide hamburger when drawer open */
+#settings-hamburger .bar {
+  width: 26px;
+  height: 4px;
+  margin: 3px 0;
+  border-radius: 2px;
+  background: #fff;
+  display: block;
+  transition: .3s;
+}
+
 #settings-drawer.open~#settings-hamburger {
   pointer-events: auto;
   touch-action: manipulation;
 }
 
-/* Slide-in drawer */
+#pause-btn {
+  cursor: pointer;
+}
+
+#pause-btn:focus {
+  outline: 2px solid #6cf;
+}
+
+#pause-btn svg {
+  width: 22px;
+  height: 22px;
+  fill: #fff;
+  display: block;
+}
+
+/* ==== Drawer / Overlay ==================================================== */
+
+#drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .33);
+  z-index: 1001;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
+}
+
+body.drawer-open #drawer-overlay {
+  opacity: 1;
+  pointer-events: all;
+}
+
 #settings-drawer {
   position: fixed;
   top: 0;
@@ -129,16 +334,79 @@ canvas {
   max-width: 80vw;
   background: #24262b;
   color: #fff;
-  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.4);
-  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, .4);
+  padding: 2rem 1.5rem 1.5rem;
   z-index: 1003;
   transform: translateX(-100%);
-  transition: transform 0.3s cubic-bezier(.62, .28, .23, .99);
+  transition: transform .3s cubic-bezier(.62, .28, .23, .99);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  /* fixes iOS viewport issues */
   will-change: transform;
+  padding-top: calc(1.5rem + var(--safe-top));
+}
+
+#settings-drawer.open {
+  transform: translateX(0);
+}
+
+#settings-close {
+  background: none;
+  color: #fff;
+  border: none;
+  font-size: 2rem;
+  align-self: flex-end;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+}
+
+#settings-close:focus {
+  outline: 2px solid #ff0;
+}
+
+#settings {
+  background: #222;
+  color: #fff;
+  padding: 2rem 1.5rem;
+  border-radius: 12px;
+  max-width: 350px;
+  margin: 2rem auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  box-shadow: 0 4px 32px #000a;
+}
+
+#settings h2 {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.setting-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  gap: .5rem;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  width: 100%;
+}
+
+input[type="range"] {
+  flex: 1;
+  margin-right: .5em;
+  height: 4px;
+  border-radius: 2px;
+  background: #ccc;
+  outline: none;
+  transition: background .2s;
+  pointer-events: auto;
+  touch-action: pan-y;
 }
 
 input[type="range"]::-moz-range-thumb {
@@ -160,190 +428,20 @@ input[type="range"]::-webkit-slider-thumb {
   touch-action: pan-x;
 }
 
-#settings-drawer.open {
-  transform: translateX(0);
-}
-
-#settings-close {
-  background: none;
-  color: #fff;
-  border: none;
-  font-size: 2rem;
-  align-self: flex-end;
-  cursor: pointer;
-  margin-bottom: 1.5rem;
-}
-
-#settings-close:focus {
-  outline: 2px solid #ff0;
-}
-
-body.drawer-open #main-content {
-  filter: blur(1.5px) brightness(0.9);
-  pointer-events: none;
-}
-
-#settings {
-  background: #222;
-  color: #fff;
-  padding: 2rem 1.5rem;
-  border-radius: 12px;
-  max-width: 350px;
-  margin: 2rem auto 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  box-shadow: 0 4px 32px #000a;
-}
-
-#settings h2 {
+.version-footer {
+  margin-top: auto;
+  padding: 1rem 0 .5rem;
+  color: #ff4e4e;
+  font-family: monospace;
+  font-size: 1rem;
   text-align: center;
-  font-size: 1.5rem;
-  margin-bottom: 1.2rem;
+  letter-spacing: .04em;
+  z-index: 1004;
+  position: relative;
 }
 
-.setting-row {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1rem;
-  gap: 0.5rem;
-}
-
-.slider-row {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  width: 100%;
-}
-
-input[type="range"] {
-  flex: 1;
-  margin-right: 0.5em;
-  height: 4px;
-  border-radius: 2px;
-  background: #ccc;
-  outline: none;
-  transition: background 0.2s;
-  pointer-events: auto;
-  /* ✅ Ensure interaction */
-  touch-action: pan-y;
-    /* ✅ Allow touch drag */
-}
-
-/* Game Overlay: used for Game Over and Pause */
-#game-overlay.overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 2000;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.45);
-  /* For Safari & iOS */
-  -webkit-backdrop-filter: blur(6px) brightness(0.8);
-  backdrop-filter: blur(6px) brightness(0.8);
-  pointer-events: auto;
-}
-
-#game-overlay.show,
-#game-overlay:not(.hidden) {
-  display: flex;
-  animation: fadeIn 0.5s;
-}
-
-#restart {
-  margin-top: 2rem;
-  padding: 0.75em 2em;
-  font-size: 1.3rem;
-  background: #488cff;
-  color: #fff;
-  border: none;
-  border-radius: 0.5em;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-#restart:hover,
-.overlay-btn:hover,
-#restart:focus,
-.overlay-btn:focus {
-  background: #3870d0;
-  outline: 2px solid #fff;
-}
-
-/* Touch interactions and double-tap prevention */
-button,
-#controls button,
-.control-btn {
-  touch-action: manipulation;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-  border-radius: 1.2rem;
-  background: #222;
-  color: #fff;
-  border: 1px solid #444;
-}
-
-/* Blurred effect when paused */
-.paused #game-wrapper,
-.paused #controls {
-  filter: blur(3px);
-  pointer-events: none;
-}
-
-.paused #pause-btn,
-.paused #settings-hamburger {
-  pointer-events: auto;
-}
-
-#pause-btn {
-  position: absolute;
-  right: 1.5rem;
-  top: 1.5rem;
-  z-index: 50;
-  background: #1a1a1a;
-  color: #fff;
-  border: 1px solid #444;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  padding: 0.5rem 0.8rem;
-  font-size: 1.6rem;
-}
-
-#pause-btn:focus {
-  outline: 2px solid #6cf;
-}
-
-#pause-btn svg {
-  display: block;
-  fill: #fff;
-}
-
-#unpause-btn {
-  margin-top: 2rem;
-  padding: 0.75em 2em;
-  font-size: 1.3rem;
-  background: #488cff;
-  color: #fff;
-  border: none;
-  border-radius: 0.5em;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-#unpause-btn:hover,
-#unpause-btn:focus {
-  background: #3870d0;
-  outline: 2px solid #fff;
-}
-
-.paused #settings-hamburger {
-  filter: none !important;
-  pointer-events: auto;
-  z-index: 1002;
-}
-
+/* Game overlay / pause overlay */
+#game-overlay.overlay,
 #pause-overlay {
   position: fixed;
   inset: 0;
@@ -351,38 +449,37 @@ button,
   display: none;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.45);
-  -webkit-backdrop-filter: blur(6px) brightness(0.8);
-  backdrop-filter: blur(6px) brightness(0.8);
+  background: rgba(0, 0, 0, .45);
+  -webkit-backdrop-filter: blur(6px) brightness(.8);
+  backdrop-filter: blur(6px) brightness(.8);
   pointer-events: auto;
 }
 
+#game-overlay.show,
+#game-overlay:not(.hidden),
 #pause-overlay.show {
   display: flex;
-  animation: fadeIn 0.5s;
+  animation: fadeIn .5s;
 }
 
-#pause-message {
-  font-size: 2.5rem;
-  font-weight: bold;
-  background: rgba(20, 20, 20, 0.96);
-  color: #fff;
-  border-radius: 1em;
-  box-shadow: 0 8px 32px #000a;
-  padding: 2rem 3.5rem;
-  border: 3px solid #48f;
-  letter-spacing: 0.12em;
-  text-align: center;
+@keyframes fadeIn {
+  from {
+    opacity: 0
+  }
+
+  to {
+    opacity: 1
+  }
 }
 
 .overlay-content {
-  background: rgba(20, 20, 20, 0.96);
+  background: rgba(20, 20, 20, .96);
   color: #fff;
   border-radius: 1em;
   box-shadow: 0 8px 32px #000a;
-  padding: 2.5rem 3.5rem 2rem 3.5rem;
+  padding: 2.5rem 3.5rem 2rem;
   border: 3px solid #48f;
-  letter-spacing: 0.12em;
+  letter-spacing: .12em;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -404,240 +501,150 @@ button,
   align-items: center;
 }
 
-.overlay-btn,
-#restart {
-  margin: 0 auto;
-  padding: 0.8em 2.2em;
-  font-size: 1.15rem;
-  background: #488cff;
-  color: #fff;
-  border: none;
-  border-radius: 0.6em;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.overlay-btn:focus,
-#restart:hover,
-#restart:focus {
-  background: #3870d0;
-  outline: 2px solid #fff;
-}
-
-.icon-btn {
-  background: #333;
-  border: none;
-  border-radius: 8px;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  position: fixed;
-  top: 1rem;
-  left: 1rem;
-  z-index: 1002;
-}
-
-.icon-btn:focus {
-  outline: 2px solid #ff0;
-}
-
-.icon-btn .bar {
-  display: block;
-  width: 26px;
-  height: 4px;
-  margin: 3px 0;
-  background: #fff;
-  border-radius: 2px;
-  transition: 0.3s;
-}
-
-.hidden {
-  display: none !important;
-}
-
-.overlay.hidden {
-  display: none !important;
-}
-
 .overlay-buttons {
   margin-top: 1rem;
   display: flex;
   gap: 1rem;
 }
 
-.control-btn {
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  border: none;
-  background-color: #444;
+.overlay-btn,
+#restart,
+#unpause-btn {
+  margin: 0 auto;
+  padding: .8em 2.2em;
+  font-size: 1.15rem;
+  background: #488cff;
   color: #fff;
-  border-radius: 4px;
+  border: none;
+  border-radius: .6em;
   cursor: pointer;
+  transition: background .2s;
 }
 
-#drawer-overlay {
+#restart:hover,
+.overlay-btn:hover,
+#restart:focus,
+.overlay-btn:focus,
+#unpause-btn:hover,
+#unpause-btn:focus {
+  background: #3870d0;
+  outline: 2px solid #fff;
+}
+
+#pause-message {
+  font-size: 2.5rem;
+  font-weight: bold;
+  background: rgba(20, 20, 20, .96);
+  color: #fff;
+  border-radius: 1em;
+  box-shadow: 0 8px 32px #000a;
+  padding: 2rem 3.5rem;
+  border: 3px solid #48f;
+  letter-spacing: .12em;
+  text-align: center;
+}
+
+.paused #game-wrapper,
+.paused #controls {
+  filter: blur(3px);
+  pointer-events: none;
+}
+
+.paused #pause-btn,
+.paused #settings-hamburger {
+  pointer-events: auto;
+}
+
+/* Spinner */
+.spinner-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.33);
-  z-index: 1001;
+  background: rgba(0, 0, 0, .85);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s;
+  transition: opacity .25s ease;
 }
 
-body.drawer-open #drawer-overlay {
+.spinner-overlay.show {
   opacity: 1;
   pointer-events: all;
 }
 
-#settings-hamburger.open .bar:nth-child(1) {
-  transform: rotate(45deg) translateY(7px);
+#tetromino-spinner-canvas {
+  width: 96px;
+  height: 96px;
+  margin-bottom: 1.2rem;
 }
 
-#settings-hamburger.open .bar:nth-child(2) {
-  opacity: 0;
-}
-
-#settings-hamburger.open .bar:nth-child(3) {
-  transform: rotate(-45deg) translateY(-7px);
-}
-
-.version-footer {
-  margin-top: auto;
-  padding: 1rem 0 0.5rem 0;
-  color: #ff4e4e;
-  font-family: monospace;
-  font-size: 1rem;
+#spinner-message {
+  color: #ffffffcc;
+  font-size: 1.1rem;
+  font-weight: 500;
   text-align: center;
-  letter-spacing: 0.04em;
-  z-index: 1004;
-  position: relative;
-  }
+}
 
-.left-controls,
-.right-controls {
+/* ==== Controls (mobile only) ============================================= */
+
+#controls {
+  width: 100vw;
   display: flex;
-  gap: 1.2rem;
-  pointer-events: all;
+  justify-content: center;
+  align-items: center;
+  margin-top: .6rem;
+  margin-bottom: 0;
+  padding-bottom: calc(16px + var(--safe-bottom));
 }
 
-.right-controls {
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: 0.6rem;
-}
-
-body.drawer-open .tetris-controls-corner {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  transition: opacity 0.25s;
-}
-
-/* Gameboy controls in a row, centered */
 .gameboy-controls {
   display: flex;
   justify-content: center;
   align-items: flex-end;
   flex-wrap: wrap;
   width: 100vw;
-  gap: var(--controls-gap);
+  gap: 1.1rem;
   box-sizing: border-box;
-  padding-bottom: max(3.5vh, env(safe-area-inset-bottom, 20px));
   flex-shrink: 0;
   overflow: visible;
 }
 
+/* D-Pad cluster */
 .dpad {
-  gap: min(1vw, 6px);
+  gap: .6rem;
   margin-right: 1.5vw;
-}
-
-.dpad button,
-.ab-btn {
-  width: clamp(32px, 10vw, 52px);
-  height: clamp(32px, 10vw, 52px);
-  background: #222;
-  color: #fff;
-  border: 2px solid #555;
-  border-radius: 8px;
-  font-size: clamp(0.75rem, 2.5vw, 1rem);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0 0.5em;
-  box-sizing: border-box;
-  text-align: center;
-  line-height: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.dpad>div {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-#ab-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.ab-buttons button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #a55;
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 54px;
-  height: 54px;
-  font-size: 2rem;
-  margin: 0.2rem 0;
-  box-shadow: 0 1px 3px #2226;
-}
-
-.dpad,
-.ab-buttons,
-.start-select {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-}
-
-.tetris-controls-corner {
-  position: static !important;
-  left: unset;
-  bottom: unset;
-  transform: unset;
-  z-index: unset;
-}
-
-#controls,
-.tetris-controls-corner {
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 1.2em 0 0.5em 0;
-  position: static !important;
-  /* <-- ensure no fixed/absolute! */
-  z-index: 5;
 }
 
 .dpad-middle {
   display: flex;
-  flex-direction: row;
-  gap: min(1vw, 6px);
+  gap: .6rem;
+}
+
+.dpad-btn,
+.dpad-center {
+  background: #3a393a;
+  border: 3px solid #222;
+  box-shadow: 0 2px 6px #0008, inset 0 1px 2px #8883;
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  color: #d5d5d5;
+  font-size: 2rem;
+  transition: box-shadow .12s;
+}
+
+.dpad-btn:active {
+  box-shadow: 0 0 2px #000b, inset 0 2px 6px #555c;
 }
 
 .dpad-center {
@@ -646,91 +653,7 @@ body.drawer-open .tetris-controls-corner {
   pointer-events: none;
 }
 
-.ab-btn {
-  border-radius: 50%;
-  background: #a55;
-  font-size: 1.2rem;
-  box-shadow: 0 1px 3px #2226;
-  border: none;
-}
-
-.start-select {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-left: 2rem;
-}
-
-/* --- End Controls --- */
-
-/* Responsive tweaks for tiny screens */
-@media (max-width: 500px),
-(max-height: 700px) {
-  #game-area {
-    max-width: 96vw;
-    max-height: 44vh;
-  }
-
-  .dpad button,
-  .ab-btn {
-    width: clamp(28px, 9vw, 44px);
-    height: clamp(28px, 9vw, 44px);
-    font-size: 1.05rem;
-  }
-
-  .start-select button {
-    min-width: 38px;
-    max-width: 68px;
-    font-size: clamp(0.6rem, 4vw, 0.84rem);
-    height: clamp(15px, 4vw, 22px);
-  }
-}
-
-/* Never scroll on body or html */
-canvas,
-#tetris {
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-.dpad-btn,
-.dpad-center {
-  background: #3a393a;
-  border: 3px solid #222;
-  box-shadow: 0 2px 6px #0008, inset 0 1px 2px #8883;
-  width: 42px;
-  height: 42px;
-  margin: 0;
-  border-radius: 8px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: box-shadow 0.12s;
-  font-size: 2rem;
-  color: #d5d5d5;
-}
-
-#tetris-layout {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-height: 100dvh;
-  overflow: hidden;
-}
-
-.dpad-btn:active {
-  box-shadow: 0 0 2px #000b, inset 0 2px 6px #555c;
-}
-
-/* Triangular arrows (CSS only) */
+/* arrows (CSS triangles) */
 .dpad-btn.up::before {
   content: "";
   border-left: 16px solid transparent;
@@ -767,35 +690,82 @@ canvas,
   right: 8px;
 }
 
-/* AB Buttons */
+/* A/B & start/select */
 .ab-buttons {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  margin-left: 2.2rem;
+  gap: 1.6rem;
+  margin-left: 2rem;
+}
+
+.ab-btn {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: #a55;
+  color: #fff;
+  border: none;
+  box-shadow: 0 1px 3px #2226;
+  font-size: 1.2rem;
 }
 
 .ab-btn:active {
   box-shadow: 0 1px 3px #000b, 0 0px 1px #fff7 inset;
 }
 
-.sr-only {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+.start-select {
+  display: flex;
+  flex-direction: column;
+  gap: .9rem;
+  margin-left: 2rem;
 }
 
+.select-btn,
+.start-btn {
+  min-width: 72px;
+  max-width: 110px;
+  height: 34px;
+  font-size: .85rem;
+  padding: 0 8px;
+  border-radius: 14px;
+  font-weight: 600;
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==== Buttons (shared) ==================================================== */
+
+button,
+#controls button,
+.control-btn {
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  border-radius: 1.2rem;
+  background: #222;
+  color: #fff;
+  border: 1px solid #444;
+}
+
+/* ==== Canvas global extras =============================================== */
+
+canvas,
+#tetris {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* ==== “Next piece preview” legacy card =================================== */
+
 #next-piece-preview.glass-card {
-  background: rgba(30, 35, 45, 0.5);
-  box-shadow: 0 6px 32px 0 rgba(20, 20, 25, 0.17);
+  background: rgba(30, 35, 45, .5);
+  box-shadow: 0 6px 32px rgba(20, 20, 25, .17);
   border-radius: 20px;
-  padding: 12px 12px 10px 12px;
+  padding: 12px 12px 10px;
   min-width: 84px;
   max-width: 120px;
   display: flex;
@@ -804,315 +774,138 @@ canvas,
   justify-content: flex-start;
   -webkit-backdrop-filter: blur(12px) saturate(120%);
   backdrop-filter: blur(12px) saturate(120%);
-  border: 2px solid rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(255, 255, 255, .12);
   margin: 0 0 16px 0;
 }
 
-#game-flex-row {
-  gap: min(5vw, 28px);
-  align-items: flex-start;
-  margin-top: 1.2rem;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  width: 100vw;
-  margin-bottom: 1em;
-}
+/* ==== Mobile small tweaks ================================================= */
 
-/* Arena styling remains unchanged */
-#next-label {
-  color: #cfe0ff;
-    font-weight: 800;
-    font-size: .98rem;
-    text-shadow: 0 1px 6px rgba(0, 0, 0, .35);
-    margin-bottom: 4px;
-}
-
-.next-canvas-wrapper,
-#next-piece-canvas {
-  background: #0b1530;
-  border: 3px solid var(--outline);
-  border-radius: 10px;
-  padding: 0;
-  box-shadow: inset 0 10px 16px rgba(0, 0, 0, .45);
-  width: 56px;
-  height: 56px;
-}
-
-.arena-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-#next-preview-panel {
-  background: linear-gradient(180deg, var(--panel) 0%, var(--panel2) 100%);
-    border: 3px solid var(--outline);
-    border-radius: 14px;
-    padding: 10px 8px;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, .35), inset 0 2px 0 rgba(255, 255, 255, .15);
-    gap: 8px;
-    min-width: 72px;
-}
-
-#game-area {
-  background: linear-gradient(180deg, #2e4b9a 0%, #2a3d7a 100%);
-  border: 6px solid var(--frame);
-  border-radius: 18px;
-  box-shadow:
-    0 10px 28px rgba(0, 0, 0, .35),
-    inset 0 2px 0 rgba(255, 255, 255, .15);
-  padding: 10px;
-  aspect-ratio: 10 / 20;
-  width: min(92vw, 360px);
-  /* Max width constraint */
-  max-height: calc(100dvh - 260px);
-  /* Reserve ~260px for controls+header */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-#main-content,
-#game-area,
-canvas,
-body {
-  -webkit-user-select: none;
-  /* iOS/Safari */
-  user-select: none;
-  -webkit-touch-callout: none;
-  /* iOS disable callout/magnifier */
-}
-
-#main-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-}
-
-#main-content,
-.tetris-viewport {
-  display: flex;
-  flex-direction: column;
-  min-height: var(--real-vh, 100vh);
-  height: var(--real-vh, 100vh);
-  align-items: center;
-  width: 100vw;
-  flex: 1 1 auto;
-  justify-content: flex-start;
-  overflow: hidden;
-  /* Prevent scroll if desired */
-  box-sizing: border-box;
-}
-
-#controls {
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  margin-top: 2vh;
-  margin-bottom: 2vh;
-  position: static;
-}
-
-.select-btn,
-.start-btn {
-  min-width: 64px;
-  height: 32px;
-  font-size: 0.7rem;
-  padding: 0 6px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  max-width: 100px;
-  border-radius: 14px;
-  font-weight: 600;
-  line-height: 1;
-}
-
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-.spinner-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-.spinner-overlay.show {
-  opacity: 1;
-  pointer-events: all;
-}
-
-#tetromino-spinner-canvas {
-  width: 96px;
-  height: 96px;
-  margin-bottom: 1.2rem;
-}
-
-#spinner-message {
-  color: #ffffffcc;
-  font-size: 1.1rem;
-  font-weight: 500;
-  text-align: center;
-}
-
-#hold-preview-panel {
-  background: linear-gradient(180deg, var(--panel) 0%, var(--panel2) 100%);
-  border: 3px solid var(--outline);
-  border-radius: 14px;
-  padding: 10px 8px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, .35), inset 0 2px 0 rgba(255, 255, 255, .15);
-  gap: 8px;
-  min-width: 72px;
-}
-
-#hold-label {
-  color: #cfe0ff;
-  font-weight: 800;
-  font-size: .98rem;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, .35);
-  margin-bottom: 4px;
-}
-
-#hold-piece-canvas {
-  background: #0b1530;
-  border: 3px solid var(--outline);
-  border-radius: 10px;
-  padding: 0;
-  box-shadow: inset 0 10px 16px rgba(0, 0, 0, .45);
-  width: 56px;
-  height: 56px;
-}
-
-@media (max-width: 600px) {
-
-  #tetris-arena-box {
-      width: min(96vw, calc((100vh - 140px) * 0.5));
+@media (max-width: 380px) {
+  :root {
+    --ui-size: 44px;
   }
 
-.dpad button,
-  .ab-btn {
-    width: 44px;
-    height: 44px;
-    font-size: 1rem;
-  }
-
-.start-select button {
-  min-width: 60px;
-  height: 22px;
-  font-size: 0.79rem;
-  padding: 0 5px; }
-
-  .select-btn,
-  .start-btn {
-    font-size: 0.79rem !important;
-    min-width: 60px;
-    max-width: 90px;
-    height: 22px;
-    padding: 0 5px;
-  }
-
-  .gameboy-controls {
-    gap: 0,5rem;
-  }
+  /* slightly smaller buttons on compact phones */
 }
 
-@media (max-width: 400px) {
-  #hold-preview-panel {
-      padding: 8px 6px;
-      min-width: 64px;
-    }
+@media (max-width: 360px) {
 
-    #hold-piece-canvas {
-      width: 48px;
-      height: 48px;
-    }
-
-  .select-btn,
-  .start-btn {
-    font-size: 0.65rem;
-    min-width: 60px;
-    padding: 0 5px;
-  }
-
-  #next-preview-panel {
-    padding: 8px 6px;
-    min-width: 64px;
-  }
-
-  #next-piece-canvas {
+  #next-piece-canvas,
+  #hold-piece-canvas {
     width: 48px;
     height: 48px;
   }
+
+  #next-preview-panel,
+  #hold-preview-panel {
+    min-width: 64px;
+    padding: 8px 6px;
+  }
+
+  .dpad-btn {
+    width: 54px;
+    height: 54px;
+  }
+
+  .ab-btn {
+    width: 64px;
+    height: 64px;
+  }
 }
+
+/* ==== Tablet / Desktop ==================================================== */
 
 @media (min-width: 768px) {
 
-    #main-content {
-      justify-content: center !important;
-    }
+  /* No on-screen controls on desktop/tablet */
+  #controls {
+    display: none !important;
+  }
 
-    #controls {
-      display: none !important;
-    }
+  :root {
+    --controls-block: 0px;
+    --ui-gap: clamp(24px, 3vh, 40px);
+    --ui-top: calc(var(--safe-top) + var(--ui-gap));
+    --top-gap: calc(var(--ui-top) + var(--ui-size) + 16px);
+  }
 
-    /* Slightly larger but still capped */
-    #game-area {
-      width: min(38vw, 460px);
-      max-height: 86vh;
-    }
+  /* Place NEXT back to the right */
+  #game-flex-row {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: min(5vw, 28px);
+    width: 100%;
+    margin: 1rem 0;
+    padding: 0 18px;
+  }
 
-    #game-flex-row {
-      margin: 2vh 0;
-    }
+  #next-preview-panel {
+    order: 0;
+  }
+
+  /* Arena width grows but must still respect height */
+  #game-area {
+    --avail-h: calc(100dvh - var(--top-gap) - 24px);
+    width: min(38vw, 480px, calc(var(--avail-h) / 2));
+    max-height: var(--avail-h);
+  }
+
+  #main-content {
+    justify-content: center;
+  }
 }
 
+/* Wide desktop: center arena under title via 3-column grid */
 @media (min-width: 1025px) {
-
-  /* keep page layout, but don't vertically center everything */
   #main-content {
-    justify-content: flex-start;
+    justify-content: center;
   }
 
-  #game-wrapper h1 {
-    margin: 1.25rem 0 1.25rem;
+  /* Adjust spacer if you want arena slightly higher/lower on desktop */
+  :root {
+    --top-gap: calc(var(--ui-top) + 28px);
   }
 
-    #game-flex-row {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      /* spacer | arena | preview */
-      align-items: start;
-      justify-items: center;
-      width: 100%;
-      gap: 0;
-    }
+  /* lift the whole game a smidge so it doesn't feel bottom-heavy */
+  #game-wrapper {
+    transform: translateY(-2vh);
+  }
 
-    #game-area {
-      grid-column: 2;
-      margin: 0 auto;
-    }
+  #game-flex-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    /* spacer | arena | next */
+    align-items: start;
+    justify-items: center;
+    gap: 0;
+    width: 100%;
+    margin: .6rem 0 0;
+  }
 
-    #next-preview-panel {
-      grid-column: 3;
-      justify-self: start;
-      margin-left: 18px;
-      margin-top: 2px;
-    }
+  #game-area {
+    grid-column: 2;
+    margin: 0 auto;
+  }
 
+  #next-preview-panel {
+    grid-column: 3;
+    justify-self: start;
+    margin-left: 18px;
+    margin-top: 2px;
+  }
+}
+
+/* ==== Short screens (landscape phones, etc.) ============================= */
+
+@media (max-height: 560px) {
+
+  /* Reserve a bit less for controls so arena can breathe */
+  :root {
+    --controls-block: clamp(140px, 24vh, 220px);
+  }
+
+  #game-wrapper::before {
+    height: calc(48px + var(--safe-top));
+  }
 }
