@@ -43,8 +43,9 @@
   /* Spacer so arena never sits under top buttons */
   --top-gap: calc(var(--ui-top) + var(--ui-size) + 12px);
 
-  /* Space reserved for on-screen controls (mobile) */
-  --controls-block: clamp(180px, 30vh, 340px);
+  /* Space reserved for on-screen controls (mobile).
+     Kept generous so controls sit above browser chrome without overlap. */
+  --controls-block: clamp(220px, 32vh, 360px);
 }
 
 /* ==== Global / Resets ===================================================== */
@@ -173,9 +174,7 @@ h1 {
   /* The playfield is 10×20 (1:2) */
   aspect-ratio: 10 / 20;
 
-  /* Fit to viewport:
-     - height is limited by what's left after top buttons + controls block
-     - width ≤ 92vw AND width ≤ (available height / 2) to keep 1:2 ratio */
+  /* Fit to viewport while keeping room for top UI and controls */
   --avail-h: calc(100dvh - var(--top-gap) - var(--controls-block) - 24px);
   width: min(92vw, calc(var(--avail-h) / 2));
   max-height: var(--avail-h);
@@ -289,6 +288,7 @@ h1 {
   transition: .3s;
 }
 
+/* keep pointer interaction when the drawer is open */
 #settings-drawer.open~#settings-hamburger {
   pointer-events: auto;
   touch-action: manipulation;
@@ -590,14 +590,24 @@ input[type="range"]::-webkit-slider-thumb {
 
 /* ==== Controls (mobile only) ============================================= */
 
+/* IN-FLOW under the arena; never overlaps the board. */
 #controls {
+  position: static;
+  /* <— back in flow */
+  left: auto;
+  right: auto;
+  bottom: auto;
+  z-index: auto;
+
   width: 100vw;
   display: flex;
   justify-content: center;
   align-items: center;
+
   margin-top: .6rem;
-  margin-bottom: 0;
-  padding-bottom: calc(16px + var(--safe-bottom));
+  margin-bottom: calc(12px + var(--safe-bottom));
+  /* keep above browser chrome */
+  padding: 0 12px;
 }
 
 .gameboy-controls {
@@ -605,7 +615,7 @@ input[type="range"]::-webkit-slider-thumb {
   justify-content: center;
   align-items: flex-end;
   flex-wrap: wrap;
-  width: 100vw;
+  width: 100%;
   gap: 1.1rem;
   box-sizing: border-box;
   flex-shrink: 0;
@@ -735,6 +745,11 @@ input[type="range"]::-webkit-slider-thumb {
   white-space: nowrap;
 }
 
+/* optional hook: hide controls via a class your JS can toggle */
+.controls-hidden #controls {
+  display: none !important;
+}
+
 /* ==== Buttons (shared) ==================================================== */
 
 button,
@@ -780,12 +795,13 @@ canvas,
 
 /* ==== Mobile small tweaks ================================================= */
 
-@media (max-width: 380px) {
-  :root {
-    --ui-size: 44px;
+/* Optional: on very small phones, keep them compact */
+@media (max-width: 380px){
+  .select-btn, .start-btn{
+    min-width: 70px;
+    height: 32px;
+    font-size: .8rem;
   }
-
-  /* slightly smaller buttons on compact phones */
 }
 
 @media (max-width: 360px) {
@@ -899,13 +915,69 @@ canvas,
 /* ==== Short screens (landscape phones, etc.) ============================= */
 
 @media (max-height: 560px) {
-
-  /* Reserve a bit less for controls so arena can breathe */
   :root {
-    --controls-block: clamp(140px, 24vh, 220px);
+    --controls-block: clamp(160px, 26vh, 240px);
   }
 
   #game-wrapper::before {
     height: calc(48px + var(--safe-top));
+  }
+}
+
+/* =========================================================
+   MOBILE: put NEXT to the RIGHT of the arena (like desktop)
+   Keeps everything inside the viewport and preserves 10:20.
+   =======================================================*/
+@media (max-width: 767.98px) {
+
+  /* Grid: [ARENA | NEXT] */
+  #game-flex-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    /* arena grows, next auto */
+    grid-auto-rows: auto;
+    align-items: start;
+    justify-content: center;
+    column-gap: clamp(8px, 4vw, 18px);
+    padding: 0 clamp(10px, 5vw, 16px);
+    /* avoid edge clipping */
+    width: 100%;
+  }
+
+  /* Arena uses the leftover width or height-limited width, whichever is smaller */
+  #game-area {
+    grid-column: 1;
+    grid-row: 1;
+    /* recompute available height with controls reserved */
+    --avail-h: calc(100dvh - var(--top-gap) - var(--controls-block) - 24px);
+    width: min(100%, calc(var(--avail-h) / 2));
+    /* 10:20 aspect respected */
+    max-height: var(--avail-h);
+  }
+
+  /* NEXT goes to the right; undo the earlier "order:-1" */
+  #next-preview-panel {
+    order: 0 !important;
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+    margin: 0;
+  }
+
+  /* Scale NEXT panel a bit on narrow screens so both fit comfortably */
+  #next-piece-canvas {
+    width: clamp(44px, 14vw, 56px);
+    height: clamp(44px, 14vw, 56px);
+  }
+}
+
+/* Optional: on very small phones, keep them compact */
+@media (max-width: 380px) {
+
+  .select-btn,
+  .start-btn {
+    min-width: 70px;
+    height: 32px;
+    font-size: .8rem;
   }
 }
